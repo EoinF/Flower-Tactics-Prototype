@@ -1,34 +1,36 @@
-import { MapGenerator } from "../MapGenerator";
 import { SoilColourConverter } from "../SoilColourConverter";
 import { MapLoader } from "../../MapLoader";
+import { Tile } from "../objects/Tile";
 
 
 export default class MainScene extends Phaser.Scene {
-
+  activeTile?: Tile;
+  highlightImage?: Phaser.GameObjects.Rectangle;
   constructor() {
     super({ key: 'MainScene' })
   }
 
   create() {
-    const seed = 1;
-
     const soilColourConverter = new SoilColourConverter();
-
     const mapLoader = new MapLoader(soilColourConverter);
-
-    const colour = new Phaser.Display.Color(255, 0, 0);
-    const soil = soilColourConverter.colourToSoil(colour);
-    const output = soilColourConverter.soilToColour(soil);
 
     const imageData = this.getMapImageData();
     const gameState = mapLoader.loadMap(imageData);
-    console.log(gameState);
     
     const sprites = gameState.tiles.map((tile, index) => {
       const x = (index % gameState.numTilesX) * 48;
       const y = Math.floor(index / gameState.numTilesX) * 48;
       const img = this.add.image(x, y, 'blank-tile');
-      return img.setTint(soilColourConverter.soilToColour(tile.soil).color);
+      img.setTint(soilColourConverter.soilToColour(tile.soil).color);
+      img.setInteractive().on('pointerup', () => {
+        if (this.highlightImage != null) {
+          this.highlightImage.destroy();
+        }
+        this.activeTile = tile;
+        this.highlightImage = this.add.rectangle(x, y, 48, 48, 0x4c00ff, 0.3);
+        this.highlightImage.setStrokeStyle(2, 0x4c00ff);
+      });
+      return img;
     });
   }
 
@@ -46,6 +48,17 @@ export default class MainScene extends Phaser.Scene {
   }
 
   update() {
+    const CAMERA_SPEED = 15;
+    const cursors = this.input.keyboard.createCursorKeys();
+    if (cursors.left && cursors.left.isDown) {
+      this.cameras.main.scrollX -= CAMERA_SPEED;
+    } else if (cursors.right && cursors.right.isDown) {
+      this.cameras.main.scrollX += CAMERA_SPEED;
+    }
+    if (cursors.down && cursors.down.isDown) {
+      this.cameras.main.scrollY += CAMERA_SPEED;
+    } else if (cursors.up && cursors.up.isDown) {
+      this.cameras.main.scrollY -= CAMERA_SPEED;
+    }
   }
 }
-//
