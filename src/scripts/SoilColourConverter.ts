@@ -2,20 +2,20 @@ import { Soil } from "./objects/Tile";
 
 
 export class SoilColourConverter {
-    private hueOffset: number;
-    private baseSaturation: number;
-    private luminosityOffset: number;
+    private maxNitrogen: number;
+    private maxPotassium: number;
+    private maxPhosphorous: number;
 
     constructor() {
-        this.hueOffset = -30;
-        this.baseSaturation = 60;
-        this.luminosityOffset = 50;
+        this.maxNitrogen = 0.3;
+        this.maxPhosphorous = 0.2;
+        this.maxPotassium = 0.2;
     }
     
     colourToSoil(colour: Phaser.Display.Color): Soil {
-        const phosphorousContent = 1 - (colour.h * 240 - this.hueOffset) / 54;
-        const nitrogenContent = 1 - (colour.v * 240 - this.luminosityOffset) / 240;
-        const potassiumContent = (colour.s * 240 - this.baseSaturation) / 240 - nitrogenContent - phosphorousContent;
+        let phosphorousContent = (1 - colour.h * (240 / 54)) * this.maxPhosphorous;
+        let nitrogenContent = (1 - colour.v) * this.maxNitrogen;
+        let potassiumContent = (colour.s * 0.8 + colour.v * 0.1 + colour.h * 0.1) * this.maxPotassium;
 
         return {
             phosphorousContent,
@@ -25,14 +25,14 @@ export class SoilColourConverter {
     }
 
     soilToColour(soil: Soil): Phaser.Display.Color {
-        const hue = Math.max(0, this.hueOffset + 54 * (1 - soil.phosphorousContent));
-        const saturation = this.baseSaturation + 240 * (soil.nitrogenContent + soil.phosphorousContent + soil.potassiumContent);
-        const luminosity = this.luminosityOffset + 240 * (1 - soil.nitrogenContent);
+        const hue = (54 / 240) * (1 - soil.phosphorousContent / this.maxPhosphorous);
+        const luminosity = (1 - soil.nitrogenContent / this.maxNitrogen);
+        const saturation = ((10 * soil.potassiumContent / this.maxPotassium) - luminosity - hue) / 8;
 
         return Phaser.Display.Color.HSVToRGB(
-            hue / 240,
-            saturation / 240,
-            luminosity / 240
+            hue,
+            saturation,
+            luminosity
         ) as Phaser.Display.Color;
     }
 }
