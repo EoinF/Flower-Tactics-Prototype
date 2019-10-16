@@ -1,13 +1,28 @@
 import { SoilColourConverter } from "./scripts/SoilColourConverter";
-import { Tile, DEFAULT_SOIL } from "./scripts/objects/Tile";
+import { Tile } from "./scripts/objects/Tile";
 import { GameState } from "./scripts/GameState";
+import { Flower } from "./scripts/objects/Flower";
+
+export interface ObjectData {
+    flowers: Array<Flower>;
+}
 
 export class MapLoader {
     soilColourConverter: SoilColourConverter;
     constructor(soilColourConverter: SoilColourConverter) {
         this.soilColourConverter = soilColourConverter;
     }
-    public loadMap(imageData: ImageData): GameState {
+    public loadMap(imageData: ImageData, objectData: ObjectData): GameState {
+        const {tiles, numTilesX, numTilesY} = this.loadTiles(imageData);
+        return {
+            numTilesX,
+            numTilesY,
+            tiles,
+            ...objectData
+        }
+    }
+
+    private loadTiles(imageData: ImageData) {
         const numTilesX = imageData.width;
         const numTilesY = imageData.height;
 
@@ -24,10 +39,6 @@ export class MapLoader {
                 tile.soil = this.soilColourConverter.colourToSoil(colour);
                 return tile;
             });
-        return {
-            numTilesX,
-            numTilesY,
-            tiles
-        }
+        return {tiles, numTilesX, numTilesY};
     }
 }

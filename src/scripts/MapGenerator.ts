@@ -19,8 +19,9 @@ export class MapGenerator {
         return {
             numTilesX,
             numTilesY,
-            tiles: this.generateTiles(numTilesX, numTilesY)
-        }
+            tiles: this.generateTiles(numTilesX, numTilesY),
+            flowers: []
+        };
     }
     
     private generateTiles(numTilesX: number, numTilesY: number): Tile[] {

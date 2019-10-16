@@ -1,7 +1,7 @@
 import { SoilColourConverter } from "../SoilColourConverter";
 import { MapLoader } from "../../MapLoader";
 import { SelectedTileView } from "../views/SelectedTileView";
-
+import objectData from '../../assets/maps/objects.json';
 
 export default class MainScene extends Phaser.Scene {
   constructor() {
@@ -14,9 +14,9 @@ export default class MainScene extends Phaser.Scene {
     const selectedTileView = new SelectedTileView(this);
 
     const imageData = this.getMapImageData();
-    const gameState = mapLoader.loadMap(imageData);
+    const gameState = mapLoader.loadMap(imageData, objectData);
     
-    const sprites = gameState.tiles.map((tile, index) => {
+    const tileSprites = gameState.tiles.map((tile, index) => {
       const x = (index % gameState.numTilesX) * 48;
       const y = Math.floor(index / gameState.numTilesX) * 48;
       const img = this.add.image(x, y, 'blank-tile');
@@ -24,6 +24,14 @@ export default class MainScene extends Phaser.Scene {
       img.setInteractive().on('pointerup', () => {
         selectedTileView.setActiveTile(tile, x, y);
       });
+      return img;
+    });
+    
+    const flowerSprites = gameState.flowers.map((flower) => {
+      const x = flower.x * 48;
+      const y = flower.y * 48;
+      const img = this.add.image(x, y, 'flower');
+      img.setScale(flower.amount);
       return img;
     });
   }
@@ -34,7 +42,7 @@ export default class MainScene extends Phaser.Scene {
     let ctx = cnv.getContext();
     ctx.clearRect(0, 0, frame.width, frame.height);
     ctx.drawImage(frame.source.image, 0, 0, frame.width, frame.height, 0, 0, frame.width, frame.height);
-    
+
     const imageData = ctx.getImageData(0, 0, frame.width, frame.height);
     return imageData;
   }
