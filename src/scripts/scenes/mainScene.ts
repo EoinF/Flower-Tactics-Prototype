@@ -1,7 +1,7 @@
 import { SoilColourConverter } from "../SoilColourConverter";
 import { MapLoader } from "../../MapLoader";
-import { SelectedTileView } from "../views/SelectedTileView";
 import objectData from '../../assets/maps/objects.json';
+import { MapView } from "../views/MapView";
 
 export default class MainScene extends Phaser.Scene {
   constructor() {
@@ -11,42 +11,11 @@ export default class MainScene extends Phaser.Scene {
   create() {
     const soilColourConverter = new SoilColourConverter();
     const mapLoader = new MapLoader(soilColourConverter);
-    const selectedTileView = new SelectedTileView(this);
 
     const imageData = this.getMapImageData();
     const gameState = mapLoader.loadMap(imageData, objectData);
     
-    const tileSprites = gameState.tiles.map((tile, index) => {
-      const x = (index % gameState.numTilesX) * 48;
-      const y = Math.floor(index / gameState.numTilesX) * 48;
-      const img = this.add.image(x, y, 'blank-tile');
-      img.setTint(soilColourConverter.soilToColour(tile.soil).color);
-      img.setInteractive().on('pointerup', () => {
-        selectedTileView.setActiveTile(tile, x, y);
-      });
-      return img;
-    });
-    
-    const flowerSprites = gameState.flowers.map((flower) => {
-      const x = flower.x * 48;
-      const y = flower.y * 48;
-      const img = this.add.image(x, y, 'flower');
-      img.setScale(flower.amount);
-      return img;
-    });
-
-    const mountainSprites = gameState.mountains.map((mountain) => {
-      const x = mountain.x * 48;
-      const y = mountain.y * 48;
-      const img = this.add.image(x, y, 'mountain');
-      return img;
-    });
-    const riverSprites = gameState.rivers.map((river) => {
-      const x = river.x * 48;
-      const y = river.y * 48;
-      const img = this.add.image(x, y, 'river');
-      return img;
-    });
+    const mapView = new MapView(this, gameState, soilColourConverter);
   }
 
   getMapImageData() {
