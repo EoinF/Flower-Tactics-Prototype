@@ -2,9 +2,13 @@ import { SoilColourConverter } from "./scripts/SoilColourConverter";
 import { Tile } from "./scripts/objects/Tile";
 import { GameState } from "./scripts/GameState";
 import { Flower } from "./scripts/objects/Flower";
+import { Mountain } from "./scripts/objects/Mountain";
+import { River } from "./scripts/objects/River";
 
 export interface ObjectData {
-    flowers: Array<Flower>;
+    flowers: Flower[];
+    mountains: Mountain[];
+    rivers: River[];
 }
 
 export class MapLoader {

@@ -34,6 +34,19 @@ export default class MainScene extends Phaser.Scene {
       img.setScale(flower.amount);
       return img;
     });
+
+    const mountainSprites = gameState.mountains.map((mountain) => {
+      const x = mountain.x * 48;
+      const y = mountain.y * 48;
+      const img = this.add.image(x, y, 'mountain');
+      return img;
+    });
+    const riverSprites = gameState.rivers.map((river) => {
+      const x = river.x * 48;
+      const y = river.y * 48;
+      const img = this.add.image(x, y, 'river');
+      return img;
+    });
   }
 
   getMapImageData() {
