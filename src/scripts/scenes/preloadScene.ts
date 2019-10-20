@@ -1,3 +1,8 @@
+import { SoilColourConverter } from "../SoilColourConverter";
+import { MapLoader } from "../../MapLoader";
+import { gameStateManager } from "../game";
+import objectData from '../../assets/maps/objects.json';
+
 export default class PreloadScene extends Phaser.Scene {
   constructor() {
     super({ key: 'PreloadScene' })
@@ -10,9 +15,28 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('river', 'assets/img/river.png');
     this.load.image('map1-soil', 'assets/maps/soil.bmp');
   }
+  
+  getMapImageData() {
+    const frame = this.textures.getFrame('map1-soil');
+    const cnv = this.textures.createCanvas('temp', frame.width, frame.height);
+    let ctx = cnv.getContext();
+    ctx.clearRect(0, 0, frame.width, frame.height);
+    ctx.drawImage(frame.source.image, 0, 0, frame.width, frame.height, 0, 0, frame.width, frame.height);
+
+    const imageData = ctx.getImageData(0, 0, frame.width, frame.height);
+    return imageData;
+  }
 
   create() {
+    const soilColourConverter = new SoilColourConverter();
+    const mapLoader = new MapLoader(soilColourConverter);
+
+    const imageData = this.getMapImageData();
+
+    gameStateManager.setState(mapLoader.loadMap(imageData, objectData));
+
     this.scene.start('MainScene')
+    this.scene.start('UIScene')
 
     /**
      * This is how you would dynamically import the mainScene class (with code splitting),

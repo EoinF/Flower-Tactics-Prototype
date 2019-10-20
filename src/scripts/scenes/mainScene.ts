@@ -1,7 +1,6 @@
 import { SoilColourConverter } from "../SoilColourConverter";
-import { MapLoader } from "../../MapLoader";
-import objectData from '../../assets/maps/objects.json';
 import { MapView } from "../views/MapView";
+import { gameStateManager } from "../game";
 
 export default class MainScene extends Phaser.Scene {
   constructor() {
@@ -10,23 +9,7 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     const soilColourConverter = new SoilColourConverter();
-    const mapLoader = new MapLoader(soilColourConverter);
-
-    const imageData = this.getMapImageData();
-    const gameState = mapLoader.loadMap(imageData, objectData);
-    
-    const mapView = new MapView(this, gameState, soilColourConverter);
-  }
-
-  getMapImageData() {
-    const frame = this.textures.getFrame('map1-soil');
-    const cnv = this.textures.createCanvas('temp', frame.width, frame.height);
-    let ctx = cnv.getContext();
-    ctx.clearRect(0, 0, frame.width, frame.height);
-    ctx.drawImage(frame.source.image, 0, 0, frame.width, frame.height, 0, 0, frame.width, frame.height);
-
-    const imageData = ctx.getImageData(0, 0, frame.width, frame.height);
-    return imageData;
+    const mapView = new MapView(this, gameStateManager, soilColourConverter);
   }
 
   update() {

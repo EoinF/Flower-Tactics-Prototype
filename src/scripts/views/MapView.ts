@@ -1,28 +1,28 @@
 import { GameState } from "../GameState";
 import { SoilColourConverter } from "../SoilColourConverter";
 import { SelectedTileView } from "./SelectedTileView";
+import { GameStateManager } from "../GameStateManager";
 
 export class MapView {
     selectedTileView: SelectedTileView;
-    
+
     tileSprites: Phaser.GameObjects.Image[];
     flowerSprites: Phaser.GameObjects.Image[];
     mountainSprites: Phaser.GameObjects.Image[];
     riverSprites: Phaser.GameObjects.Image[];
 
-    constructor(scene: Phaser.Scene, gameState: GameState, soilColourConverter: SoilColourConverter) {
-        this.selectedTileView = new SelectedTileView(scene);
-        this.setupSprites(scene, gameState, soilColourConverter);
-        this.setupCallbacks();
+    constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, soilColourConverter: SoilColourConverter) {
+        this.selectedTileView = new SelectedTileView(scene, gameStateManager);
+        this.setupSprites(scene, gameStateManager.gameState, soilColourConverter);
+        this.setupCallbacks(gameStateManager);
     }
 
     setupSprites(scene: Phaser.Scene, gameState: GameState, soilColourConverter: SoilColourConverter) {
         this.tileSprites = gameState.tiles.map((tile, index) => {
-            const x = (index % gameState.numTilesX) * 48;
-            const y = Math.floor(index / gameState.numTilesX) * 48;
-            const img = scene.add.image(x, y, 'blank-tile');
+            const x = (index % gameState.numTilesX);
+            const y = Math.floor(index / gameState.numTilesX);
+            const img = scene.add.image(x * 48, y * 48, 'blank-tile');
             img.setTint(soilColourConverter.soilToColour(tile.soil).color);
-            img.setData("tile", tile);
             img.setData("x", x);
             img.setData("y", y);
             return img;
@@ -50,15 +50,17 @@ export class MapView {
           });
     }
 
-    setupCallbacks() {
+    setupCallbacks(gameStateManager: GameStateManager) {
         this.tileSprites.forEach(img => {
             img.setInteractive().on('pointerup', () => {
                 this.selectedTileView.setActiveTile(
-                    img.getData("tile"), 
-                    img.getData("x"), 
+                    img.getData("x"),
                     img.getData("y")
                 );
             });
+        });
+
+        gameStateManager.onChange(() => {
         });
     }
 }
