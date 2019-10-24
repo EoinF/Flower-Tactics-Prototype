@@ -1,10 +1,16 @@
 import { Tile } from "./objects/Tile";
-import { GameState } from "./GameState";
+import { GameStateData } from "./GameState";
+import { River } from "./objects/River";
 
 export interface MapGeneratorConfig {
     numTilesX: number;
     numTilesY: number;
 }
+
+const DEFAULT_MAP_CONFIG: MapGeneratorConfig = {
+    numTilesX: 10,
+    numTilesY: 10
+};
 
 export class MapGenerator {
     rnd: Phaser.Math.RandomDataGenerator
@@ -13,30 +19,40 @@ export class MapGenerator {
     }
 
     public generateNewMap({
-        numTilesX = 10,
-        numTilesY = 10
-    }: MapGeneratorConfig): GameState {
+        numTilesX,
+        numTilesY
+    }: MapGeneratorConfig = DEFAULT_MAP_CONFIG): GameStateData {
         return {
             numTilesX,
             numTilesY,
             tiles: this.generateTiles(numTilesX, numTilesY),
             flowers: [],
             mountains: [],
-            rivers: []
+            rivers: this.generateRivers(numTilesX, numTilesY),
+            flowerTypes: {}
         };
     }
     
     private generateTiles(numTilesX: number, numTilesY: number): Tile[] {
         return new Array<Tile | undefined>(numTilesX * numTilesY)
             .fill(undefined)
-            .map(() => new Tile())
-            .map((tile, index) => {
+            .map((_, index) => new Tile(index))
+            .map((tile) => {
                 tile.soil = {
-                    nitrogenContent: 0.3 + 0.2 * this.rnd.frac(),
-                    potassiumContent: 0.25 + 0.05 * this.rnd.frac(),
-                    phosphorousContent: 0.15 + 0.05 * this.rnd.frac()
+                    nitrogenContent: 0.09 * this.rnd.frac(),
+                    potassiumContent: 0.07 * this.rnd.frac(),
+                    phosphorousContent: 0.1 * this.rnd.frac()
                 }
                 return tile;
             });
+    }
+
+    private generateRivers(numTilesX: number, numTilesY: number): River[] {
+        return new Array<River | undefined>(numTilesX * numTilesY)
+            .fill(undefined)
+            .map((_, index) => ({
+                x: index % numTilesX,
+                y: Math.floor(index / numTilesX)
+            }));
     }
 }

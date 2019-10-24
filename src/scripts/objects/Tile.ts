@@ -1,3 +1,5 @@
+import { Flower } from "./Flower";
+
 export const DEFAULT_SOIL = {
     nitrogenContent: 0,
     potassiumContent: 0,
@@ -11,9 +13,13 @@ export interface Soil {
 }
 
 export class Tile {
+    index: number;
+    flowers: Flower[];
     soil: Soil;
 
-    constructor(soil: Soil = DEFAULT_SOIL) {
+    constructor(index: number, soil: Soil = DEFAULT_SOIL, flowers: Flower[] = []) {
+        this.index = index;
         this.soil = {...soil};
+        this.flowers = flowers;
     }
 }

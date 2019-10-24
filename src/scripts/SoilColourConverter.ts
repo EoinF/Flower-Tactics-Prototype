@@ -1,4 +1,5 @@
 import { Soil } from "./objects/Tile";
+import { HSLColor } from "./extensions";
 
 
 export class SoilColourConverter {
@@ -7,15 +8,15 @@ export class SoilColourConverter {
     private maxPhosphorous: number;
 
     constructor() {
-        this.maxNitrogen = 0.3;
+        this.maxNitrogen = 0.2;
         this.maxPhosphorous = 0.2;
         this.maxPotassium = 0.2;
     }
     
-    colourToSoil(colour: Phaser.Display.Color): Soil {
+    colourToSoil(colour: HSLColor): Soil {
         let phosphorousContent = (1 - colour.h * (240 / 54)) * this.maxPhosphorous;
-        let nitrogenContent = (1 - colour.v) * this.maxNitrogen;
-        let potassiumContent = (colour.s * 0.8 + colour.v * 0.1 + colour.h * 0.1) * this.maxPotassium;
+        let nitrogenContent = (1 - colour.l) * this.maxNitrogen;
+        let potassiumContent = (colour.s * 0.8 + colour.l * 0.1 + colour.h * 0.1) * this.maxPotassium;
 
         return {
             phosphorousContent,
@@ -29,10 +30,10 @@ export class SoilColourConverter {
         const luminosity = (1 - soil.nitrogenContent / this.maxNitrogen);
         const saturation = ((10 * soil.potassiumContent / this.maxPotassium) - luminosity - hue) / 8;
 
-        return Phaser.Display.Color.HSVToRGB(
+        return Phaser.Display.Color.HSLToColor(
             hue,
             saturation,
             luminosity
-        ) as Phaser.Display.Color;
+        );
     }
 }

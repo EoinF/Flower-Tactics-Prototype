@@ -1,4 +1,4 @@
-export class River {
+export interface River {
     x: number;
     y: number;
 }

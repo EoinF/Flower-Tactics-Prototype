@@ -1,4 +1,5 @@
 import { GameStateManager } from "../GameStateManager";
+import { Tile } from "../objects/Tile";
 
 const POPUP_OFFSET = {
     x: 0,
@@ -31,11 +32,7 @@ export class SelectedTileView {
         this.gameStateManager.onChange((newState) =>{
             if (this.activeTileIndex != null) {
                 const tile = newState.tiles[this.activeTileIndex];
-                        
-                const nitrogenContent = (tile.soil.nitrogenContent * 100).toFixed(2);
-                const phosphorousContent = (tile.soil.phosphorousContent * 100).toFixed(2);
-                const potassiumContent = (tile.soil.potassiumContent * 100).toFixed(2);
-                this.popupText.setText(`N = ${nitrogenContent}%\nP = ${phosphorousContent}%\nK = ${potassiumContent}%`);
+                this.updatePopupText(tile);
             }
         })
     }
@@ -53,12 +50,31 @@ export class SelectedTileView {
             .setVisible(true)
             .setPosition(POPUP_OFFSET.x + x, POPUP_OFFSET.y + y);
         
-        const nitrogenContent = (tile.soil.nitrogenContent * 100).toFixed(2);
-        const phosphorousContent = (tile.soil.phosphorousContent * 100).toFixed(2);
-        const potassiumContent = (tile.soil.potassiumContent * 100).toFixed(2);
+
         this.popupText
             .setVisible(true)
-            .setPosition(POPUP_OFFSET.x + x, POPUP_OFFSET.y + y)
-            .setText(`N = ${nitrogenContent}%\nP = ${phosphorousContent}%\nK = ${potassiumContent}%`);
+            .setPosition(POPUP_OFFSET.x + x, POPUP_OFFSET.y + y);
+        this.updatePopupText(tile);
+    }
+
+    updatePopupText(tile: Tile) {
+        const nitrogenContent = (tile.soil.nitrogenContent * 100).toFixed(1);
+        const phosphorousContent = (tile.soil.phosphorousContent * 100).toFixed(1);
+        const potassiumContent = (tile.soil.potassiumContent * 100).toFixed(1);
+        
+        let lines = [
+            `N = ${nitrogenContent}%`,
+            `P = ${phosphorousContent}%`,
+            `K = ${potassiumContent}%`
+        ];
+
+        if (tile.flowers.length > 0) {
+            lines = [
+                ...tile.flowers.map(flower => `${this.gameStateManager.gameState.getFlowerType(flower).name}: ${(flower.amount * 100)}%`),
+                ...lines
+            ]
+        }
+
+        this.popupText.setText(lines);
     }
 }

@@ -1,4 +1,19 @@
 {
+    "flowerTypes": {
+        "1": {
+            "name": "Daisy",
+            "growthRate": 0.1,
+            "nitrogenRequirements": {
+                "min": 0.12, "max": 0.15
+            },
+            "phosphorousRequirements": {
+                "min": 0.1, "max": 0.15
+            },
+            "potassiumRequirements": {
+                "min": 0.7, "max": 0.1
+            }
+        }
+    },
     "rivers": [
         {
             "x": 17,
@@ -55,47 +70,56 @@
         {
             "x": 1,
             "y": 1,
+            "type": "1",
             "amount": 0.5
         },
         {
             "x": 14,
             "y": 14,
-            "amount": 1
+            "type": "1",
+            "amount": 0.3
         },
         {
             "x": 15,
             "y": 14,
-            "amount": 1
+            "type": "1",
+            "amount": 0.1
         },
         {
             "x": 15,
             "y": 15,
-            "amount": 1
+            "type": "1",
+            "amount": 0.1
         },
         {
             "x": 14,
             "y": 15,
-            "amount": 1
+            "type": "1",
+            "amount": 0.1
         },
         {
             "x": 25,
             "y": 25,
-            "amount": 1
+            "type": "1",
+            "amount": 0.1
         },
         {
             "x": 26,
             "y": 25,
-            "amount": 1
+            "type": "1",
+            "amount": 0.1
         },
         {
             "x": 26,
             "y": 26,
-            "amount": 1
+            "type": "1",
+            "amount": 0.1
         },
         {
             "x": 25,
             "y": 26,
-            "amount": 1
+            "type": "1",
+            "amount": 0.1
         }
     ]
 }

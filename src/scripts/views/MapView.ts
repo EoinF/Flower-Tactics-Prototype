@@ -4,6 +4,7 @@ import { SelectedTileView } from "./SelectedTileView";
 import { GameStateManager } from "../GameStateManager";
 
 export class MapView {
+    soilColourConverter: SoilColourConverter;
     selectedTileView: SelectedTileView;
 
     tileSprites: Phaser.GameObjects.Image[];
@@ -12,6 +13,7 @@ export class MapView {
     riverSprites: Phaser.GameObjects.Image[];
 
     constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, soilColourConverter: SoilColourConverter) {
+        this.soilColourConverter = soilColourConverter;
         this.selectedTileView = new SelectedTileView(scene, gameStateManager);
         this.setupSprites(scene, gameStateManager.gameState, soilColourConverter);
         this.setupCallbacks(gameStateManager);
@@ -60,7 +62,11 @@ export class MapView {
             });
         });
 
-        gameStateManager.onChange(() => {
+        gameStateManager.onChange((newState) => {
+          this.tileSprites.forEach(img => {
+            const tile = newState.getTileAt(img.getData("x"), img.getData("y"));
+            img.setTint(this.soilColourConverter.soilToColour(tile.soil).color);
+          })
         });
     }
 }

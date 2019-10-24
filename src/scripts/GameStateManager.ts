@@ -1,5 +1,6 @@
-import { GameState } from "./GameState";
-import { Tile, Soil } from "./objects/Tile";
+import { GameState, GameStateData } from "./GameState";
+import { applyRiverEffect } from "./applyEffectToTile";
+import { River } from "./objects/River";
 
 export class GameStateManager {
     private seed: number;
@@ -10,24 +11,32 @@ export class GameStateManager {
         this.callbacks = [];
     }
 
-    setState(gameState: GameState) {
-        this.gameState = gameState;
+    setState(gameStateOrData: GameState | GameStateData) {
+        if (gameStateOrData instanceof GameState) {
+            this.gameState = gameStateOrData;
+        } else {
+            this.gameState = new GameState(gameStateOrData)
+        }
     }
 
     nextState() {
-        const copiedState = JSON.parse(JSON.stringify(this.gameState)) as GameState;
+        const copiedData = JSON.parse(JSON.stringify(this.gameState)) as GameStateData;
+        const copiedState = new GameState(copiedData);
 
-        this.gameState.rivers.forEach(river => {
-            const tileIndex = river.x + river.y * this.gameState.numTilesX;
-            const tile = copiedState.tiles[tileIndex];
-            tile.soil.nitrogenContent += 0.001;
-            tile.soil.phosphorousContent += 0.001;
-            tile.soil.potassiumContent += 0.001;
-        });
+        this.gameState.rivers.forEach(river => this.applyRiverEffect(river, copiedState));
 
         this.gameState = copiedState;
-        
         this.callbacks.forEach(callback => callback(this.gameState));
+    }
+
+    applyRiverEffect(river: River, copiedState: GameState) {
+        const centreTile = copiedState.getTileAt(river.x, river.y);
+
+        copiedState.updateTile(applyRiverEffect(centreTile, 1));
+
+        copiedState.getTilesAdjacent(river.x, river.y)
+            .map(tile => applyRiverEffect(tile, 0.5))
+            .forEach(tile => copiedState.updateTile(tile));
     }
 
     onChange(callback: (gameState: GameState) => void) {

@@ -1,7 +1,8 @@
 import { SoilColourConverter } from "../SoilColourConverter";
-import { MapLoader } from "../../MapLoader";
+import { MapLoader } from "../MapLoader";
 import { gameStateManager } from "../game";
 import objectData from '../../assets/maps/objects.json';
+import { MapGenerator } from "../MapGenerator";
 
 export default class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -32,7 +33,9 @@ export default class PreloadScene extends Phaser.Scene {
     const mapLoader = new MapLoader(soilColourConverter);
 
     const imageData = this.getMapImageData();
+    const mapGenerator = new MapGenerator(1);
 
+    // gameStateManager.setState(mapGenerator.generateNewMap({numTilesX: 100, numTilesY: 100}));
     gameStateManager.setState(mapLoader.loadMap(imageData, objectData));
 
     this.scene.start('MainScene')

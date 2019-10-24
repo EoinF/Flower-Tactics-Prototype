@@ -6,7 +6,7 @@ export class GuiView {
             width, height
         } = scene.game.canvas;
         console.log(width, height);
-        const rectangle = scene.add.rectangle(width - 10, height - 10, 98, 24, 0xeeddff)
+        const rectangle = scene.add.rectangle(width - 10, height - 10, 98, 24, 0xeeddff);
         rectangle.setInteractive().on('pointerup', () => {
             controller.nextTurn();
         });
