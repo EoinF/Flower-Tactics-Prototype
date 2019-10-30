@@ -51,6 +51,17 @@ export class GameState implements GameStateData {
         return this.tileToFlowerMap.get(tile) || [];
     }
 
+    getFlowerByTypeAt(type: string, x: number, y: number) {
+        const flowers = this.tileToFlowerMap.get(this.getTileAt(x, y));
+        if (flowers != null) {
+            const flower = flowers.find(f => f.type === type);
+            if (flower != null) {
+                return flower;
+            }
+        } 
+        throw Error(`No flower of type ${type} found at (${x},${y})`);    
+    }
+
     getTileAt(x: number, y: number): Tile {
         const tileIndex = x + y * this.numTilesX;
         return this.tiles[tileIndex];

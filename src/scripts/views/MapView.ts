@@ -32,6 +32,9 @@ export class MapView {
           this.flowerSprites = gameState.flowers.map((flower) => {
             const img = scene.add.image(flower.x * 48, flower.y * 48, 'flower');
             img.setScale(flower.amount);
+            img.setData("x", flower.x);
+            img.setData("y", flower.y);
+            img.setData("type", flower.type);
             return img;
           });
       
@@ -66,6 +69,10 @@ export class MapView {
           this.tileSprites.forEach(img => {
             const tile = newState.getTileAt(img.getData("x"), img.getData("y"));
             img.setTint(this.soilColourConverter.soilToColour(tile.soil).color);
+          })
+          this.flowerSprites.forEach(img => {
+            const flower = newState.getFlowerByTypeAt(img.getData("type"), img.getData("x"), img.getData("y"));
+            img.setScale(flower.amount);
           })
         });
     }

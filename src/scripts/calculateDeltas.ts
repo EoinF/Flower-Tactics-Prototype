@@ -28,7 +28,9 @@ export function getFlowerEffect(tile: Tile, flowers: Flower[], flowerTypes: Stri
     if (nitrogenRequirements.min <= tile.soil.nitrogenContent && tile.soil.nitrogenContent <= nitrogenRequirements.max
         && phosphorousRequirements.min <= tile.soil.phosphorousContent && tile.soil.phosphorousContent <= phosphorousRequirements.max
         && potassiumRequirements.min <= tile.soil.potassiumContent && tile.soil.potassiumContent <= potassiumRequirements.max) {
-        flowerDelta.set(flower, {amount: growthRate});
+        
+        console.log("delta: " + growthRate);
+        flowerDelta.set(flower, {amount: growthRate * 0.6});
     }
     const soilDelta = {
         nitrogen: -0.01 * growthRate * flower.amount,

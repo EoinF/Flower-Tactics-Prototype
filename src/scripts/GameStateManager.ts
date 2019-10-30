@@ -33,10 +33,7 @@ export class GameStateManager {
         } else {
             this.gameState = new GameState(gameStateOrData)
         }
-        this.calculateDelta();
-    }
-
-    calculateDelta() {
+        
         const totalTiles = this.gameState.tiles.length;
         this.gameStateDelta = {
             tileSoilDelta: new Array<SoilDelta | undefined>(totalTiles)
@@ -48,6 +45,18 @@ export class GameStateManager {
                 })),
             flowerDelta: new Map<Flower, FlowerDelta>()
         };
+        this.calculateDelta();
+    }
+
+    calculateDelta() {
+        this.gameStateDelta.flowerDelta.clear();
+        this.gameStateDelta.tileSoilDelta.forEach((_, index, array) => {
+            array[index] = {
+                nitrogen: 0,
+                potassium: 0,
+                phosphorous: 0
+            };
+        })
         this.calculateRiverEffects(this.gameStateDelta);
         this.calculateFlowerEffects(this.gameStateDelta);
     }
@@ -70,6 +79,7 @@ export class GameStateManager {
 
         this.gameState = new GameState(copiedData);
         this.callbacks.forEach(callback => callback(this.gameState));
+        this.calculateDelta();
     }
 
     private calculateRiverEffects(gameStateDelta: GameStateDelta) {

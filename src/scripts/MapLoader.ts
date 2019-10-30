@@ -38,15 +38,12 @@ export class MapLoader {
             .fill(undefined)
             .map((_, index) => new Tile(index))
             .map((tile, index) => {
-                const x = index % numTilesX;
-                const y = Math.floor(index / numTilesX);
                 const colour = RGBtoHSL(
                     imageData.data[(index * 4)],
                     imageData.data[(index * 4) + 1],
                     imageData.data[(index * 4) + 2]
                 );
                 tile.soil = this.soilColourConverter.colourToSoil(colour);
-                tile.flowers = objectData.flowers.filter(flower => flower.x == x && flower.y == y);
                 return tile;
             });
         return {tiles, numTilesX, numTilesY};

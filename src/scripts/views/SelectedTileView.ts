@@ -1,5 +1,6 @@
 import { GameStateManager } from "../GameStateManager";
 import { Tile } from "../objects/Tile";
+import { Flower } from "../objects/Flower";
 
 const POPUP_OFFSET = {
     x: 0,
@@ -23,16 +24,16 @@ export class SelectedTileView {
             .setStrokeStyle(1, 0x1a0033)
             .setDepth(2)
             .setVisible(false);
-        this.popupText = scene.add.text(0, 0, "hello world")
+        this.popupText = scene.add.text(0, 0, "...")
             .setColor("#000")
             .setDepth(2)
             .setOrigin(0.5, 0.5)
             .setVisible(false);
 
-        this.gameStateManager.onChange((newState) =>{
+        this.gameStateManager.onChange((newState) => {
             if (this.activeTileIndex != null) {
                 const tile = newState.tiles[this.activeTileIndex];
-                this.updatePopupText(tile);
+                this.updatePopupText(tile, newState.getFlowersAtTile(tile));
             }
         })
     }
@@ -54,10 +55,10 @@ export class SelectedTileView {
         this.popupText
             .setVisible(true)
             .setPosition(POPUP_OFFSET.x + x, POPUP_OFFSET.y + y);
-        this.updatePopupText(tile);
+        this.updatePopupText(tile, this.gameStateManager.gameState.getFlowersAtTile(tile));
     }
 
-    updatePopupText(tile: Tile) {
+    updatePopupText(tile: Tile, flowers: Flower[]) {
         const nitrogenContent = (tile.soil.nitrogenContent * 100).toFixed(2);
         const phosphorousContent = (tile.soil.phosphorousContent * 100).toFixed(2);
         const potassiumContent = (tile.soil.potassiumContent * 100).toFixed(2);
@@ -68,9 +69,9 @@ export class SelectedTileView {
             `K = ${potassiumContent}%`
         ];
 
-        if (tile.flowers.length > 0) {
+        if (flowers.length > 0) {
             lines = [
-                ...tile.flowers.map(flower => `${this.gameStateManager.gameState.getFlowerType(flower).name}: ${(flower.amount * 100)}%`),
+                ...flowers.map(flower => `${this.gameStateManager.gameState.getFlowerType(flower).name}: ${(flower.amount * 100)}%`),
                 ...lines
             ]
         }
