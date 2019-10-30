@@ -21,8 +21,7 @@ export class MapView {
 
     setupSprites(scene: Phaser.Scene, gameState: GameState, soilColourConverter: SoilColourConverter) {
         this.tileSprites = gameState.tiles.map((tile, index) => {
-            const x = (index % gameState.numTilesX);
-            const y = Math.floor(index / gameState.numTilesX);
+            const {x, y} = this.indexToMapCoordinates(index, gameState.numTilesX);
             const img = scene.add.image(x * 48, y * 48, 'blank-tile');
             img.setTint(soilColourConverter.soilToColour(tile.soil).color);
             img.setData("x", x);
@@ -31,25 +30,26 @@ export class MapView {
           });
           
           this.flowerSprites = gameState.flowers.map((flower) => {
-            const x = flower.x * 48;
-            const y = flower.y * 48;
-            const img = scene.add.image(x, y, 'flower');
+            const img = scene.add.image(flower.x * 48, flower.y * 48, 'flower');
             img.setScale(flower.amount);
             return img;
           });
       
           this.mountainSprites = gameState.mountains.map((mountain) => {
-            const x = mountain.x * 48;
-            const y = mountain.y * 48;
-            const img = scene.add.image(x, y, 'mountain');
+            const img = scene.add.image(mountain.x * 48, mountain.y * 48, 'mountain');
             return img;
           });
           this.riverSprites = gameState.rivers.map((river) => {
-            const x = river.x * 48;
-            const y = river.y * 48;
-            const img = scene.add.image(x, y, 'river');
+            const img = scene.add.image(river.x * 48, river.y * 48, 'river');
             return img;
           });
+    }
+
+    indexToMapCoordinates(index: number, numTilesX: number) {
+      return { 
+        x: (index % numTilesX),
+        y: Math.floor(index / numTilesX)
+      };
     }
 
     setupCallbacks(gameStateManager: GameStateManager) {

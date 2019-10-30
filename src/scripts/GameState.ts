@@ -16,11 +16,6 @@ export interface GameStateData {
 }
 
 export class GameState implements GameStateData {
-    constructor(data: GameStateData) {
-        Object.keys(data).forEach(key => {
-            this[key] = data[key];
-        })
-    }
     numTilesX: number;
     numTilesY: number;
     tiles: Tile[];
@@ -28,6 +23,33 @@ export class GameState implements GameStateData {
     mountains: Mountain[];
     rivers: River[];
     flowerTypes: StringMap<FlowerType>;
+
+    tileToFlowerMap: Map<Tile, Flower[]>;
+
+    constructor(data: GameStateData) {
+        Object.keys(data).forEach(key => {
+            this[key] = data[key];
+        });
+        this.tileToFlowerMap = new Map<Tile, Flower[]>();
+
+        this.mapTilesToFlowersArray(data.flowers, this.tileToFlowerMap);
+    }
+
+    private mapTilesToFlowersArray(flowers: Flower[], map: Map<Tile, Flower[]>) {
+        flowers.forEach(flower => {
+            const tile = this.getTileAt(flower.x, flower.y);
+            const flowerArray = map.get(tile);
+            if (flowerArray != null) {
+                map.set(tile, [flower, ...flowerArray]);
+            } else {
+                map.set(tile, [flower]);
+            }
+        });
+    }
+    
+    getFlowersAtTile(tile: Tile): Array<Flower> {
+        return this.tileToFlowerMap.get(tile) || [];
+    }
 
     getTileAt(x: number, y: number): Tile {
         const tileIndex = x + y * this.numTilesX;

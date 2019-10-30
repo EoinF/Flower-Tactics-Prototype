@@ -58,9 +58,9 @@ export class SelectedTileView {
     }
 
     updatePopupText(tile: Tile) {
-        const nitrogenContent = (tile.soil.nitrogenContent * 100).toFixed(1);
-        const phosphorousContent = (tile.soil.phosphorousContent * 100).toFixed(1);
-        const potassiumContent = (tile.soil.potassiumContent * 100).toFixed(1);
+        const nitrogenContent = (tile.soil.nitrogenContent * 100).toFixed(2);
+        const phosphorousContent = (tile.soil.phosphorousContent * 100).toFixed(2);
+        const potassiumContent = (tile.soil.potassiumContent * 100).toFixed(2);
         
         let lines = [
             `N = ${nitrogenContent}%`,

@@ -39,7 +39,7 @@ export class MapLoader {
             .map((_, index) => new Tile(index))
             .map((tile, index) => {
                 const x = index % numTilesX;
-                const y = Math.floor(index / numTilesY);
+                const y = Math.floor(index / numTilesX);
                 const colour = RGBtoHSL(
                     imageData.data[(index * 4)],
                     imageData.data[(index * 4) + 1],

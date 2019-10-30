@@ -3,4 +3,4 @@ export interface Flower {
     y: number;
     type: string;
     amount: number;
-}
+};
