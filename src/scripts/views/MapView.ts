@@ -31,7 +31,7 @@ export class MapView {
           
           this.flowerSprites = gameState.flowers.map((flower) => {
             const img = scene.add.image(flower.x * 48, flower.y * 48, 'flower');
-            img.setScale(flower.amount);
+            img.setScale(flower.amount / 100);
             img.setData("x", flower.x);
             img.setData("y", flower.y);
             img.setData("type", flower.type);
@@ -72,7 +72,7 @@ export class MapView {
           })
           this.flowerSprites.forEach(img => {
             const flower = newState.getFlowerByTypeAt(img.getData("type"), img.getData("x"), img.getData("y"));
-            img.setScale(flower.amount);
+            img.setScale(flower.amount / 100);
           })
         });
     }

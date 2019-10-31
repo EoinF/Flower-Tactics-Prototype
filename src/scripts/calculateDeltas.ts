@@ -6,9 +6,9 @@ import { SoilDelta, FlowerDelta } from "./GameStateManager";
 
 export function getRiverEffect(tile: Tile, amount: number): SoilDelta {
     return {
-        nitrogen: 0.002 * amount,
-        potassium: 0.001 * amount,
-        phosphorous: 0.001 * amount
+        nitrogen: 0.02 * amount,
+        potassium: 0.02 * amount,
+        phosphorous: 0.02 * amount
     };
 }
 
@@ -30,12 +30,12 @@ export function getFlowerEffect(tile: Tile, flowers: Flower[], flowerTypes: Stri
         && potassiumRequirements.min <= tile.soil.potassiumContent && tile.soil.potassiumContent <= potassiumRequirements.max) {
         
         console.log("delta: " + growthRate);
-        flowerDelta.set(flower, {amount: growthRate * 0.6});
+        flowerDelta.set(flower, {amount: growthRate});
     }
     const soilDelta = {
-        nitrogen: -0.01 * growthRate * flower.amount,
-        potassium: -0.01 * growthRate * flower.amount,
-        phosphorous: -0.01 * growthRate * flower.amount
+        nitrogen: -0.001 * growthRate * flower.amount,
+        potassium: -0.001 * growthRate * flower.amount,
+        phosphorous: -0.001 * growthRate * flower.amount
     };
 
     return {

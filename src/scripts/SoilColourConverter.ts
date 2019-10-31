@@ -8,9 +8,9 @@ export class SoilColourConverter {
     private maxPhosphorous: number;
 
     constructor() {
-        this.maxNitrogen = 0.2;
-        this.maxPhosphorous = 0.2;
-        this.maxPotassium = 0.2;
+        this.maxNitrogen = 20;
+        this.maxPhosphorous = 20;
+        this.maxPotassium = 20;
     }
     
     colourToSoil(colour: HSLColor): Soil {

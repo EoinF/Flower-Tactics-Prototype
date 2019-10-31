@@ -59,9 +59,9 @@ export class SelectedTileView {
     }
 
     updatePopupText(tile: Tile, flowers: Flower[]) {
-        const nitrogenContent = (tile.soil.nitrogenContent * 100).toFixed(2);
-        const phosphorousContent = (tile.soil.phosphorousContent * 100).toFixed(2);
-        const potassiumContent = (tile.soil.potassiumContent * 100).toFixed(2);
+        const nitrogenContent = (tile.soil.nitrogenContent).toFixed(2);
+        const phosphorousContent = (tile.soil.phosphorousContent).toFixed(2);
+        const potassiumContent = (tile.soil.potassiumContent).toFixed(2);
         
         let lines = [
             `N = ${nitrogenContent}%`,
@@ -71,7 +71,7 @@ export class SelectedTileView {
 
         if (flowers.length > 0) {
             lines = [
-                ...flowers.map(flower => `${this.gameStateManager.gameState.getFlowerType(flower).name}: ${(flower.amount * 100)}%`),
+                ...flowers.map(flower => `${this.gameStateManager.gameState.getFlowerType(flower).name}: ${flower.amount}%`),
                 ...lines
             ]
         }
