@@ -1,6 +1,7 @@
 import { SoilColourConverter } from "../SoilColourConverter";
 import { MapView } from "../views/MapView";
-import { gameStateManager } from "../game";
+import { gameStateManager, selectedTileController } from "../game";
+import { TileStatsView } from "../views/TileStatsView";
 
 export default class MainScene extends Phaser.Scene {
   constructor() {
@@ -9,7 +10,8 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     const soilColourConverter = new SoilColourConverter();
-    const mapView = new MapView(this, gameStateManager, soilColourConverter);
+    const mapView = new MapView(this, gameStateManager, soilColourConverter, selectedTileController);
+    const tileStatsView = new TileStatsView(this, selectedTileController);
   }
 
   update() {

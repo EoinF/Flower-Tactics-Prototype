@@ -3,6 +3,8 @@ import MainScene from './scenes/mainScene'
 import PreloadScene from './scenes/preloadScene'
 import UIScene from './scenes/uiScene'
 import { GameStateManager } from './GameStateManager'
+import { GuiController } from './controllers/GuiController'
+import { SelectedTileController } from './controllers/SelectedTileController'
 
 const DEFAULT_WIDTH = 1280
 const DEFAULT_HEIGHT = 720
@@ -18,7 +20,7 @@ const config: GameConfig = {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT
   },
-  scene: [PreloadScene, MainScene, UIScene],
+  scene: [PreloadScene, MainScene, UIScene]
   // physics: {
   //   default: 'arcade',
   //   arcade: {
@@ -33,3 +35,5 @@ window.addEventListener('load', () => {
 })
 
 export const gameStateManager = new GameStateManager(0);
+export const selectedTileController = new SelectedTileController();
+export const guiController = new GuiController(gameStateManager);

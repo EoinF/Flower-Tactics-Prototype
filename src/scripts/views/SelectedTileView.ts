@@ -1,80 +1,80 @@
 import { GameStateManager } from "../GameStateManager";
 import { Tile } from "../objects/Tile";
 import { Flower } from "../objects/Flower";
+import { SelectedTileController } from "../controllers/SelectedTileController";
 
 const POPUP_OFFSET = {
-    x: 0,
-    y: -96
+    x: 8,
+    y: -8
 }
 
 export class SelectedTileView {
-    private highlightImage: Phaser.GameObjects.Rectangle;
     private popupImage: Phaser.GameObjects.Rectangle;
     private popupText: Phaser.GameObjects.Text;
     private gameStateManager: GameStateManager;
     private activeTileIndex?: number;
 
-    constructor(scene: Phaser.Scene, gameStateManager: GameStateManager) {
+    constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, selectedTileController: SelectedTileController) {
         this.gameStateManager = gameStateManager;
-        this.highlightImage = scene.add.rectangle(0, 0, 48, 48, 0x4c00ff, 0.3)
-            .setStrokeStyle(2, 0x4c00ff)
-            .setDepth(1)
-            .setVisible(false);
-        this.popupImage = scene.add.rectangle(0, 0, 144, 72, 0xccaaff, 1)
+        const {
+            width, height
+        } = scene.game.canvas;
+
+        this.popupImage = new Phaser.GameObjects.Rectangle(scene, 0, 0, 412, 96, 0xccaaff, 1)
             .setStrokeStyle(1, 0x1a0033)
+            .setOrigin(0, 0)
             .setDepth(2)
             .setVisible(false);
-        this.popupText = scene.add.text(0, 0, "...")
+        const container = scene.add.container(POPUP_OFFSET.x, height + POPUP_OFFSET.y, this.popupImage);
+        container.setSize(this.popupImage.width, this.popupImage.height);
+        console.log(container.width, container.height);
+        container.setPosition(container.x, container.y - container.height);
+
+        this.popupText = new Phaser.GameObjects.Text(scene, 8, 8, "...", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontStyle: 'bold' })
             .setColor("#000")
             .setDepth(2)
-            .setOrigin(0.5, 0.5)
             .setVisible(false);
+        
+        container.add(this.popupText);
 
-        this.gameStateManager.onChange((newState) => {
+        gameStateManager.onChange((newState) => {
             if (this.activeTileIndex != null) {
                 const tile = newState.tiles[this.activeTileIndex];
                 this.updatePopupText(tile, newState.getFlowersAtTile(tile));
             }
+        });
+        selectedTileController.onChange((x, y) => {
+            this.onSetActiveTile(x, y);
         })
     }
 
-    setActiveTile(tileX: number, tileY: number) {
-        const x = tileX * 48;
-        const y = tileY * 48;
+    private onSetActiveTile(tileX: number, tileY: number) {
         this.activeTileIndex = tileX + tileY * this.gameStateManager.gameState.numTilesX;
 
         const tile = this.gameStateManager.gameState.tiles[this.activeTileIndex];
-        this.highlightImage
-            .setVisible(true)
-            .setPosition(x, y);
+        
         this.popupImage
             .setVisible(true)
-            .setPosition(POPUP_OFFSET.x + x, POPUP_OFFSET.y + y);
-        
-
         this.popupText
             .setVisible(true)
-            .setPosition(POPUP_OFFSET.x + x, POPUP_OFFSET.y + y);
         this.updatePopupText(tile, this.gameStateManager.gameState.getFlowersAtTile(tile));
     }
 
-    updatePopupText(tile: Tile, flowers: Flower[]) {
+    private updatePopupText(tile: Tile, flowers: Flower[]) {
         const nitrogenContent = (tile.soil.nitrogenContent).toFixed(2);
         const phosphorousContent = (tile.soil.phosphorousContent).toFixed(2);
         const potassiumContent = (tile.soil.potassiumContent).toFixed(2);
         
-        let lines = [
-            `N = ${nitrogenContent}%`,
-            `P = ${phosphorousContent}%`,
-            `K = ${potassiumContent}%`
-        ];
-
+        let titleText = "Plains";
         if (flowers.length > 0) {
-            lines = [
-                ...flowers.map(flower => `${this.gameStateManager.gameState.getFlowerType(flower).name}: ${flower.amount}%`),
-                ...lines
-            ]
+            titleText = "Flowers";
+            // ...flowers.map(flower => `${this.gameStateManager.gameState.getFlowerType(flower).name}: ${flower.amount}%`),
         }
+        
+        let lines = [
+            titleText,
+            `N|P|K :   ${nitrogenContent}% | ${phosphorousContent}% | ${potassiumContent}%`
+        ];
 
         this.popupText.setText(lines);
     }

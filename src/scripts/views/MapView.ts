@@ -1,22 +1,24 @@
 import { GameState } from "../GameState";
 import { SoilColourConverter } from "../SoilColourConverter";
-import { SelectedTileView } from "./SelectedTileView";
 import { GameStateManager } from "../GameStateManager";
+import { SelectedTileController } from "../controllers/SelectedTileController";
 
 export class MapView {
     soilColourConverter: SoilColourConverter;
-    selectedTileView: SelectedTileView;
 
     tileSprites: Phaser.GameObjects.Image[];
     flowerSprites: Phaser.GameObjects.Image[];
     mountainSprites: Phaser.GameObjects.Image[];
     riverSprites: Phaser.GameObjects.Image[];
 
-    constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, soilColourConverter: SoilColourConverter) {
+    constructor(scene: Phaser.Scene, 
+      gameStateManager: GameStateManager, 
+      soilColourConverter: SoilColourConverter, 
+      selectedTileController: SelectedTileController
+    ) {
         this.soilColourConverter = soilColourConverter;
-        this.selectedTileView = new SelectedTileView(scene, gameStateManager);
         this.setupSprites(scene, gameStateManager.gameState, soilColourConverter);
-        this.setupCallbacks(gameStateManager);
+        this.setupCallbacks(gameStateManager, selectedTileController);
     }
 
     setupSprites(scene: Phaser.Scene, gameState: GameState, soilColourConverter: SoilColourConverter) {
@@ -55,10 +57,10 @@ export class MapView {
       };
     }
 
-    setupCallbacks(gameStateManager: GameStateManager) {
+    setupCallbacks(gameStateManager: GameStateManager, selectedTileController: SelectedTileController) {
         this.tileSprites.forEach(img => {
             img.setInteractive().on('pointerup', () => {
-                this.selectedTileView.setActiveTile(
+                selectedTileController.setActiveTile(
                     img.getData("x"),
                     img.getData("y")
                 );

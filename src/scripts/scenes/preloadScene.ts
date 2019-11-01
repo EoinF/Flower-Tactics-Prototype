@@ -10,6 +10,11 @@ export default class PreloadScene extends Phaser.Scene {
   }
 
   preload() {
+    this.load.scenePlugin({
+        key: 'rexuiplugin',
+        url: 'https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/plugins/dist/rexuiplugin.min.js',
+        sceneKey: 'rexUI'
+    });
     this.load.image('blank-tile', 'assets/img/tile.png');
     this.load.image('flower', 'assets/img/flower.png');
     this.load.image('mountain', 'assets/img/mountain.png');
