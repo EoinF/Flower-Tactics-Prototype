@@ -3,6 +3,10 @@ import { GameStateManager } from "../GameStateManager";
 import { UIContainer } from "../widgets/UIContainer";
 import { TextButton } from "../widgets/TextButton";
 
+const COLOUR_RED = "#d00";
+const COLOUR_GREEN = "#090";
+const COLOUR_NEUTRAL = "#555";
+
 export class GuiView {
     gameStateManager: GameStateManager;
 
@@ -29,9 +33,9 @@ export class GuiView {
                 fontStyle: "bold"
             }
         );
-        this.seedDeltaText = new Phaser.GameObjects.Text(scene, 52, 4, "(+1)",
+        this.seedDeltaText = new Phaser.GameObjects.Text(scene, 52, 4, "",
             {
-                color: "#090",
+                color: COLOUR_GREEN,
                 fontStyle: "bold",
                 fontSize: "16px"
             }
@@ -48,8 +52,8 @@ export class GuiView {
     }
 
     setSeedAmountText() {
-        let amount = Object.keys(this.gameStateManager.gameState.seedsOwned)
-                .map(key => this.gameStateManager.gameState.seedsOwned[key])
+        let amount = Object.keys(this.gameStateManager.gameState.seedStatus)
+                .map(key => this.gameStateManager.gameState.seedStatus[key].quantity)
                 .reduce((previousValue, currentValue) => {
                     return currentValue + previousValue;
                 }, 0)
@@ -57,5 +61,26 @@ export class GuiView {
         amount = "   " + amount;
         amount = amount.slice(amount.length - 3, amount.length);
         this.seedAmountText.setText(amount);
+        let delta = Object.keys(this.gameStateManager.gameStateDelta.seedStatusDelta)
+            .map(key => {
+                const seedDelta = this.gameStateManager.gameStateDelta.seedStatusDelta[key];
+                const deltaProgress = seedDelta.quantity * 100 + seedDelta.progress;
+                console.log(this.gameStateManager.gameState.seedStatus[key].progress + deltaProgress)
+                return this.gameStateManager.gameState.seedStatus[key].progress + deltaProgress;
+            })
+            .map(progress => Math.floor(progress / 100))
+            .reduce((previousValue, currentValue) => {
+                return currentValue + previousValue;
+            }, 0)
+        
+        const sign = delta < 0 ? '-': '+';
+        this.seedDeltaText.setText(`(${sign}${delta.toString()})`);
+        if (delta == 0) {
+            this.seedDeltaText.setColor(COLOUR_NEUTRAL);
+        } else if (delta < 0) {
+            this.seedDeltaText.setColor(COLOUR_RED);
+        } else {
+            this.seedDeltaText.setColor(COLOUR_GREEN);
+        }
     }
 }

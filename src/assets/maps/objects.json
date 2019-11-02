@@ -1,6 +1,10 @@
 {
-    "seedsOwned": {
-        "1": 1
+    "seedStatus": {
+        "1": {
+            "type": "1",
+            "quantity": 1,
+            "progress": 0
+        }
     },
     "flowerTypes": {
         "1": {
@@ -74,55 +78,64 @@
             "x": 1,
             "y": 1,
             "type": "1",
-            "amount": 50
+            "amount": 50,
+            "mode": "Grow"
         },
         {
             "x": 14,
             "y": 14,
             "type": "1",
-            "amount": 30
+            "amount": 30,
+            "mode": "Grow"
         },
         {
             "x": 15,
             "y": 14,
             "type": "1",
-            "amount": 10
+            "amount": 10,
+            "mode": "Grow"
         },
         {
             "x": 15,
             "y": 15,
             "type": "1",
-            "amount": 10
+            "amount": 10,
+            "mode": "Grow"
         },
         {
             "x": 14,
             "y": 15,
             "type": "1",
-            "amount": 10
+            "amount": 10,
+            "mode": "Grow"
         },
         {
             "x": 25,
             "y": 25,
             "type": "1",
-            "amount": 10
+            "amount": 10,
+            "mode": "Produce"
         },
         {
             "x": 26,
             "y": 25,
             "type": "1",
-            "amount": 10
+            "amount": 10,
+            "mode": "Produce"
         },
         {
             "x": 26,
             "y": 26,
             "type": "1",
-            "amount": 10
+            "amount": 10,
+            "mode": "Produce"
         },
         {
             "x": 25,
             "y": 26,
             "type": "1",
-            "amount": 10
+            "amount": 10,
+            "mode": "Produce"
         }
     ]
 }

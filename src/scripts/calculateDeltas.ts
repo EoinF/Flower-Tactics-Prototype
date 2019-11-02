@@ -2,7 +2,7 @@ import { Tile } from "./objects/Tile";
 import { Flower } from "./objects/Flower";
 import { StringMap } from "./types";
 import { FlowerType } from "./objects/FlowerType";
-import { SoilDelta, FlowerDelta } from "./GameStateManager";
+import { SoilDelta, FlowerDelta, SeedStatusDelta } from "./GameStateManager";
 
 export function getRiverEffect(tile: Tile, amount: number): SoilDelta {
     return {
@@ -12,11 +12,11 @@ export function getRiverEffect(tile: Tile, amount: number): SoilDelta {
     };
 }
 
-export function getFlowerEffect(tile: Tile, flowers: Flower[], flowerTypes: StringMap<FlowerType>): {soilDelta: SoilDelta, flowerDelta: Map<Flower, FlowerDelta>} {
+export function getFlowerEffect(tile: Tile, flowers: Flower[], flowerTypes: StringMap<FlowerType>): {soilDelta: SoilDelta, flowerDelta: Map<Flower, FlowerDelta>, seedDelta: Map<string, SeedStatusDelta>} {
     const flower = {
         ...flowers[0]
     };
-    const { 
+    const {
         growthRate,
         nitrogenRequirements,
         phosphorousRequirements,
@@ -24,22 +24,31 @@ export function getFlowerEffect(tile: Tile, flowers: Flower[], flowerTypes: Stri
     } = flowerTypes[flower.type];
     
     const flowerDelta = new Map<Flower, FlowerDelta>();
+    const seedDelta = new Map<string, SeedStatusDelta>();
     
     if (nitrogenRequirements.min <= tile.soil.nitrogenContent && tile.soil.nitrogenContent <= nitrogenRequirements.max
         && phosphorousRequirements.min <= tile.soil.phosphorousContent && tile.soil.phosphorousContent <= phosphorousRequirements.max
         && potassiumRequirements.min <= tile.soil.potassiumContent && tile.soil.potassiumContent <= potassiumRequirements.max) {
         
-        console.log("delta: " + growthRate);
-        flowerDelta.set(flower, {amount: growthRate});
+        if (flower.mode == "Grow") {
+            flowerDelta.set(flower, {amount: growthRate});
+        } else {
+            seedDelta.set(flower.type, {
+                quantity: 0,
+                progress: Math.floor(growthRate * flower.amount * 0.1),
+                type: flower.type
+            })
+        }
     }
     const soilDelta = {
-        nitrogen: -0.001 * growthRate * flower.amount,
-        potassium: -0.001 * growthRate * flower.amount,
-        phosphorous: -0.001 * growthRate * flower.amount
+        nitrogen: -0.0002 * growthRate * flower.amount,
+        potassium: -0.0002 * growthRate * flower.amount,
+        phosphorous: -0.0002 * growthRate * flower.amount
     };
 
     return {
         soilDelta,
-        flowerDelta
+        flowerDelta,
+        seedDelta
     }
 }

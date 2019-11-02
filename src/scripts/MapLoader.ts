@@ -7,13 +7,14 @@ import { River } from "./objects/River";
 import { RGBtoHSL } from "./extensions";
 import { FlowerType } from "./objects/FlowerType";
 import { StringMap } from "./types";
+import { SeedStatusDelta } from "./GameStateManager";
 
 export interface ObjectData {
     flowers: Flower[];
     mountains: Mountain[];
     rivers: River[];
     flowerTypes: StringMap<FlowerType>;
-    seedsOwned: StringMap<number>;
+    seedStatus: StringMap<SeedStatusDelta>;
 }
 
 export class MapLoader {

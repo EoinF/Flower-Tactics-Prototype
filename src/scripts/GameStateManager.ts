@@ -1,6 +1,7 @@
 import { GameState, GameStateData } from "./GameState";
 import { getRiverEffect, getFlowerEffect } from "./calculateDeltas";
 import { Flower } from "./objects/Flower";
+import { StringMap } from "./types";
 
 export interface FlowerDelta {
     amount: number;
@@ -12,9 +13,16 @@ export interface SoilDelta {
     potassium: number;
 }
 
+export interface SeedStatusDelta {
+    type: string;
+    quantity: number;
+    progress: number;
+}
+
 export interface GameStateDelta {
     tileSoilDelta: Array<SoilDelta>;
     flowerDelta: Map<Flower, FlowerDelta>;
+    seedStatusDelta: StringMap<SeedStatusDelta>;
 }
 
 export class GameStateManager {
@@ -43,7 +51,8 @@ export class GameStateManager {
                     potassium: 0,
                     phosphorous: 0
                 })),
-            flowerDelta: new Map<Flower, FlowerDelta>()
+            flowerDelta: new Map<Flower, FlowerDelta>(),
+            seedStatusDelta: {}
         };
         this.calculateDelta();
     }
@@ -57,6 +66,7 @@ export class GameStateManager {
                 phosphorous: 0
             };
         });
+        this.gameStateDelta.seedStatusDelta = {};
         this.calculateRiverEffects(this.gameStateDelta);
         this.calculateFlowerEffects(this.gameStateDelta);
     }
@@ -74,6 +84,17 @@ export class GameStateManager {
             const copiedFlower = copiedData.flowers.find(f => flower.x == f.x && flower.y == f.y && flower.type == flower.type);
             if (copiedFlower != null) {
                 copiedFlower.amount += flowerDelta.amount
+            }
+        });
+        Object.keys(this.gameStateDelta.seedStatusDelta).forEach((type) => {
+            const seedDelta = this.gameStateDelta.seedStatusDelta[type];
+            const copiedSeedStatus = copiedData.seedStatus[type];
+            if (copiedSeedStatus != null) {
+                console.log(copiedSeedStatus);
+                console.log(seedDelta);
+                copiedSeedStatus.progress += seedDelta.progress;
+                copiedSeedStatus.quantity += seedDelta.quantity + Math.floor(copiedSeedStatus.progress / 100);
+                copiedSeedStatus.progress %= 100;
             }
         });
 
@@ -120,6 +141,21 @@ export class GameStateManager {
                     newDelta = flowerDelta;
                 }
                 gameStateDelta.flowerDelta.set(flower, newDelta);
+            });
+
+            deltas.seedDelta.forEach((seedDelta, type) => {
+                const existingEntry = gameStateDelta.seedStatusDelta[type];
+                let newDelta: SeedStatusDelta;
+                if (existingEntry != null) {
+                    newDelta = {
+                        quantity: existingEntry.quantity + seedDelta.quantity,
+                        progress: existingEntry.progress + seedDelta.progress,
+                        type: existingEntry.type
+                    }
+                } else {
+                    newDelta = seedDelta;
+                }
+                gameStateDelta.seedStatusDelta[type] = newDelta;
             });
         });
     }

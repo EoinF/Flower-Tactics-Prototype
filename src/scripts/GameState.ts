@@ -4,6 +4,7 @@ import { Mountain } from "./objects/Mountain";
 import { River } from "./objects/River";
 import { FlowerType } from "./objects/FlowerType";
 import { StringMap } from "./types";
+import { SeedStatusDelta } from "./GameStateManager";
 
 export interface GameStateData {
     numTilesX: number;
@@ -13,7 +14,7 @@ export interface GameStateData {
     mountains: Mountain[];
     rivers: River[];
     flowerTypes: StringMap<FlowerType>;
-    seedsOwned: StringMap<number>;
+    seedStatus: StringMap<SeedStatusDelta>;
 }
 
 export class GameState implements GameStateData {
@@ -26,7 +27,7 @@ export class GameState implements GameStateData {
     flowerTypes: StringMap<FlowerType>;
 
     tileToFlowerMap: Map<Tile, Flower[]>;
-    seedsOwned: StringMap<number>;
+    seedStatus: StringMap<SeedStatusDelta>;
 
     constructor(data: GameStateData) {
         Object.keys(data).forEach(key => {

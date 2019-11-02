@@ -30,7 +30,7 @@ export class MapGenerator {
             mountains: [],
             rivers: this.generateRivers(numTilesX, numTilesY),
             flowerTypes: {},
-            seedsOwned: {}
+            seedStatus: {}
         };
     }
     
