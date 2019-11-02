@@ -8,7 +8,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
   create() {
-    const guiView = new GuiView(this, guiController);
+    const guiView = new GuiView(this, gameStateManager, guiController);
     const selectedTileView = new SelectedTileView(this, gameStateManager, selectedTileController);
   }
 }

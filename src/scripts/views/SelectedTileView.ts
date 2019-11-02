@@ -2,6 +2,7 @@ import { GameStateManager } from "../GameStateManager";
 import { Tile } from "../objects/Tile";
 import { Flower } from "../objects/Flower";
 import { SelectedTileController } from "../controllers/SelectedTileController";
+import { UIContainer } from "../widgets/UIContainer";
 
 const POPUP_OFFSET = {
     x: 8,
@@ -9,33 +10,23 @@ const POPUP_OFFSET = {
 }
 
 export class SelectedTileView {
-    private popupImage: Phaser.GameObjects.Rectangle;
+    private popup: UIContainer;
     private popupText: Phaser.GameObjects.Text;
     private gameStateManager: GameStateManager;
     private activeTileIndex?: number;
 
     constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, selectedTileController: SelectedTileController) {
         this.gameStateManager = gameStateManager;
-        const {
-            width, height
-        } = scene.game.canvas;
 
-        this.popupImage = new Phaser.GameObjects.Rectangle(scene, 0, 0, 412, 96, 0xccaaff, 1)
-            .setStrokeStyle(1, 0x1a0033)
-            .setOrigin(0, 0)
-            .setDepth(2)
+        this.popup = new UIContainer(scene, 8, 8, 412, 96, "Bottom")
             .setVisible(false);
-        const container = scene.add.container(POPUP_OFFSET.x, height + POPUP_OFFSET.y, this.popupImage);
-        container.setSize(this.popupImage.width, this.popupImage.height);
-        console.log(container.width, container.height);
-        container.setPosition(container.x, container.y - container.height);
 
         this.popupText = new Phaser.GameObjects.Text(scene, 8, 8, "...", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontStyle: 'bold' })
             .setColor("#000")
             .setDepth(2)
             .setVisible(false);
         
-        container.add(this.popupText);
+        this.popup.addChild(this.popupText);
 
         gameStateManager.onChange((newState) => {
             if (this.activeTileIndex != null) {
@@ -53,10 +44,9 @@ export class SelectedTileView {
 
         const tile = this.gameStateManager.gameState.tiles[this.activeTileIndex];
         
-        this.popupImage
-            .setVisible(true)
-        this.popupText
-            .setVisible(true)
+        this.popup.setVisible(true);
+        this.popupText.setVisible(true);
+
         this.updatePopupText(tile, this.gameStateManager.gameState.getFlowersAtTile(tile));
     }
 

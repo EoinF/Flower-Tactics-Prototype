@@ -13,6 +13,7 @@ export interface GameStateData {
     mountains: Mountain[];
     rivers: River[];
     flowerTypes: StringMap<FlowerType>;
+    seedsOwned: StringMap<number>;
 }
 
 export class GameState implements GameStateData {
@@ -25,6 +26,7 @@ export class GameState implements GameStateData {
     flowerTypes: StringMap<FlowerType>;
 
     tileToFlowerMap: Map<Tile, Flower[]>;
+    seedsOwned: StringMap<number>;
 
     constructor(data: GameStateData) {
         Object.keys(data).forEach(key => {

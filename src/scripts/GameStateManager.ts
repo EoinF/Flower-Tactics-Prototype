@@ -56,7 +56,7 @@ export class GameStateManager {
                 potassium: 0,
                 phosphorous: 0
             };
-        })
+        });
         this.calculateRiverEffects(this.gameStateDelta);
         this.calculateFlowerEffects(this.gameStateDelta);
     }
@@ -78,8 +78,8 @@ export class GameStateManager {
         });
 
         this.gameState = new GameState(copiedData);
-        this.callbacks.forEach(callback => callback(this.gameState));
         this.calculateDelta();
+        this.callbacks.forEach(callback => callback(this.gameState));
     }
 
     private calculateRiverEffects(gameStateDelta: GameStateDelta) {

@@ -29,7 +29,8 @@ export class MapGenerator {
             flowers: [],
             mountains: [],
             rivers: this.generateRivers(numTilesX, numTilesY),
-            flowerTypes: {}
+            flowerTypes: {},
+            seedsOwned: {}
         };
     }
     

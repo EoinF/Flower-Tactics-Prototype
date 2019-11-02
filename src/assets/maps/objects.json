@@ -1,4 +1,7 @@
 {
+    "seedsOwned": {
+        "1": 1
+    },
     "flowerTypes": {
         "1": {
             "name": "Daisy",

@@ -12,7 +12,8 @@ export interface ObjectData {
     flowers: Flower[];
     mountains: Mountain[];
     rivers: River[];
-    flowerTypes: StringMap<FlowerType>
+    flowerTypes: StringMap<FlowerType>;
+    seedsOwned: StringMap<number>;
 }
 
 export class MapLoader {
