@@ -56,8 +56,13 @@ export class SelectedTileView {
         const potassiumContent = (tile.soil.potassiumContent).toFixed(2);
         
         let titleText = "Plains";
+        if (this.gameStateManager.gameState.getRiverAtTile(tile) != null) {
+            titleText = "River";
+        } else if (this.gameStateManager.gameState.getMountainAtTile(tile) != null) {
+            titleText = "Mountains";
+        }
         if (flowers.length > 0) {
-            titleText = "Flowers";
+            // titleText = "Flowers";
             // ...flowers.map(flower => `${this.gameStateManager.gameState.getFlowerType(flower).name}: ${flower.amount}%`),
         }
         

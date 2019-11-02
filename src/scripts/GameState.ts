@@ -27,6 +27,8 @@ export class GameState implements GameStateData {
     flowerTypes: StringMap<FlowerType>;
 
     tileToFlowerMap: Map<Tile, Flower[]>;
+    tileToRiverMap: Map<Tile, River>;
+    tileToMountainMap: Map<Tile, Mountain>;
     seedStatus: StringMap<SeedStatusDelta>;
 
     constructor(data: GameStateData) {
@@ -34,8 +36,12 @@ export class GameState implements GameStateData {
             this[key] = data[key];
         });
         this.tileToFlowerMap = new Map<Tile, Flower[]>();
+        this.tileToRiverMap = new Map<Tile, River>();
+        this.tileToMountainMap = new Map<Tile, Mountain>();
 
         this.mapTilesToFlowersArray(data.flowers, this.tileToFlowerMap);
+        this.mapTilesToRivers(data.rivers, this.tileToRiverMap);
+        this.mapTilesToMountains(data.mountains, this.tileToMountainMap);
     }
 
     private mapTilesToFlowersArray(flowers: Flower[], map: Map<Tile, Flower[]>) {
@@ -48,6 +54,27 @@ export class GameState implements GameStateData {
                 map.set(tile, [flower]);
             }
         });
+    }
+
+    private mapTilesToRivers(rivers: River[], map: Map<Tile, River>) {
+        rivers.forEach(river => {
+            const tile = this.getTileAt(river.x, river.y);
+            map.set(tile, river);
+        });
+    }
+    private mapTilesToMountains(mountains: Mountain[], map: Map<Tile, Mountain>) {
+        mountains.forEach(mountain => {
+            const tile = this.getTileAt(mountain.x, mountain.y);
+            map.set(tile, mountain);
+        });
+    }
+
+    getRiverAtTile(tile: Tile): River | undefined {
+        return this.tileToRiverMap.get(tile);
+    }
+    
+    getMountainAtTile(tile: Tile): Mountain | undefined {
+        return this.tileToMountainMap.get(tile);
     }
     
     getFlowersAtTile(tile: Tile): Array<Flower> {
