@@ -1,33 +1,27 @@
-import { VerticalAlignment, HorizontalAlignment } from "./constants";
-import { getAlignedCoordinates } from "./utils";
+import { VerticalAlignment, HorizontalAlignment, COLOURS } from "./constants";
+import { UIContainer } from "./UIContainer";
+import { BaseButton } from "./BaseButton";
 
-export class TextButton {
-    
-    rectangle: Phaser.GameObjects.Rectangle;
+export class TextButton extends BaseButton {
     constructor(
         scene: Phaser.Scene, 
         x: number, y: number, 
         width: number, height: number,
         text: string,
+        colourUp: Phaser.Display.Color = COLOURS.WHITE,
+        colourDown: Phaser.Display.Color = COLOURS.LIGHT_GRAY,
         verticalAlignment: VerticalAlignment = "Top",
         horizontalAlignment: HorizontalAlignment = "Left") {
 
-        const {x: ax, y: ay} = getAlignedCoordinates(scene, x, y, width, height, verticalAlignment, horizontalAlignment);
-
-        this.rectangle = scene.add.rectangle(ax, ay, width, height, 0xeeddff)
-            .setInteractive()
-            .setStrokeStyle(1, 0x4c00ff, 0.5)
-            .setOrigin(0, 0);
-
-        const buttonText = scene.add.text(ax, ay, text)
+        super(scene, x, y, width, height, colourUp, colourDown, verticalAlignment, horizontalAlignment);
+        
+        const buttonText = scene.add.text(0, 0, text)
             .setTint(0x0);
         
         const differenceX = width - buttonText.width;
         const differenceY = height - buttonText.height;
         buttonText.setPadding(differenceX / 2, differenceY / 2, differenceX / 2, differenceY / 2);
+        
+        this.container.addChild(buttonText);
     }
-
-    onClick(callback) {
-        this.rectangle.on('pointerup', callback);
-    };
 }

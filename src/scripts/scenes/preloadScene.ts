@@ -21,6 +21,9 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('river', 'assets/img/river.png');
     this.load.image('seed', 'assets/img/seed.png');
     this.load.image('map1-soil', 'assets/maps/soil.bmp');
+
+    this.load.image('button-npk', 'assets/img/button-npk.png');
+    this.load.image('button-flower', 'assets/img/button-flower.png');
   }
   
   getMapImageData() {

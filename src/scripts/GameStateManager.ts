@@ -90,8 +90,6 @@ export class GameStateManager {
             const seedDelta = this.gameStateDelta.seedStatusDelta[type];
             const copiedSeedStatus = copiedData.seedStatus[type];
             if (copiedSeedStatus != null) {
-                console.log(copiedSeedStatus);
-                console.log(seedDelta);
                 copiedSeedStatus.progress += seedDelta.progress;
                 copiedSeedStatus.quantity += seedDelta.quantity + Math.floor(copiedSeedStatus.progress / 100);
                 copiedSeedStatus.progress %= 100;

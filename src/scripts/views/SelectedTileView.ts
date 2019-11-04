@@ -3,15 +3,15 @@ import { Tile } from "../objects/Tile";
 import { Flower } from "../objects/Flower";
 import { SelectedTileController } from "../controllers/SelectedTileController";
 import { UIContainer } from "../widgets/UIContainer";
-
-const POPUP_OFFSET = {
-    x: 8,
-    y: -8
-}
+import { ImageButton } from "../widgets/ImageButton";
+import { COLOURS } from "../widgets/constants";
 
 export class SelectedTileView {
     private popup: UIContainer;
     private popupText: Phaser.GameObjects.Text;
+    private npkTab: ImageButton;
+    private flowerTab: ImageButton;
+
     private gameStateManager: GameStateManager;
     private activeTileIndex?: number;
 
@@ -19,14 +19,31 @@ export class SelectedTileView {
         this.gameStateManager = gameStateManager;
 
         this.popup = new UIContainer(scene, 8, 8, 412, 96, "Bottom")
-            .setVisible(false);
-
-        this.popupText = new Phaser.GameObjects.Text(scene, 8, 8, "...", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontStyle: 'bold' })
-            .setColor("#000")
+            .setVisible(false)
             .setDepth(2)
-            .setVisible(false);
+            .setBackground(0xccaaff, 1)
+            .setBorder(1, 0x1a0033, 1);
+
+        this.popupText = scene.add.text(8, 8, "...", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontStyle: 'bold' })
+            .setColor("#000");
+        
+        this.npkTab = new ImageButton(scene, 2, 2, 'button-npk')
+            .setBackground(COLOURS.PURPLE_100, COLOURS.PURPLE_200, COLOURS.WHITE, COLOURS.PURPLE_200)
+            .setBorder(1, COLOURS.BLACK);
+        this.flowerTab = new ImageButton(scene, 4 + this.npkTab.width, 2, 'button-flower')
+            .setBackground(COLOURS.PURPLE_100, COLOURS.PURPLE_200, COLOURS.WHITE, COLOURS.PURPLE_200)
+            .setBorder(1, COLOURS.BLACK);
         
         this.popup.addChild(this.popupText);
+        this.popup.addChild(this.npkTab, "Top", "Right");
+        this.popup.addChild(this.flowerTab, "Top", "Right");
+
+        this.flowerTab.onClick(() => {
+            
+        })
+        this.npkTab.onClick(() => {
+            
+        })
 
         gameStateManager.onChange((newState) => {
             if (this.activeTileIndex != null) {
@@ -45,7 +62,6 @@ export class SelectedTileView {
         const tile = this.gameStateManager.gameState.tiles[this.activeTileIndex];
         
         this.popup.setVisible(true);
-        this.popupText.setVisible(true);
 
         this.updatePopupText(tile, this.gameStateManager.gameState.getFlowersAtTile(tile));
     }

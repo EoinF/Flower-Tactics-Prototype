@@ -1,29 +1,27 @@
 import { VerticalAlignment, HorizontalAlignment } from "./constants";
 
 export function getAlignedCoordinates(
-    scene: Phaser.Scene, 
     x: number,
     y: number,
     width: number,
     height: number,
+    parentWidth: number,
+    parentHeight: number,
     verticalAlignment: VerticalAlignment,
     horizontalAlignment: HorizontalAlignment
 ) {
     let x2 = x;
     let y2 = y;
-    const {
-        width: w, height: h
-    } = scene.game.canvas;
 
     if (verticalAlignment == "Bottom") {
-        y2 = h - y - height;
+        y2 = parentHeight - y - height;
     } else if (verticalAlignment == "Middle") {
-        y2 = (h - y - height) / 2;
+        y2 = (parentHeight - y - height) / 2;
     }
     if (horizontalAlignment == "Right") {
-        x2 = w - x - width;
+        x2 = parentWidth - x - width;
     } else if (horizontalAlignment == "Middle") {
-        x2 = (w - x - width) / 2
+        x2 = (parentWidth - x - width) / 2
     }
 
     return {
