@@ -5,10 +5,13 @@ import { SelectedTileController } from "../controllers/SelectedTileController";
 import { UIContainer } from "../widgets/UIContainer";
 import { ImageButton } from "../widgets/ImageButton";
 import { COLOURS } from "../widgets/constants";
+import { RadioButtonGroup } from "../widgets/RadioButtonGroup";
 
 export class SelectedTileView {
     private popup: UIContainer;
     private popupText: Phaser.GameObjects.Text;
+
+    private tabGroup: RadioButtonGroup;
     private npkTab: ImageButton;
     private flowerTab: ImageButton;
 
@@ -29,21 +32,24 @@ export class SelectedTileView {
         
         this.npkTab = new ImageButton(scene, 2, 2, 'button-npk')
             .setBackground(COLOURS.PURPLE_200, COLOURS.PURPLE_400, COLOURS.WHITE, COLOURS.PURPLE_500)
-            .setBorder(1, COLOURS.BLACK);
+            .setBorder(1, COLOURS.GRAY);
         this.flowerTab = new ImageButton(scene, 4 + this.npkTab.width, 2, 'button-flower')
             .setBackground(COLOURS.PURPLE_200, COLOURS.PURPLE_400, COLOURS.WHITE, COLOURS.PURPLE_500)
-            .setBorder(1, COLOURS.BLACK);
+            .setBorder(1, COLOURS.GRAY);
+
+        this.tabGroup = new RadioButtonGroup([this.npkTab, this.flowerTab])
+            .onChange(index => {
+                if (index == 0) {
+                    console.log(0)
+                }
+                if (index == 1) {
+                    console.log(1)
+                }
+            })
         
         this.popup.addChild(this.popupText);
         this.popup.addChild(this.npkTab, "Top", "Right");
         this.popup.addChild(this.flowerTab, "Top", "Right");
-
-        this.flowerTab.onClick(() => {
-            
-        })
-        this.npkTab.onClick(() => {
-            
-        })
 
         gameStateManager.onChange((newState) => {
             if (this.activeTileIndex != null) {

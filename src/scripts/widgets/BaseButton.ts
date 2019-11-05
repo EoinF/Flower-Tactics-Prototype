@@ -1,4 +1,4 @@
-import { VerticalAlignment, HorizontalAlignment } from "./constants";
+import { VerticalAlignment, HorizontalAlignment, COLOURS } from "./constants";
 import { UIContainer } from "./UIContainer";
 import { BaseUIObject } from "./BaseUIObject";
 
@@ -7,9 +7,12 @@ export class BaseButton implements BaseUIObject {
     y: number;
     width: number;
     height: number;
+
+    borderThickness: number;
+    borderColour: Phaser.Display.Color;
     
-    protected colourUp: Phaser.Display.Color;
-    protected colourDown: Phaser.Display.Color;
+    colourUp: Phaser.Display.Color;
+    colourDown: Phaser.Display.Color;
     protected container: UIContainer;
 
     constructor(
@@ -27,6 +30,8 @@ export class BaseButton implements BaseUIObject {
         this.height = height;
         this.colourUp = colourUp;
         this.colourDown = colourDown;
+        this.borderThickness = 0;
+        this.borderColour = COLOURS.BLACK;
 
         this.container = new UIContainer(scene, x, y, width, height, verticalAlignment, horizontalAlignment);
         this.container.setInteractive()
@@ -70,6 +75,8 @@ export class BaseButton implements BaseUIObject {
     }
 
     setBorder(thickness: number, strokeColour: Phaser.Display.Color) {
+        this.borderColour = strokeColour;
+        this.borderThickness = thickness;
         this.container.setBorder(thickness, strokeColour);
         return this;
     }
