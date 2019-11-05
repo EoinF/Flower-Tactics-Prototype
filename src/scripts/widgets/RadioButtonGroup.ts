@@ -4,21 +4,21 @@ import { ImageButton } from "./ImageButton";
 
 export class RadioButtonGroup {
     selectedButtonIndex: number;
-    buttons: Array<BaseButton>;
-    callbacks: Array<Function>;
-    selectedColourUp: Phaser.Display.Color;
-    selectedColourDown: Phaser.Display.Color;
-    selectedBorderThickness: number;
-    selectedBorderColour: Phaser.Display.Color;
+    private buttons: Array<BaseButton>;
+    private callbacks: Array<Function>;
+    private selectedColourUp: Phaser.Display.Color;
+    private selectedColourDown: Phaser.Display.Color;
+    private selectedBorderThickness: number;
+    private selectedBorderColour: Phaser.Display.Color;
     ///
     /// Save the previous colours of the selected button so they can be restored when it becomes unselected
     ///
-    savedColourUp: Phaser.Display.Color;
-    savedColourDown: Phaser.Display.Color;
-    savedBorderThickness: number;
-    savedBorderColour: Phaser.Display.Color;
-    savedImageColourUp?: Phaser.Display.Color;
-    savedImageColourDown?: Phaser.Display.Color;
+    private savedColourUp: Phaser.Display.Color;
+    private savedColourDown: Phaser.Display.Color;
+    private savedBorderThickness: number;
+    private savedBorderColour: Phaser.Display.Color;
+    private savedImageColourUp?: Phaser.Display.Color;
+    private savedImageColourDown?: Phaser.Display.Color;
     constructor(
         buttons: Array<BaseButton>,
         selectedColourUp: Phaser.Display.Color = COLOURS.LIGHT_YELLOW,

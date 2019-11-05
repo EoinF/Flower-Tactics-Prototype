@@ -38,12 +38,10 @@ export class SelectedTileView {
             .setBorder(1, COLOURS.GRAY);
 
         this.tabGroup = new RadioButtonGroup([this.npkTab, this.flowerTab])
-            .onChange(index => {
-                if (index == 0) {
-                    console.log(0)
-                }
-                if (index == 1) {
-                    console.log(1)
+            .onChange(() => {
+                if (this.activeTileIndex != null) {
+                    const tile = this.gameStateManager.gameState.tiles[this.activeTileIndex];
+                    this.updatePopupText(tile, this.gameStateManager.gameState.getFlowersAtTile(tile));
                 }
             })
         
@@ -73,6 +71,14 @@ export class SelectedTileView {
     }
 
     private updatePopupText(tile: Tile, flowers: Flower[]) {
+        if (this.tabGroup.selectedButtonIndex == 0) {
+            this.setSoilText(tile, flowers);
+        } else {
+            this.setFlowerText(tile, flowers);
+        }
+    }
+
+    private setSoilText(tile: Tile, flowers: Flower[]) {
         const nitrogenContent = (tile.soil.nitrogenContent).toFixed(2);
         const phosphorousContent = (tile.soil.phosphorousContent).toFixed(2);
         const potassiumContent = (tile.soil.potassiumContent).toFixed(2);
@@ -83,14 +89,29 @@ export class SelectedTileView {
         } else if (this.gameStateManager.gameState.getMountainAtTile(tile) != null) {
             titleText = "Mountains";
         }
-        if (flowers.length > 0) {
-            // titleText = "Flowers";
-            // ...flowers.map(flower => `${this.gameStateManager.gameState.getFlowerType(flower).name}: ${flower.amount}%`),
-        }
         
         let lines = [
             titleText,
             `N|P|K :   ${nitrogenContent}% | ${phosphorousContent}% | ${potassiumContent}%`
+        ];
+
+        this.popupText.setText(lines);
+    }
+    
+    private setFlowerText(tile: Tile, flowers: Flower[]) {
+        
+        let titleText = "Plains";
+        if (this.gameStateManager.gameState.getRiverAtTile(tile) != null) {
+            titleText = "River";
+        } else if (this.gameStateManager.gameState.getMountainAtTile(tile) != null) {
+            titleText = "Mountains";
+        }
+
+        const flowerTypesMap = this.gameStateManager.gameState.flowerTypes;
+        
+        let lines = [
+            titleText,
+            ...flowers.map(flower => `${flowerTypesMap[flower.type].name}: ${flower.amount}%`)
         ];
 
         this.popupText.setText(lines);
