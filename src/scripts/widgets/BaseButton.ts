@@ -30,7 +30,7 @@ export class BaseButton implements BaseUIObject {
 
         this.container = new UIContainer(scene, x, y, width, height, verticalAlignment, horizontalAlignment);
         this.container.setInteractive()
-            .setBackground(this.colourUp, 1);
+            .setBackground(this.colourUp);
 
         scene.input.on('pointerup', () => {
             this.onPointerUp();
@@ -41,10 +41,10 @@ export class BaseButton implements BaseUIObject {
     }
 
     protected onPointerUp() {
-        this.container.setBackground(this.colourUp, 1);
+        this.container.setBackground(this.colourUp);
     }
     protected onPointerDown() {
-        this.container.setBackground(this.colourDown, 1);
+        this.container.setBackground(this.colourDown);
     }
 
     setPosition (x: number, y: number) {

@@ -21,17 +21,17 @@ export class SelectedTileView {
         this.popup = new UIContainer(scene, 8, 8, 412, 96, "Bottom")
             .setVisible(false)
             .setDepth(2)
-            .setBackground(0xccaaff, 1)
-            .setBorder(1, 0x1a0033, 1);
+            .setBackground(COLOURS.PURPLE_100)
+            .setBorder(1, COLOURS.PURPLE_700);
 
         this.popupText = scene.add.text(8, 8, "...", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontStyle: 'bold' })
             .setColor("#000");
         
         this.npkTab = new ImageButton(scene, 2, 2, 'button-npk')
-            .setBackground(COLOURS.PURPLE_100, COLOURS.PURPLE_200, COLOURS.WHITE, COLOURS.PURPLE_200)
+            .setBackground(COLOURS.PURPLE_200, COLOURS.PURPLE_400, COLOURS.WHITE, COLOURS.PURPLE_500)
             .setBorder(1, COLOURS.BLACK);
         this.flowerTab = new ImageButton(scene, 4 + this.npkTab.width, 2, 'button-flower')
-            .setBackground(COLOURS.PURPLE_100, COLOURS.PURPLE_200, COLOURS.WHITE, COLOURS.PURPLE_200)
+            .setBackground(COLOURS.PURPLE_200, COLOURS.PURPLE_400, COLOURS.WHITE, COLOURS.PURPLE_500)
             .setBorder(1, COLOURS.BLACK);
         
         this.popup.addChild(this.popupText);

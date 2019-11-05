@@ -12,23 +12,20 @@ export class GuiView {
 
     constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, controller: GuiController) {
         this.gameStateManager = gameStateManager;
-        const {
-            width, height
-        } = scene.game.canvas;
 
         const endTurnButton = new TextButton(scene, 10, 10, 98, 24, "End Turn", COLOURS.WHITE, COLOURS.LIGHT_GRAY, "Bottom", "Right")
             .setBorder(1, COLOURS.PURPLE_500)
             .onClick(() => this.gameStateManager.nextState());
 
         const seedContainer = new UIContainer(scene, 8, 8, 108, 24)
-            .setBackground(0xffffff)
-            .setBorder(1, 0x0);
+            .setBackground(COLOURS.WHITE)
+            .setBorder(1, COLOURS.BLACK);
 
         const seedSprite = scene.add.sprite(4, 4, "seed")
             .setOrigin(0, 0);
         this.seedAmountText = scene.add.text(24, 4, "",
             {
-                color: "#000",
+                color: COLOURS.BLACK.rgba,
                 fontStyle: "bold"
             }
         ).setDepth(2);

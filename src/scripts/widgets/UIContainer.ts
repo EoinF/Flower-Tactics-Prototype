@@ -37,21 +37,13 @@ export class UIContainer implements BaseUIObject {
         this.height = height;
     }
     
-    setBackground(color: Phaser.Display.Color | number, alpha: number = 1) {
-        if (typeof(color) === "number") {
-            this.backgroundImage.setFillStyle(color, alpha);
-        } else {
-            this.backgroundImage.setFillStyle(color.color, alpha);
-        }
+    setBackground(color: Phaser.Display.Color) {
+        this.backgroundImage.setFillStyle(color.color, color.alphaGL);
         return this;
     }
 
-    setBorder(thickness: number, color: Phaser.Display.Color | number, alpha: number = 1) {
-        if (typeof(color) === "number") {
-            this.backgroundImage.setStrokeStyle(thickness, color, alpha);
-        } else {
-            this.backgroundImage.setStrokeStyle(thickness, color.color, alpha);
-        }
+    setBorder(thickness: number, color: Phaser.Display.Color) {
+        this.backgroundImage.setStrokeStyle(thickness, color.color, color.alphaGL);
         return this;
     }
 
