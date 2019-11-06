@@ -90,6 +90,18 @@ export class UIContainer implements BaseUIObject {
         return this;
     }
 
+    destroy() {
+        this.clear();
+        this.backgroundImage.destroy();
+    }
+
+    clear() {
+        this.children
+            .filter(child => child != this.backgroundImage)
+            .forEach(child => child.destroy());
+        this.children = [this.backgroundImage];
+    }
+
     on(event: string | symbol, fn: Function, context: any = undefined) {
         this.backgroundImage.on(event, fn, context);
         return this;

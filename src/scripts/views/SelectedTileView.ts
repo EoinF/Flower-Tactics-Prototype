@@ -6,8 +6,33 @@ import { UIContainer } from "../widgets/UIContainer";
 import { ImageButton } from "../widgets/ImageButton";
 import { COLOURS } from "../widgets/constants";
 import { RadioButtonGroup } from "../widgets/RadioButtonGroup";
+import { BaseUIObject } from "../widgets/BaseUIObject";
 
-export class SelectedTileView {
+export class SelectedTileView implements BaseUIObject {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+
+    setPosition(x: number, y: number) {
+        this.x = x;
+        this.y = y;
+        this.popup.setPosition(x, y);
+        return this;
+    };
+    setVisible (isVisible: boolean) {
+        this.popup.setVisible(isVisible);
+        return this;
+    }
+    setDepth (depth: number) {
+        this.popup.setDepth(depth);
+        return this;
+    }
+
+    destroy() {
+        this.popup.destroy();
+    }
+
     private popup: UIContainer;
     private popupText: Phaser.GameObjects.Text;
 
@@ -26,6 +51,11 @@ export class SelectedTileView {
             .setDepth(2)
             .setBackground(COLOURS.PURPLE_100)
             .setBorder(1, COLOURS.PURPLE_700);
+
+        this.x = this.popup.x;
+        this.y = this.popup.y;
+        this.width = this.popup.width;
+        this.height = this.popup.height;
 
         this.popupText = scene.add.text(8, 8, "...", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontStyle: 'bold' })
             .setColor("#000");

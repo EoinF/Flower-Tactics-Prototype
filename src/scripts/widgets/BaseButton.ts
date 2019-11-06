@@ -68,6 +68,10 @@ export class BaseButton implements BaseUIObject {
         return this;
     }
 
+    destroy() {
+        this.container.destroy();
+    }
+
     setBackground(colourUp: Phaser.Display.Color, colourDown: Phaser.Display.Color) {
         this.colourUp = colourUp;
         this.colourDown = colourDown;

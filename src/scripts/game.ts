@@ -5,6 +5,7 @@ import UIScene from './scenes/uiScene'
 import { GameStateManager } from './GameStateManager'
 import { GuiController } from './controllers/GuiController'
 import { SelectedTileController } from './controllers/SelectedTileController'
+import { SeedController } from './controllers/SeedController'
 
 const DEFAULT_WIDTH = 1280
 const DEFAULT_HEIGHT = 720
@@ -37,3 +38,4 @@ window.addEventListener('load', () => {
 export const gameStateManager = new GameStateManager(0);
 export const selectedTileController = new SelectedTileController();
 export const guiController = new GuiController(gameStateManager);
+export const seedController = new SeedController(gameStateManager);

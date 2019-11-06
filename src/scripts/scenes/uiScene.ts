@@ -1,6 +1,5 @@
 import { GuiView } from "../views/GuiView";
-import { guiController, gameStateManager, selectedTileController } from "../game";
-import { SelectedTileView } from "../views/SelectedTileView";
+import { guiController, gameStateManager, selectedTileController, seedController } from "../game";
 
 export default class UIScene extends Phaser.Scene {
     constructor() {
@@ -8,8 +7,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
   create() {
-    const guiView = new GuiView(this, gameStateManager, guiController);
-    const selectedTileView = new SelectedTileView(this, gameStateManager, selectedTileController);
+    const guiView = new GuiView(this, gameStateManager, guiController, selectedTileController, seedController);
   }
 }
   
