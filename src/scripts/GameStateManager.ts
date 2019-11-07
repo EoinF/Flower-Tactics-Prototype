@@ -19,20 +19,28 @@ export interface SeedStatusDelta {
     progress: number;
 }
 
+interface MapLocation {
+    x: number;
+    y: number;
+}
+
 export interface GameStateDelta {
     tileSoilDelta: Array<SoilDelta>;
     flowerDelta: Map<Flower, FlowerDelta>;
     seedStatusDelta: StringMap<SeedStatusDelta>;
+    placedSeeds: StringMap<Array<MapLocation>>;
 }
 
 export class GameStateManager {
     private seed: number;
     gameState: GameState;
     gameStateDelta: GameStateDelta;
-    private callbacks: Function[];
+    private nextStateCallbacks: Array<(nextState: GameState) => void>;
+    private nextDeltaCallbacks: Array<(nextDelta: GameStateDelta) => void>;
     constructor(seed: number) {
         this.seed = seed;
-        this.callbacks = [];
+        this.nextStateCallbacks = [];
+        this.nextDeltaCallbacks = [];
     }
 
     setState(gameStateOrData: GameState | GameStateData) {
@@ -52,9 +60,19 @@ export class GameStateManager {
                     phosphorous: 0
                 })),
             flowerDelta: new Map<Flower, FlowerDelta>(),
-            seedStatusDelta: {}
+            seedStatusDelta: {},
+            placedSeeds: this.generatePlacedSeedsMap()
         };
         this.calculateDelta();
+    }
+
+    generatePlacedSeedsMap() {
+        const placedSeeds: StringMap<Array<MapLocation>> = {};
+        
+        Object.keys(this.gameState.flowerTypes).forEach(type => {
+            placedSeeds[type] = [];
+        })
+        return placedSeeds;
     }
 
     calculateDelta() {
@@ -67,6 +85,7 @@ export class GameStateManager {
             };
         });
         this.gameStateDelta.seedStatusDelta = {};
+        this.gameStateDelta.placedSeeds = this.generatePlacedSeedsMap();
         this.calculateRiverEffects(this.gameStateDelta);
         this.calculateFlowerEffects(this.gameStateDelta);
     }
@@ -98,12 +117,13 @@ export class GameStateManager {
 
         this.gameState = new GameState(copiedData);
         this.calculateDelta();
-        this.callbacks.forEach(callback => callback(this.gameState));
+        this.nextDeltaCallbacks.forEach(f => f(this.gameStateDelta));
+        this.nextStateCallbacks.forEach(callback => callback(this.gameState));
     }
 
     private calculateRiverEffects(gameStateDelta: GameStateDelta) {
         this.gameState.rivers.forEach(river => {
-            const centreTile = this.gameState.getTileAt(river.x, river.y);
+            const centreTile = this.gameState.getTileAt(river.x, river.y)!;
             const soilDelta = getRiverEffect(centreTile, 1);
                 
             gameStateDelta.tileSoilDelta[centreTile.index].nitrogen += soilDelta.nitrogen;
@@ -112,7 +132,7 @@ export class GameStateManager {
 
             this.gameState.getTilesAdjacent(river.x, river.y)
                 .forEach(tile => {
-                    const soilDelta = getRiverEffect(tile, 0.5)
+                    const soilDelta = getRiverEffect(tile, 0.5);
                             
                     gameStateDelta.tileSoilDelta[tile.index].nitrogen += soilDelta.nitrogen;
                     gameStateDelta.tileSoilDelta[tile.index].phosphorous += soilDelta.phosphorous;
@@ -158,7 +178,16 @@ export class GameStateManager {
         });
     }
 
-    onChange(callback: (gameState: GameState) => void) {
-        this.callbacks.push(callback);
+    onNextState(callback: (gameState: GameState) => void) {
+        this.nextStateCallbacks.push(callback);
+    }
+
+    onNextDelta(callback: (gameStateDelta: GameStateDelta) => void) {
+        this.nextDeltaCallbacks.push(callback);
+    }
+
+    placeSeed(type: string, tileX: number, tileY) {
+        this.gameStateDelta.placedSeeds[type].push({x: tileX, y: tileY});
+        this.nextDeltaCallbacks.forEach(f => f(this.gameStateDelta));
     }
 }

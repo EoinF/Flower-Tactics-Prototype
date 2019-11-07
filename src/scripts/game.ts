@@ -6,6 +6,7 @@ import { GameStateManager } from './GameStateManager'
 import { GuiController } from './controllers/GuiController'
 import { SelectedTileController } from './controllers/SelectedTileController'
 import { SeedController } from './controllers/SeedController'
+import { MapController } from './controllers/MapController'
 
 const DEFAULT_WIDTH = 1280
 const DEFAULT_HEIGHT = 720
@@ -32,10 +33,11 @@ const config: GameConfig = {
 }
 
 window.addEventListener('load', () => {
-  let game = new Phaser.Game(config)
+  let game = new Phaser.Game(config);
 })
 
 export const gameStateManager = new GameStateManager(0);
 export const selectedTileController = new SelectedTileController();
 export const guiController = new GuiController(gameStateManager);
-export const seedController = new SeedController(gameStateManager);
+export const mapController = new MapController(gameStateManager);
+export const seedController = new SeedController(mapController);

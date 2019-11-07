@@ -106,4 +106,13 @@ export class UIContainer implements BaseUIObject {
         this.backgroundImage.on(event, fn, context);
         return this;
     }
+
+    hits(x: number, y: number): boolean {
+        return (
+            x >= this.x &&
+            x < this.x + this.width &&
+            y >= this.y &&
+            y < this.y + this.height
+        );
+    }
 }

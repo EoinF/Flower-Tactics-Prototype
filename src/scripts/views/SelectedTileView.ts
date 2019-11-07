@@ -79,7 +79,7 @@ export class SelectedTileView implements BaseUIObject {
         this.popup.addChild(this.npkTab, "Top", "Right");
         this.popup.addChild(this.flowerTab, "Top", "Right");
 
-        gameStateManager.onChange((newState) => {
+        gameStateManager.onNextState((newState) => {
             if (this.activeTileIndex != null) {
                 const tile = newState.tiles[this.activeTileIndex];
                 this.updatePopupText(tile, newState.getFlowersAtTile(tile));

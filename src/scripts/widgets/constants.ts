@@ -22,5 +22,9 @@ export const COLOURS = {
     RED: new Phaser.Display.Color(255, 0, 0),
 
     YELLOW: new Phaser.Display.Color(255, 242, 0),
-    LIGHT_YELLOW: new Phaser.Display.Color(255, 255, 94)
+    LIGHT_YELLOW: new Phaser.Display.Color(255, 255, 94),
+
+    withAlpha: (colour: Phaser.Display.Color, alpha: number) => {
+        return new Phaser.Display.Color(colour.red, colour.green, colour.blue, Math.floor(alpha * 255));
+    }
 };

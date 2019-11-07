@@ -46,7 +46,7 @@ export class GameState implements GameStateData {
 
     private mapTilesToFlowersArray(flowers: Flower[], map: Map<Tile, Flower[]>) {
         flowers.forEach(flower => {
-            const tile = this.getTileAt(flower.x, flower.y);
+            const tile = this.getTileAt(flower.x, flower.y)!;
             const flowerArray = map.get(tile);
             if (flowerArray != null) {
                 map.set(tile, [flower, ...flowerArray]);
@@ -58,13 +58,13 @@ export class GameState implements GameStateData {
 
     private mapTilesToRivers(rivers: River[], map: Map<Tile, River>) {
         rivers.forEach(river => {
-            const tile = this.getTileAt(river.x, river.y);
+            const tile = this.getTileAt(river.x, river.y)!;
             map.set(tile, river);
         });
     }
     private mapTilesToMountains(mountains: Mountain[], map: Map<Tile, Mountain>) {
         mountains.forEach(mountain => {
-            const tile = this.getTileAt(mountain.x, mountain.y);
+            const tile = this.getTileAt(mountain.x, mountain.y)!;
             map.set(tile, mountain);
         });
     }
@@ -82,19 +82,26 @@ export class GameState implements GameStateData {
     }
 
     getFlowerByTypeAt(type: string, x: number, y: number) {
-        const flowers = this.tileToFlowerMap.get(this.getTileAt(x, y));
-        if (flowers != null) {
-            const flower = flowers.find(f => f.type === type);
-            if (flower != null) {
-                return flower;
+        const tile = this.getTileAt(x, y);
+        if (tile != null) {
+            const flowers = this.tileToFlowerMap.get(tile);
+            if (flowers != null) {
+                const flower = flowers.find(f => f.type === type);
+                if (flower != null) {
+                    return flower;
+                }
             }
-        } 
-        throw Error(`No flower of type ${type} found at (${x},${y})`);    
+        }
+        throw Error(`No flower of type ${type} found at (${x},${y})`);
     }
 
-    getTileAt(x: number, y: number): Tile {
-        const tileIndex = x + y * this.numTilesX;
-        return this.tiles[tileIndex];
+    getTileAt(x: number, y: number): Tile | null {
+        if (x >= 0 && x < this.numTilesX && y >= 0 && y < this.numTilesY) {
+            const tileIndex = x + y * this.numTilesX;
+            return this.tiles[tileIndex];
+        } else {
+            return null;
+        }
     }
     
     getTilesAdjacent(x: number, y: number): Tile[] {
@@ -107,7 +114,10 @@ export class GameState implements GameStateData {
         for (let i = minX; i <= maxX; i++) {
             for (let j = minY; j <= maxY; j++) {
                 if (!(i === x && j === y)) {
-                    adjacentTiles.push(this.getTileAt(i, j));
+                    const tile = this.getTileAt(i, j);
+                    if (tile != null) {
+                        adjacentTiles.push(tile);
+                    }
                 }
             }
         }
