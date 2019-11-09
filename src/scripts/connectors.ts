@@ -1,4 +1,4 @@
-import { withLatestFrom, filter, mergeAll } from 'rxjs/operators';
+import { withLatestFrom } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
 import { GameState } from './objects/GameState';
 import { GuiController } from './controllers/GuiController';
@@ -30,13 +30,14 @@ export function setupConnectors(guiController: GuiController, gameStateManager: 
 
     dropSeed$
         .pipe(
-            withLatestFrom(combineLatest([isMouseOverSeedContainer$, gameState$, mapCamera$])),
-            filter(([droppedSeed, [isMouseOverSeedContainer]]) => !isMouseOverSeedContainer),
-        ).subscribe(([droppedSeed, [isMouseOverContainer, gameState, camera]]) => {
-            const tile = guiPositionToTile(gameState, camera, droppedSeed.x, droppedSeed.y);
+            withLatestFrom(combineLatest([isMouseOverSeedContainer$, gameState$, mapCamera$]))
+        ).subscribe(([droppedSeed, [isMouseOverSeedContainer, gameState, camera]]) => {
+            if (!isMouseOverSeedContainer) {
+                const tile = guiPositionToTile(gameState, camera, droppedSeed.x, droppedSeed.y);
 
-            if (tile != null) {
-                gameStateManager.placeSeed(droppedSeed.type, tile.index);
+                if (tile != null) {
+                    gameStateManager.placeSeed(droppedSeed.type, tile.index);
+                }
             }
         });
 

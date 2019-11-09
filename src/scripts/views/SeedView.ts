@@ -4,8 +4,7 @@ import { SeedController } from "../controllers/SeedController";
 import { seedController } from "../game";
 import { GameState } from "../objects/GameState";
 import { COLOURS } from "../widgets/constants";
-import { pipe, combineLatest } from "rxjs";
-import { withLatestFrom, filter } from "rxjs/operators";
+import { combineLatest } from "rxjs";
 
 const SEEDS_PER_ROW = 16;
 const MAX_ROWS = 15;
@@ -14,6 +13,8 @@ export class SeedView {
     scene: Phaser.Scene;
     gameStateManager: GameStateManager;
     seedContainer: UIContainer;
+    savedPositionX: number;
+    savedPositionY: number;
 
     constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, seedController: SeedController, offsetY: number) {
         this.gameStateManager = gameStateManager;
@@ -44,21 +45,6 @@ export class SeedView {
             }
         })
 
-        seedController.dropSeedObservable()
-            .pipe(
-                withLatestFrom(seedController.mouseOverSeedContainerObservable())
-            ).pipe(
-                filter(([a, isMouseOverContainer]) => isMouseOverContainer),
-                withLatestFrom(seedController.startDragSeedObservable())
-            ).subscribe(([a, startSeedDrag]) => {
-                const child = this.seedContainer.children.find(child => {
-                    child.getData("type") == startSeedDrag.type
-                });
-                if (child != null) {
-                    child.setPosition(startSeedDrag.x, startSeedDrag.y);
-                }
-            });
-
         combineLatest(gameStateManager.nextStateObservable(), gameStateManager.nextDeltaObservable())
             .subscribe(([nextState, nextDelta]) => {
                 this.seedContainer.clear();
@@ -87,7 +73,9 @@ export class SeedView {
             .setData("type", type);
         
         seedSprite.on('dragstart', () => {
-            seedController.startDraggingSeed(type, seedSprite.x, seedSprite.y);
+            seedController.dragSeed(type, seedSprite.x, seedSprite.y);
+            this.savedPositionX = seedSprite.x;
+            this.savedPositionY = seedSprite.y;
         });
         
         seedSprite.on('drag', (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
@@ -97,9 +85,8 @@ export class SeedView {
 
         seedSprite.on('dragend', (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
             seedController.dropSeed(type, seedSprite.x, seedSprite.y);
+            seedSprite.setPosition(this.savedPositionX, this.savedPositionY);
         });
-
-        
 
         this.seedContainer.addChild(seedSprite);
     }

@@ -1,5 +1,4 @@
-import { MapController } from "./MapController";
-import { ReplaySubject, Observable } from "rxjs";
+import { ReplaySubject, Observable, Subject } from "rxjs";
 import { distinctUntilChanged } from "rxjs/operators";
 
 interface DragSeed {
@@ -9,25 +8,19 @@ interface DragSeed {
 }
 
 export class SeedController {
-    private startDragSeed$: ReplaySubject<DragSeed>;
-    private dragSeed$: ReplaySubject<DragSeed | null>;
-    private dropSeed$: ReplaySubject<DragSeed>;
+    private dragSeed$: Subject<DragSeed | null>;
+    private dropSeed$: Subject<DragSeed>;
 
-    private mouseOverSeedContainer$: ReplaySubject<boolean>;
+    private mouseOverSeedContainer$: Subject<boolean>;
+    private mouseOverSeedContainerDistinct$: Observable<boolean>;
 
     constructor() {
-        this.startDragSeed$ = new ReplaySubject(1);
         this.dragSeed$ = new ReplaySubject(1);
         this.dropSeed$ = new ReplaySubject(1);
         this.mouseOverSeedContainer$ = new ReplaySubject(1);
-    }
 
-    startDraggingSeed(type: string, savedPositionX: number, savedPositionY: number) {
-        this.startDragSeed$.next({
-            type,
-            x: savedPositionX,
-            y: savedPositionY
-        })
+        this.mouseOverSeedContainerDistinct$ = this.mouseOverSeedContainer$
+            .pipe(distinctUntilChanged());
     }
 
     dragSeed(type: string, x: number, y: number) {
@@ -46,21 +39,16 @@ export class SeedController {
     setMouseOverSeedContainer(isHighlighted: boolean) {
         this.mouseOverSeedContainer$.next(isHighlighted);
     }
-    
-    startDragSeedObservable(): Observable<DragSeed> {
-        return this.startDragSeed$;
-    }
 
     dragSeedObservable(): Observable<DragSeed | null> {
         return this.dragSeed$;
     }
 
-    dropSeedObservable() {
+    dropSeedObservable(): Observable<DragSeed> {
         return this.dropSeed$;
     }
 
-    mouseOverSeedContainerObservable() {
-        return this.mouseOverSeedContainer$
-            .pipe(distinctUntilChanged());
+    mouseOverSeedContainerObservable(): Observable<boolean> {
+        return this.mouseOverSeedContainerDistinct$;
     }
 }
