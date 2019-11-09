@@ -1,5 +1,5 @@
 import { Tile } from "./objects/Tile";
-import { GameStateData } from "./GameState";
+import { GameStateData } from "./objects/GameState";
 import { River } from "./objects/River";
 
 export interface MapGeneratorConfig {

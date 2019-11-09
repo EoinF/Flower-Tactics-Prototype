@@ -7,4 +7,6 @@ export interface BaseUIObject {
     setVisible: (isVisible: boolean) => BaseUIObject;
     setDepth: (depth: number) => BaseUIObject;
     destroy: () => void;
+    getData: (key: string) => any;
+    setData: (key: string, value: any) => void;
 }

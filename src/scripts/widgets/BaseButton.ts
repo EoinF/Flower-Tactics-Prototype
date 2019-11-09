@@ -68,6 +68,14 @@ export class BaseButton implements BaseUIObject {
         return this;
     }
 
+    getData(key: string) {
+        return this.container.getData(key);
+    }
+
+    setData(key: string, value: any) {
+        this.container.setData(key, value);
+    }
+
     destroy() {
         this.container.destroy();
     }

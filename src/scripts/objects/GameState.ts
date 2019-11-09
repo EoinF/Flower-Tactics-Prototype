@@ -1,10 +1,10 @@
-import { Tile } from "./objects/Tile";
-import { Flower } from "./objects/Flower";
-import { Mountain } from "./objects/Mountain";
-import { River } from "./objects/River";
-import { FlowerType } from "./objects/FlowerType";
-import { StringMap } from "./types";
-import { SeedStatusDelta } from "./GameStateManager";
+import { Tile } from "./Tile";
+import { Flower } from "./Flower";
+import { Mountain } from "./Mountain";
+import { River } from "./River";
+import { FlowerType } from "./FlowerType";
+import { StringMap } from "../types";
+import { SeedStatusDelta } from "../controllers/GameStateManager";
 
 export interface GameStateData {
     numTilesX: number;

@@ -12,6 +12,7 @@ export default class MainScene extends Phaser.Scene {
     const soilColourConverter = new SoilColourConverter();
     const mapView = new MapView(this, gameStateManager, soilColourConverter, selectedTileController, seedController, mapController);
     const tileStatsView = new TileStatsView(this, selectedTileController);
+    mapController.setCamera(this.cameras.main);
   }
 
   update() {

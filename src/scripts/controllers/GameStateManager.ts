@@ -1,7 +1,8 @@
-import { GameState, GameStateData } from "./GameState";
-import { getRiverEffect, getFlowerEffect } from "./calculateDeltas";
-import { Flower } from "./objects/Flower";
-import { StringMap } from "./types";
+import { GameState, GameStateData } from "../objects/GameState";
+import { getRiverEffect, getFlowerEffect } from "../calculateDeltas";
+import { Flower } from "../objects/Flower";
+import { StringMap } from "../types";
+import { Observable, ReplaySubject } from "rxjs";
 
 export interface FlowerDelta {
     amount: number;
@@ -19,35 +20,32 @@ export interface SeedStatusDelta {
     progress: number;
 }
 
-interface MapLocation {
-    x: number;
-    y: number;
-}
-
 export interface GameStateDelta {
     tileSoilDelta: Array<SoilDelta>;
     flowerDelta: Map<Flower, FlowerDelta>;
     seedStatusDelta: StringMap<SeedStatusDelta>;
-    placedSeeds: StringMap<Array<MapLocation>>;
+    placedSeeds: StringMap<Array<number>>;
 }
 
 export class GameStateManager {
     private seed: number;
-    gameState: GameState;
-    gameStateDelta: GameStateDelta;
-    private nextStateCallbacks: Array<(nextState: GameState) => void>;
-    private nextDeltaCallbacks: Array<(nextDelta: GameStateDelta) => void>;
+    private gameState: GameState;
+    private gameStateDelta: GameStateDelta;
+    private loadMap$: ReplaySubject<GameState>;
+    private nextState$: ReplaySubject<GameState>;
+    private nextDelta$: ReplaySubject<GameStateDelta>;
     constructor(seed: number) {
         this.seed = seed;
-        this.nextStateCallbacks = [];
-        this.nextDeltaCallbacks = [];
+        this.loadMap$ = new ReplaySubject(1);
+        this.nextState$ = new ReplaySubject(1);
+        this.nextDelta$ = new ReplaySubject(1);
     }
 
     setState(gameStateOrData: GameState | GameStateData) {
         if (gameStateOrData instanceof GameState) {
             this.gameState = gameStateOrData;
         } else {
-            this.gameState = new GameState(gameStateOrData)
+            this.gameState = new GameState(gameStateOrData);
         }
         
         const totalTiles = this.gameState.tiles.length;
@@ -63,11 +61,13 @@ export class GameStateManager {
             seedStatusDelta: {},
             placedSeeds: this.generatePlacedSeedsMap()
         };
+        this.nextState$.next(this.gameState);
+        this.loadMap$.next(this.gameState);
         this.calculateDelta();
     }
 
-    generatePlacedSeedsMap() {
-        const placedSeeds: StringMap<Array<MapLocation>> = {};
+    private generatePlacedSeedsMap() {
+        const placedSeeds: StringMap<Array<number>> = {};
         
         Object.keys(this.gameState.flowerTypes).forEach(type => {
             placedSeeds[type] = [];
@@ -75,7 +75,7 @@ export class GameStateManager {
         return placedSeeds;
     }
 
-    calculateDelta() {
+    private calculateDelta() {
         this.gameStateDelta.flowerDelta.clear();
         this.gameStateDelta.tileSoilDelta.forEach((_, index, array) => {
             array[index] = {
@@ -88,6 +88,7 @@ export class GameStateManager {
         this.gameStateDelta.placedSeeds = this.generatePlacedSeedsMap();
         this.calculateRiverEffects(this.gameStateDelta);
         this.calculateFlowerEffects(this.gameStateDelta);
+        this.nextDelta$.next(this.gameStateDelta);
     }
 
     nextState() {
@@ -117,8 +118,7 @@ export class GameStateManager {
 
         this.gameState = new GameState(copiedData);
         this.calculateDelta();
-        this.nextDeltaCallbacks.forEach(f => f(this.gameStateDelta));
-        this.nextStateCallbacks.forEach(callback => callback(this.gameState));
+        this.nextState$.next(this.gameState);
     }
 
     private calculateRiverEffects(gameStateDelta: GameStateDelta) {
@@ -178,16 +178,20 @@ export class GameStateManager {
         });
     }
 
-    onNextState(callback: (gameState: GameState) => void) {
-        this.nextStateCallbacks.push(callback);
+    nextStateObservable(): Observable<GameState> {
+        return this.nextState$;
     }
 
-    onNextDelta(callback: (gameStateDelta: GameStateDelta) => void) {
-        this.nextDeltaCallbacks.push(callback);
+    nextDeltaObservable(): Observable<GameStateDelta> {
+        return this.nextDelta$;
     }
 
-    placeSeed(type: string, tileX: number, tileY) {
-        this.gameStateDelta.placedSeeds[type].push({x: tileX, y: tileY});
-        this.nextDeltaCallbacks.forEach(f => f(this.gameStateDelta));
+    loadMapObservable(): Observable<GameState> {
+        return this.loadMap$;
+    }
+
+    placeSeed(type: string, tileIndex: number) {
+        this.gameStateDelta.placedSeeds[type].push(tileIndex);
+        this.nextDelta$.next(this.gameStateDelta);
     }
 }

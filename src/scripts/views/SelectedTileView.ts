@@ -1,4 +1,4 @@
-import { GameStateManager } from "../GameStateManager";
+import { GameStateManager } from "../controllers/GameStateManager";
 import { Tile } from "../objects/Tile";
 import { Flower } from "../objects/Flower";
 import { SelectedTileController } from "../controllers/SelectedTileController";
@@ -7,6 +7,9 @@ import { ImageButton } from "../widgets/ImageButton";
 import { COLOURS } from "../widgets/constants";
 import { RadioButtonGroup } from "../widgets/RadioButtonGroup";
 import { BaseUIObject } from "../widgets/BaseUIObject";
+import { combineLatest } from "rxjs";
+import { filter } from "rxjs/operators";
+import { GameState } from "../objects/GameState";
 
 export class SelectedTileView implements BaseUIObject {
     x: number;
@@ -28,6 +31,14 @@ export class SelectedTileView implements BaseUIObject {
         this.popup.setDepth(depth);
         return this;
     }
+    
+    getData(key: string) {
+        return this.popup.getData(key);
+    }
+
+    setData(key: string, value: any) {
+        this.popup.setData(key, value);
+    }
 
     destroy() {
         this.popup.destroy();
@@ -40,12 +51,7 @@ export class SelectedTileView implements BaseUIObject {
     private npkTab: ImageButton;
     private flowerTab: ImageButton;
 
-    private gameStateManager: GameStateManager;
-    private activeTileIndex?: number;
-
     constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, selectedTileController: SelectedTileController) {
-        this.gameStateManager = gameStateManager;
-
         this.popup = new UIContainer(scene, 8, 8, 412, 96, "Bottom")
             .setVisible(false)
             .setDepth(2)
@@ -68,55 +74,47 @@ export class SelectedTileView implements BaseUIObject {
             .setBorder(1, COLOURS.GRAY);
 
         this.tabGroup = new RadioButtonGroup([this.npkTab, this.flowerTab])
-            .onChange(() => {
-                if (this.activeTileIndex != null) {
-                    const tile = this.gameStateManager.gameState.tiles[this.activeTileIndex];
-                    this.updatePopupText(tile, this.gameStateManager.gameState.getFlowersAtTile(tile));
-                }
-            })
+            .onChange((index) => {
+                selectedTileController.setActiveTabIndex(index);
+            });
         
         this.popup.addChild(this.popupText);
         this.popup.addChild(this.npkTab, "Top", "Right");
         this.popup.addChild(this.flowerTab, "Top", "Right");
 
-        gameStateManager.onNextState((newState) => {
-            if (this.activeTileIndex != null) {
-                const tile = newState.tiles[this.activeTileIndex];
-                this.updatePopupText(tile, newState.getFlowersAtTile(tile));
-            }
-        });
-        selectedTileController.onChange((x, y) => {
-            this.onSetActiveTile(x, y);
-        })
+        combineLatest(gameStateManager.nextStateObservable(), 
+            selectedTileController.activeTileObservable(),
+            selectedTileController.activeTabObservable())
+            .pipe(
+                filter(([newState, activeTile]) => activeTile != null)
+            ).subscribe(([newState, activeTile, activeTab]) => {
+                if (activeTile != null) {
+                    this.popup.setVisible(true);
+                    const tile = newState.getTileAt(activeTile.x, activeTile.y)!;
+                    this.updatePopupText(newState, tile, activeTab);
+                } else {
+                    this.popup.setVisible(false);
+                }
+            });
     }
 
-    private onSetActiveTile(tileX: number, tileY: number) {
-        this.activeTileIndex = tileX + tileY * this.gameStateManager.gameState.numTilesX;
-
-        const tile = this.gameStateManager.gameState.tiles[this.activeTileIndex];
-        
-        this.popup.setVisible(true);
-
-        this.updatePopupText(tile, this.gameStateManager.gameState.getFlowersAtTile(tile));
-    }
-
-    private updatePopupText(tile: Tile, flowers: Flower[]) {
-        if (this.tabGroup.selectedButtonIndex == 0) {
-            this.setSoilText(tile, flowers);
+    private updatePopupText(gameState: GameState, tile: Tile, activeTab: number) {
+        if (activeTab == 0) {
+            this.setSoilText(gameState, tile);
         } else {
-            this.setFlowerText(tile, flowers);
+            this.setFlowerText(gameState, tile);
         }
     }
 
-    private setSoilText(tile: Tile, flowers: Flower[]) {
+    private setSoilText(gameState: GameState, tile: Tile) {
         const nitrogenContent = (tile.soil.nitrogenContent).toFixed(2);
         const phosphorousContent = (tile.soil.phosphorousContent).toFixed(2);
         const potassiumContent = (tile.soil.potassiumContent).toFixed(2);
         
         let titleText = "Plains";
-        if (this.gameStateManager.gameState.getRiverAtTile(tile) != null) {
+        if (gameState.getRiverAtTile(tile) != null) {
             titleText = "River";
-        } else if (this.gameStateManager.gameState.getMountainAtTile(tile) != null) {
+        } else if (gameState.getMountainAtTile(tile) != null) {
             titleText = "Mountains";
         }
         
@@ -128,16 +126,16 @@ export class SelectedTileView implements BaseUIObject {
         this.popupText.setText(lines);
     }
     
-    private setFlowerText(tile: Tile, flowers: Flower[]) {
-        
+    private setFlowerText(gameState: GameState, tile: Tile) {
+        const flowers = gameState.getFlowersAtTile(tile);
         let titleText = "Plains";
-        if (this.gameStateManager.gameState.getRiverAtTile(tile) != null) {
+        if (gameState.getRiverAtTile(tile) != null) {
             titleText = "River";
-        } else if (this.gameStateManager.gameState.getMountainAtTile(tile) != null) {
+        } else if (gameState.getMountainAtTile(tile) != null) {
             titleText = "Mountains";
         }
 
-        const flowerTypesMap = this.gameStateManager.gameState.flowerTypes;
+        const flowerTypesMap = gameState.flowerTypes;
         
         let lines = [
             titleText,

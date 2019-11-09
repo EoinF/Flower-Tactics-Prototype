@@ -1,4 +1,4 @@
-import { GameStateManager } from "../GameStateManager";
+import { GameStateManager } from "../controllers/GameStateManager";
 import { Tile } from "../objects/Tile";
 import { Flower } from "../objects/Flower";
 import { SelectedTileController } from "../controllers/SelectedTileController";
@@ -20,8 +20,12 @@ export class TileStatsView {
             .setDepth(1)
             .setVisible(false);
 
-        this.selectedTileController.onChange((x, y) => {
-            this.onSetActiveTile(x, y);
+        this.selectedTileController.activeTileObservable().subscribe((activeTile) => {
+            if (activeTile != null) {
+                this.onSetActiveTile(activeTile.x, activeTile.y);
+            } else {
+                this.highlightImage.setVisible(false);
+            }
         })
     }
 

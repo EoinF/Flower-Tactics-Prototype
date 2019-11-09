@@ -1,12 +1,17 @@
-import { GameStateManager } from "../GameStateManager";
+import { Observable, Subject, ReplaySubject } from 'rxjs';
 
 export class GuiController {
-    gameStateManager: GameStateManager
-    constructor(gameStateManager: GameStateManager) {
-        this.gameStateManager = gameStateManager;
+    private endTurn$: Subject<void>;
+
+    constructor() {
+        this.endTurn$ = new ReplaySubject(1);
     }
 
-    nextTurn() {
-        this.gameStateManager.nextState();
+    endTurn() {
+        this.endTurn$.next();
+    }
+
+    endTurnObservable(): Observable<void> {
+        return this.endTurn$;
     }
 }

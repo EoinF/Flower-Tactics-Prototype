@@ -1,13 +1,13 @@
 import { SoilColourConverter } from "./SoilColourConverter";
 import { Tile } from "./objects/Tile";
-import { GameStateData } from "./GameState";
+import { GameStateData } from "./objects/GameState";
 import { Flower } from "./objects/Flower";
 import { Mountain } from "./objects/Mountain";
 import { River } from "./objects/River";
 import { RGBtoHSL } from "./extensions";
 import { FlowerType } from "./objects/FlowerType";
 import { StringMap } from "./types";
-import { SeedStatusDelta } from "./GameStateManager";
+import { SeedStatusDelta } from "./controllers/GameStateManager";
 
 export interface ObjectData {
     flowers: Flower[];

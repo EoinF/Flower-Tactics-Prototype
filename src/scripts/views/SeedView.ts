@@ -1,9 +1,11 @@
-import { GameStateManager, GameStateDelta } from "../GameStateManager";
+import { GameStateManager, GameStateDelta } from "../controllers/GameStateManager";
 import { UIContainer } from "../widgets/UIContainer";
 import { SeedController } from "../controllers/SeedController";
 import { seedController } from "../game";
-import { GameState } from "../GameState";
+import { GameState } from "../objects/GameState";
 import { COLOURS } from "../widgets/constants";
+import { pipe, combineLatest } from "rxjs";
+import { withLatestFrom, filter } from "rxjs/operators";
 
 const SEEDS_PER_ROW = 16;
 const MAX_ROWS = 15;
@@ -18,43 +20,50 @@ export class SeedView {
         this.scene = scene;
 
         this.seedContainer = new UIContainer(scene, 8, offsetY + 4, 16 + SEEDS_PER_ROW * 8, 24 * MAX_ROWS, "Bottom")
-            .setBackground(COLOURS.withAlpha(COLOURS.LIGHT_GRAY, 0.1))
+            .setBackground(COLOURS.withAlpha(COLOURS.GRAY, 0.1))
             .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.3))
             .setInteractive();
 
         scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
             if (this.seedContainer.hits(pointer.x, pointer.y)) {
-                seedController.setMouseOverContainer(true);
+                seedController.setMouseOverSeedContainer(true);
             } else {
-                seedController.setMouseOverContainer(false);
+                seedController.setMouseOverSeedContainer(false);
             }
         });
 
-        seedController.onSetContainerHighlighted((isHighlighted) => {
+        seedController.mouseOverSeedContainerObservable().subscribe((isHighlighted) => {
             if (isHighlighted) {
                 this.seedContainer
-                    .setBackground(COLOURS.withAlpha(COLOURS.LIGHT_GRAY, 0.6))
-                    .setBorder(1, COLOURS.withAlpha(COLOURS.LIGHT_GRAY, 0.8))
+                    .setBackground(COLOURS.withAlpha(COLOURS.PURPLE_300, 0.9))
+                    .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.8))
             } else {
                 this.seedContainer
-                    .setBackground(COLOURS.withAlpha(COLOURS.LIGHT_GRAY, 0.1))
+                    .setBackground(COLOURS.withAlpha(COLOURS.GRAY, 0.1))
                     .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.3))
             }
         })
 
-        seedController.onDropSeedOverContainer((spriteIndex: number, savedX: number, savedY: number) => {
-            this.seedContainer.children[spriteIndex].setPosition(savedX, savedY);
-        });
+        seedController.dropSeedObservable()
+            .pipe(
+                withLatestFrom(seedController.mouseOverSeedContainerObservable())
+            ).pipe(
+                filter(([a, isMouseOverContainer]) => isMouseOverContainer),
+                withLatestFrom(seedController.startDragSeedObservable())
+            ).subscribe(([a, startSeedDrag]) => {
+                const child = this.seedContainer.children.find(child => {
+                    child.getData("type") == startSeedDrag.type
+                });
+                if (child != null) {
+                    child.setPosition(startSeedDrag.x, startSeedDrag.y);
+                }
+            });
 
-        gameStateManager.onNextState(() => {
-            this.seedContainer.clear();
-            this.addSeedGUI(this.gameStateManager.gameState, this.gameStateManager.gameStateDelta);
-        });
-        gameStateManager.onNextDelta(() => {
-            this.seedContainer.clear();
-            this.addSeedGUI(this.gameStateManager.gameState, this.gameStateManager.gameStateDelta);
-        });
-        this.addSeedGUI(this.gameStateManager.gameState, this.gameStateManager.gameStateDelta);
+        combineLatest(gameStateManager.nextStateObservable(), gameStateManager.nextDeltaObservable())
+            .subscribe(([nextState, nextDelta]) => {
+                this.seedContainer.clear();
+                this.addSeedGUI(nextState, nextDelta);
+            });
     }
 
     addSeedGUI(gameState: GameState, gameStateDelta: GameStateDelta) {
@@ -74,10 +83,11 @@ export class SeedView {
         
         const seedSprite = this.scene.add.sprite((x * 8) + 4, this.seedContainer.height + ((y + 1) * -24) + 4, "seed2")
             .setOrigin(0, 0)
-            .setInteractive({draggable: true});
+            .setInteractive({draggable: true})
+            .setData("type", type);
         
         seedSprite.on('dragstart', () => {
-            seedController.startDraggingSeed(this.seedContainer.children.indexOf(seedSprite), seedSprite.x, seedSprite.y);
+            seedController.startDraggingSeed(type, seedSprite.x, seedSprite.y);
         });
         
         seedSprite.on('drag', (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
@@ -88,6 +98,7 @@ export class SeedView {
         seedSprite.on('dragend', (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
             seedController.dropSeed(type, seedSprite.x, seedSprite.y);
         });
+
         
 
         this.seedContainer.addChild(seedSprite);

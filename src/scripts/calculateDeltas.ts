@@ -2,7 +2,7 @@ import { Tile } from "./objects/Tile";
 import { Flower } from "./objects/Flower";
 import { StringMap } from "./types";
 import { FlowerType } from "./objects/FlowerType";
-import { SoilDelta, FlowerDelta, SeedStatusDelta } from "./GameStateManager";
+import { SoilDelta, FlowerDelta, SeedStatusDelta } from "./controllers/GameStateManager";
 
 export function getRiverEffect(tile: Tile, amount: number): SoilDelta {
     return {

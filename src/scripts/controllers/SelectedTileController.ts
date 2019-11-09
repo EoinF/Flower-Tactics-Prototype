@@ -1,16 +1,27 @@
+import { Subject, ReplaySubject, BehaviorSubject, Observable } from "rxjs";
 
 export class SelectedTileController {
-    callbacks: Array<(x: number, y: number) => void>
+    private activeTile$: Subject<{x: number, y: number} | null>;
+    private activeTab$: Subject<number>;
 
     constructor() {
-        this.callbacks = [];
+        this.activeTile$ = new BehaviorSubject<{x: number, y: number} | null>(null);
+        this.activeTab$ = new BehaviorSubject(0);
     }
 
-    onChange(callback: (x: number, y: number) => void) {
-        this.callbacks.push(callback);
+    activeTileObservable(): Observable<{x: number, y: number} | null> {
+        return this.activeTile$;
     }
 
-    setActiveTile(tileX: number, tileY: number) {
-        this.callbacks.forEach(f => f(tileX, tileY));
+    activeTabObservable(): Observable<number> {
+        return this.activeTab$;
+    }
+
+    setActiveTile(x: number, y: number) {
+        this.activeTile$.next({x, y})
+    }
+    
+    setActiveTabIndex(index: number) {
+        this.activeTab$.next(index);
     }
 }

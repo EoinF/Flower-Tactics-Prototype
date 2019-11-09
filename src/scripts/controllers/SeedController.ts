@@ -1,78 +1,66 @@
 import { MapController } from "./MapController";
+import { ReplaySubject, Observable } from "rxjs";
+import { distinctUntilChanged } from "rxjs/operators";
+
+interface DragSeed {
+    type: string,
+    x: number,
+    y: number
+}
 
 export class SeedController {
-    private mapController: MapController;
-    private onDragSeedOverMapCallbacks: Array<(seedType: string, x: number, y: number) => void>;
-    private onDropSeedOverMapCallbacks: Array<(seedType: string, x: number, y: number) => void>;
-    private onSetContainerHighlightedCallbacks: Array<(isHighlighted: boolean) => void>;
-    private onDropSeedOverContainerCallbacks: Array<(spriteIndex: number, x: number, y: number) => void>;
+    private startDragSeed$: ReplaySubject<DragSeed>;
+    private dragSeed$: ReplaySubject<DragSeed | null>;
+    private dropSeed$: ReplaySubject<DragSeed>;
 
-    private heldSeed: number | null;
-    private savedPositionX: number;
-    private savedPositionY: number;
+    private mouseOverSeedContainer$: ReplaySubject<boolean>;
 
-    private isMouseOverContainer: boolean;
-
-    constructor(mapController: MapController) {
-        this.mapController = mapController;
-        this.onDragSeedOverMapCallbacks = [];
-        this.onDropSeedOverMapCallbacks = [];
-        this.onSetContainerHighlightedCallbacks = [];
-        this.onDropSeedOverContainerCallbacks =[];
+    constructor() {
+        this.startDragSeed$ = new ReplaySubject(1);
+        this.dragSeed$ = new ReplaySubject(1);
+        this.dropSeed$ = new ReplaySubject(1);
+        this.mouseOverSeedContainer$ = new ReplaySubject(1);
     }
 
-    startDraggingSeed(heldSeed: number | null, savedPositionX: number, savedPositionY: number) {
-        this.savedPositionX = savedPositionX;
-        this.savedPositionY = savedPositionY;
-        this.heldSeed = heldSeed;
+    startDraggingSeed(type: string, savedPositionX: number, savedPositionY: number) {
+        this.startDragSeed$.next({
+            type,
+            x: savedPositionX,
+            y: savedPositionY
+        })
     }
 
     dragSeed(type: string, x: number, y: number) {
-        if (!this.isMouseOverContainer) {
-            this.dragSeedOverMap(type, x, y);
-        } else {
-            this.mapController.dragSeedOverTile(null);
-        }
+        this.dragSeed$.next({
+            type, x, y
+        })
     }
 
     dropSeed(type: string, x: number, y: number) {
-        if (!this.isMouseOverContainer) {
-            this.dropSeedOverMap(type, x, y);
-        } else {
-            this.dropSeedOverContainer(this.heldSeed!, this.savedPositionX, this.savedPositionY);
-        }
+        this.dropSeed$.next({
+            type, x, y
+        });
+        this.dragSeed$.next(null);
     }
 
-    dragSeedOverMap(seedType: string, x: number, y: number) {
-        this.onDragSeedOverMapCallbacks.forEach(f => f(seedType, x, y));
-    }
-
-    dropSeedOverMap(seedType: string, x: number, y: number) {
-        this.onDropSeedOverMapCallbacks.forEach(f => f(seedType, x, y));
-    }
-
-    dropSeedOverContainer(seedIndex: number, savedPositionX: number, savedPositionY: number) {
-        this.onDropSeedOverContainerCallbacks.forEach(f => f(seedIndex, savedPositionX, savedPositionY));
-    }
-
-    setMouseOverContainer(isHighlighted: boolean) {
-        this.isMouseOverContainer = isHighlighted;
-        this.onSetContainerHighlightedCallbacks.forEach(f => f(isHighlighted));
-    }
-
-    onSetContainerHighlighted(callback: (isHighlighted: boolean) => void) {
-        this.onSetContainerHighlightedCallbacks.push(callback);
-    }
-
-    onDragSeedOverMap(callback: (seedType: string, x: number, y: number) => void) {
-        this.onDragSeedOverMapCallbacks.push(callback);
-    }
-
-    onDropSeedOverMap(callback: (seedType: string, x: number, y: number) => void) {
-        this.onDropSeedOverMapCallbacks.push(callback);
+    setMouseOverSeedContainer(isHighlighted: boolean) {
+        this.mouseOverSeedContainer$.next(isHighlighted);
     }
     
-    onDropSeedOverContainer(callback: (spriteIndex: number, x: number, y: number) => void) {
-        this.onDropSeedOverContainerCallbacks.push(callback);
+    startDragSeedObservable(): Observable<DragSeed> {
+        return this.startDragSeed$;
+    }
+
+    dragSeedObservable(): Observable<DragSeed | null> {
+        return this.dragSeed$;
+    }
+
+    dropSeedObservable() {
+        return this.dropSeed$;
+    }
+
+    mouseOverSeedContainerObservable() {
+        return this.mouseOverSeedContainer$
+            .pipe(distinctUntilChanged());
     }
 }

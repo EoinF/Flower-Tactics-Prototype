@@ -1,28 +1,28 @@
-import { GameStateManager } from "../GameStateManager";
+import { Observable, ReplaySubject, Subject } from "rxjs";
+import { Tile } from "../objects/Tile";
 
 export class MapController {
-    gameStateManager: GameStateManager;
-    savedDragSeedOverTileIndex: number | null;
-    dragSeedOverTileCallbacks: Array<(newIndex: number | null, oldIndex: number | null) => void>;
+    dragSeedOverTile$: Subject<Tile | null>;
+    camera$: Subject<Phaser.Cameras.Scene2D.Camera>;
 
-    constructor(gameStateManager: GameStateManager) {
-        this.dragSeedOverTileCallbacks = [];
-        this.gameStateManager = gameStateManager;
+    constructor() {
+        this.dragSeedOverTile$ = new ReplaySubject(1);
+        this.camera$ = new ReplaySubject(1);
     }
 
-    dragSeedOverTile(newIndex: number | null) {
-        this.dragSeedOverTileCallbacks.forEach(f => f(newIndex, this.savedDragSeedOverTileIndex));
-        this.savedDragSeedOverTileIndex = newIndex;
+    dragSeedOverTile(tile: Tile | null) {
+        this.dragSeedOverTile$.next(tile);
     }
 
-    onDragSeedOverTile(callback: (newIndex: number | null, oldIndex: number | null) => void) {
-        this.dragSeedOverTileCallbacks.push(callback);
+    dragSeedOverTileObservable(): Observable<Tile | null> {
+        return this.dragSeedOverTile$;
     }
 
-    placeSeed(type: string, tileX: number, tileY: number) {
-        if (this.gameStateManager.gameState.getTileAt(tileX, tileY) != null) {
-            this.gameStateManager.placeSeed(type, tileX, tileY);
-        }
-        this.dragSeedOverTile(null);
+    setCamera(camera: Phaser.Cameras.Scene2D.Camera) {
+        this.camera$.next(camera);
+    }
+
+    cameraObservable(): Observable<Phaser.Cameras.Scene2D.Camera> {
+        return this.camera$;
     }
 }
