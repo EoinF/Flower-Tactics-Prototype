@@ -17,6 +17,9 @@ export class MapView {
 	riverSprites: Phaser.GameObjects.Image[];
 	placedSeedSprites: Phaser.GameObjects.Image[];
 
+	savedPositionX: number;
+	savedPositionY: number;
+
     constructor(
       scene: Phaser.Scene, 
       gameStateManager: GameStateManager, 
@@ -97,7 +100,7 @@ export class MapView {
           this.tileSprites.forEach(img => {
             const tile = newState.getTileAt(img.getData("x"), img.getData("y"))!;
             img.setTint(this.soilColourConverter.soilToColour(tile.soil).color);
-          })
+		  })
           this.flowerSprites.forEach(img => {
             const flower = newState.getFlowerByTypeAt(img.getData("type"), img.getData("x"), img.getData("y"));
             img.setScale(flower.amount / 100);
@@ -115,8 +118,18 @@ export class MapView {
 					.forEach(type => {
 						newStateDelta.placedSeeds[type]
 							.forEach(tileIndex => {
-								const location = this.indexToMapCoordinates(tileIndex, newState.numTilesX)
-								this.placedSeedSprites.push(this.scene.add.image(location.x * 48, location.y * 48, "seed2"));
+								const location = this.indexToMapCoordinates(tileIndex, newState.numTilesX);
+								const seedSprite = this.scene.add.image(location.x * 48, location.y * 48, "seed2")
+									.setInteractive({draggable: true})
+									.setDepth(99);
+								
+								seedSprite.on('pointerdown', (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
+									seedController.pickUpSeed(type, pointer.x, pointer.y, 'SEED_ORIGIN_MAP');
+									this.placedSeedSprites = this.placedSeedSprites.filter(s => s != seedSprite);
+									seedSprite.destroy();
+								});
+								
+								this.placedSeedSprites.push(seedSprite);
 							})
 					});
 			});

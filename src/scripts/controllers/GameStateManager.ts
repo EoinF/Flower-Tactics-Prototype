@@ -190,8 +190,21 @@ export class GameStateManager {
         return this.loadMap$;
     }
 
+    moveSeed(type: string, previousTileIndex: number, nextTileIndex: number) {
+        const arrayIndex = this.gameStateDelta.placedSeeds[type].findIndex(existing => existing == previousTileIndex);
+        this.gameStateDelta.placedSeeds[type] = this.gameStateDelta.placedSeeds[type].filter((existing, index) => index != arrayIndex);
+        this.gameStateDelta.placedSeeds[type].push(nextTileIndex);
+        this.nextDelta$.next(this.gameStateDelta);
+    }
+
     placeSeed(type: string, tileIndex: number) {
         this.gameStateDelta.placedSeeds[type].push(tileIndex);
+        this.nextDelta$.next(this.gameStateDelta);
+    }
+
+    removeSeed(type: string, tileIndex: number) {
+        const arrayIndex = this.gameStateDelta.placedSeeds[type].findIndex(existing => existing == tileIndex);
+        this.gameStateDelta.placedSeeds[type] = this.gameStateDelta.placedSeeds[type].filter((existing, index) => index != arrayIndex);
         this.nextDelta$.next(this.gameStateDelta);
     }
 }

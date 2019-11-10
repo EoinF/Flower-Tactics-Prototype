@@ -23,6 +23,7 @@ export function setupConnectors(guiController: GuiController, gameStateManager: 
     const gameState$ = gameStateManager.nextStateObservable();
     const mapCamera$ = mapController.cameraObservable();
     const isMouseOverSeedContainer$ = seedController.mouseOverSeedContainerObservable();
+    const pickUpSeed$ = seedController.pickUpSeedObservable();
 
     endTurn$.subscribe(() => {
         gameStateManager.nextState();
@@ -30,15 +31,27 @@ export function setupConnectors(guiController: GuiController, gameStateManager: 
 
     dropSeed$
         .pipe(
-            withLatestFrom(combineLatest([isMouseOverSeedContainer$, gameState$, mapCamera$]))
-        ).subscribe(([droppedSeed, [isMouseOverSeedContainer, gameState, camera]]) => {
+            withLatestFrom(combineLatest([isMouseOverSeedContainer$, gameState$, mapCamera$, pickUpSeed$]))
+        ).subscribe(([droppedSeed, [isMouseOverSeedContainer, gameState, camera, pickedUpSeed]]) => {
             if (!isMouseOverSeedContainer) {
                 const tile = guiPositionToTile(gameState, camera, droppedSeed.x, droppedSeed.y);
 
                 if (tile != null) {
-                    gameStateManager.placeSeed(droppedSeed.type, tile.index);
+                    if (pickedUpSeed.origin == 'SEED_ORIGIN_INVENTORY') {
+                        gameStateManager.placeSeed(droppedSeed.type, tile.index);
+                    } else { // SEED_ORIGIN_MAP
+                        const pickedUpTile = guiPositionToTile(gameState, camera, pickedUpSeed.x, pickedUpSeed.y)!;
+                        gameStateManager.moveSeed(droppedSeed.type, pickedUpTile.index, tile.index);
+                    }
+                    return;
+                }
+            } else if (pickedUpSeed.origin == 'SEED_ORIGIN_MAP') {
+                const tile = guiPositionToTile(gameState, camera, pickedUpSeed.x, pickedUpSeed.y);
+                if (tile != null) {
+                    gameStateManager.removeSeed(pickedUpSeed.type, tile.index);
                 }
             }
+            seedController.resetPickedUpSeed();
         });
 
     combineLatest(dragSeed$, mapCamera$, isMouseOverSeedContainer$)

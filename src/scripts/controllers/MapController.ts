@@ -1,6 +1,11 @@
 import { Observable, ReplaySubject, Subject } from "rxjs";
 import { Tile } from "../objects/Tile";
 
+interface MapLocation {
+    x: number;
+    y: number;
+}
+
 export class MapController {
     dragSeedOverTile$: Subject<Tile | null>;
     camera$: Subject<Phaser.Cameras.Scene2D.Camera>;

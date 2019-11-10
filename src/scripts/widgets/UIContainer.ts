@@ -30,7 +30,7 @@ export class UIContainer implements BaseUIObject {
 
         this.depth = 0;
         this.isVisible = true;
-        this.children = [this.backgroundImage];
+        this.children = [];
         this.x = ax;
         this.y = ay;
         this.width = width;
@@ -66,6 +66,7 @@ export class UIContainer implements BaseUIObject {
         const diffY = y - this.y;
         this.x = x;
         this.y = y;
+        this.backgroundImage.setPosition(this.backgroundImage.x + diffX, this.backgroundImage.y + diffY);
         this.children.forEach(child => {
             child.setPosition(child.x + diffX, child.y + diffY);
         });
@@ -82,6 +83,7 @@ export class UIContainer implements BaseUIObject {
     setVisible(isVisible: boolean) {
         this.isVisible = isVisible;
         this.children.forEach(child => child.setVisible(this.isVisible));
+        this.backgroundImage.setVisible(this.isVisible);
         return this;
     }
 
@@ -91,10 +93,16 @@ export class UIContainer implements BaseUIObject {
     
     setData(key: string, value: any) {
         this.backgroundImage.setData(key, value);
+        return this;
     }
 
     setInteractive() {
         this.backgroundImage.setInteractive();
+        return this;
+    }
+
+    removeInteractive() {
+        this.backgroundImage.removeInteractive();
         return this;
     }
 
@@ -105,9 +113,8 @@ export class UIContainer implements BaseUIObject {
 
     clear() {
         this.children
-            .filter(child => child != this.backgroundImage)
             .forEach(child => child.destroy());
-        this.children = [this.backgroundImage];
+        this.children = [];
     }
 
     on(event: string | symbol, fn: Function, context: any = undefined) {

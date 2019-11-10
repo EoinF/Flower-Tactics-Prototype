@@ -38,6 +38,12 @@ export class SelectedTileView implements BaseUIObject {
 
     setData(key: string, value: any) {
         this.popup.setData(key, value);
+        return this;
+    }
+    
+    removeInteractive() {
+        this.popup.removeInteractive();
+        return this;
     }
 
     destroy() {
