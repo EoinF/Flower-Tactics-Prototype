@@ -26,7 +26,7 @@ export class SeedController {
         this.pickUpSeed$ = new ReplaySubject(1);
         this.resetPickedUpSeed$ = new Subject();
         this.dragSeed$ = new ReplaySubject(1);
-        this.dropSeed$ = new ReplaySubject(1);
+        this.dropSeed$ = new Subject();
         this.mouseOverSeedContainer$ = new ReplaySubject(1);
 
         this.mouseOverSeedContainerDistinct$ = this.mouseOverSeedContainer$

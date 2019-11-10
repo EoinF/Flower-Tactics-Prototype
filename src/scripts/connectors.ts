@@ -54,7 +54,7 @@ export function setupConnectors(guiController: GuiController, gameStateManager: 
             if (!isMouseOverSeedContainer) {
                 const tileXY = guiPositionToTileLocation(camera, droppedSeed.x, droppedSeed.y);
                 const tile = gameState.getTileAt(tileXY.tileX, tileXY.tileY);
-
+                
                 if (tile != null) {
                     if (pickedUpSeed.origin == 'SEED_ORIGIN_INVENTORY') {
                         gameStateManager.placeSeed(droppedSeed.type, tile.index);
@@ -68,6 +68,7 @@ export function setupConnectors(guiController: GuiController, gameStateManager: 
                 const pickedUpTile = gameState.getTileAt(pickedUpSeed.x, pickedUpSeed.y);
                 if (pickedUpTile != null) {
                     gameStateManager.removeSeed(pickedUpSeed.type, pickedUpTile.index);
+                    return;
                 }
             }
             seedController.resetPickedUpSeed();

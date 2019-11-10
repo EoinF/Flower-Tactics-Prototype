@@ -4,8 +4,9 @@ import { SelectedTileController } from "../controllers/SelectedTileController";
 import { SeedController } from "../controllers/SeedController";
 import { COLOURS } from "../widgets/constants";
 import { MapController } from "../controllers/MapController";
-import { startWith, pairwise, distinct, distinctUntilChanged, distinctUntilKeyChanged, take, tap, publish, withLatestFrom } from "rxjs/operators";
+import { startWith, pairwise, distinct, distinctUntilChanged, distinctUntilKeyChanged, take, tap, publish, withLatestFrom, first } from "rxjs/operators";
 import { range, ReplaySubject } from "rxjs";
+import { GameState } from "../objects/GameState";
 
 export class MapView {
     scene: Phaser.Scene;
@@ -118,18 +119,7 @@ export class MapView {
 					.forEach(type => {
 						newStateDelta.placedSeeds[type]
 							.forEach(tileIndex => {
-								const location = this.indexToMapCoordinates(tileIndex, newState.numTilesX);
-								const seedSprite = this.scene.add.image(location.x * 48, location.y * 48, "seed2")
-									.setInteractive({draggable: true})
-									.setDepth(99);
-								
-								seedSprite.on('pointerdown', (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
-									seedController.pickUpSeed(type, pointer.x, pointer.y, 'SEED_ORIGIN_MAP');
-									this.placedSeedSprites = this.placedSeedSprites.filter(s => s != seedSprite);
-									seedSprite.destroy();
-								});
-								
-								this.placedSeedSprites.push(seedSprite);
+								this.addNewSeed(tileIndex, type, newState, seedController);
 							})
 					});
 			});
@@ -151,5 +141,27 @@ export class MapView {
 					sprite.setTint(COLOURS.PURPLE_200.color);
 				}
 			});
-    }
+	}
+	
+	addNewSeed(tileIndex: number, seedType: string, newState: GameState, seedController: SeedController) {
+		const location = this.indexToMapCoordinates(tileIndex, newState.numTilesX);
+		const seedSprite = this.scene.add.image(location.x * 48, location.y * 48, "seed2")
+			.setInteractive({draggable: true})
+			.setDepth(99);
+		
+		seedSprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+			seedController.pickUpSeed(seedType, pointer.x, pointer.y, 'SEED_ORIGIN_MAP');
+			this.placedSeedSprites = this.placedSeedSprites.filter(s => s != seedSprite);
+			seedSprite.destroy();
+			
+			const subscription = seedController.resetPickedUpSeedObservable()
+				.pipe(first())
+				.subscribe(() => this.addNewSeed(tileIndex, seedType, newState, seedController));
+			seedController.dropSeedObservable()
+				.pipe(first())
+				.subscribe(() => subscription.unsubscribe());
+		});
+		
+		this.placedSeedSprites.push(seedSprite);
+	}
 }
