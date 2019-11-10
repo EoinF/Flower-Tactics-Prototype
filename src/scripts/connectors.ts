@@ -1,4 +1,4 @@
-import { withLatestFrom } from 'rxjs/operators';
+import { withLatestFrom, map } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
 import { GameState } from './objects/GameState';
 import { GuiController } from './controllers/GuiController';
@@ -6,14 +6,19 @@ import { GameStateManager } from './controllers/GameStateManager';
 import { SeedController } from './controllers/SeedController';
 import { MapController } from './controllers/MapController';
 
-function guiPositionToTile(gameState: GameState, camera: Phaser.Cameras.Scene2D.Camera, x: number, y: number) {
+interface TileLocation {
+    tileX: number,
+    tileY: number
+}
+
+function guiPositionToTileLocation(camera: Phaser.Cameras.Scene2D.Camera, x: number, y: number): TileLocation {
     const {
         x: worldX,
         y: worldY
     } = camera.getWorldPoint(x, y);
     const tileX = Math.floor((worldX + 24) / 48);
     const tileY = Math.floor((worldY + 24) / 48);
-    return gameState.getTileAt(tileX, tileY);
+    return { tileX, tileY };
 }
 
 export function setupConnectors(guiController: GuiController, gameStateManager: GameStateManager, seedController: SeedController, mapController: MapController) {
@@ -29,26 +34,40 @@ export function setupConnectors(guiController: GuiController, gameStateManager: 
         gameStateManager.nextState();
     });
 
+    const pickedUpSeedTileLocation$ = pickUpSeed$.pipe(
+        withLatestFrom(mapCamera$),
+        map(([pickedUpSeed, camera]) => {
+            const tileXY = guiPositionToTileLocation(camera, pickedUpSeed.x, pickedUpSeed.y);
+            return {
+                x: tileXY.tileX,
+                y: tileXY.tileY,
+                type: pickedUpSeed.type,
+                origin: pickedUpSeed.origin
+            }
+        })
+    )
+
     dropSeed$
         .pipe(
-            withLatestFrom(combineLatest([isMouseOverSeedContainer$, gameState$, mapCamera$, pickUpSeed$]))
+            withLatestFrom(combineLatest([isMouseOverSeedContainer$, gameState$, mapCamera$, pickedUpSeedTileLocation$]))
         ).subscribe(([droppedSeed, [isMouseOverSeedContainer, gameState, camera, pickedUpSeed]]) => {
             if (!isMouseOverSeedContainer) {
-                const tile = guiPositionToTile(gameState, camera, droppedSeed.x, droppedSeed.y);
+                const tileXY = guiPositionToTileLocation(camera, droppedSeed.x, droppedSeed.y);
+                const tile = gameState.getTileAt(tileXY.tileX, tileXY.tileY);
 
                 if (tile != null) {
                     if (pickedUpSeed.origin == 'SEED_ORIGIN_INVENTORY') {
                         gameStateManager.placeSeed(droppedSeed.type, tile.index);
                     } else { // SEED_ORIGIN_MAP
-                        const pickedUpTile = guiPositionToTile(gameState, camera, pickedUpSeed.x, pickedUpSeed.y)!;
+                        const pickedUpTile = gameState.getTileAt(pickedUpSeed.x, pickedUpSeed.y)!;
                         gameStateManager.moveSeed(droppedSeed.type, pickedUpTile.index, tile.index);
                     }
                     return;
                 }
             } else if (pickedUpSeed.origin == 'SEED_ORIGIN_MAP') {
-                const tile = guiPositionToTile(gameState, camera, pickedUpSeed.x, pickedUpSeed.y);
-                if (tile != null) {
-                    gameStateManager.removeSeed(pickedUpSeed.type, tile.index);
+                const pickedUpTile = gameState.getTileAt(pickedUpSeed.x, pickedUpSeed.y);
+                if (pickedUpTile != null) {
+                    gameStateManager.removeSeed(pickedUpSeed.type, pickedUpTile.index);
                 }
             }
             seedController.resetPickedUpSeed();
@@ -59,7 +78,8 @@ export function setupConnectors(guiController: GuiController, gameStateManager: 
             withLatestFrom(gameState$),
         ).subscribe(([[draggedSeed, camera, isMouseOverContainer], gameState]) => {
             if (draggedSeed != null) {
-                const tile = guiPositionToTile(gameState, camera, draggedSeed.x, draggedSeed.y);
+                const tileXY = guiPositionToTileLocation(camera, draggedSeed.x, draggedSeed.y);
+                const tile = gameState.getTileAt(tileXY.tileX, tileXY.tileY);
 
                 if (!isMouseOverContainer && tile != null) {
                     mapController.dragSeedOverTile(tile);
