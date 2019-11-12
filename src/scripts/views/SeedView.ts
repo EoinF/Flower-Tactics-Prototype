@@ -15,8 +15,6 @@ export class SeedView {
     gameStateManager: GameStateManager;
     seedContainer: UIContainer;
     heldSeed: Phaser.GameObjects.Sprite | null;
-    // savedPositionX: number;
-    // savedPositionY: number;
 
     constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, seedController: SeedController, offsetY: number) {
         this.gameStateManager = gameStateManager;
@@ -25,6 +23,7 @@ export class SeedView {
         this.seedContainer = new UIContainer(scene, 8, offsetY + 4, 16 + SEEDS_PER_ROW * 8, 24 * MAX_ROWS, "Bottom")
             .setBackground(COLOURS.withAlpha(COLOURS.GRAY, 0.1))
             .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.3))
+            .setInteractive()
             .setDepth(3)
 
         scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {

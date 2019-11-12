@@ -80,9 +80,8 @@ export class GameState implements GameStateData {
     getFlowersAtTile(tile: Tile): Array<Flower> {
         return this.tileToFlowerMap.get(tile) || [];
     }
-
-    getFlowerByTypeAt(type: string, x: number, y: number) {
-        const tile = this.getTileAt(x, y);
+    
+    getFlowerByTypeAtTile(type: string, tile: Tile) {
         if (tile != null) {
             const flowers = this.tileToFlowerMap.get(tile);
             if (flowers != null) {
@@ -92,7 +91,16 @@ export class GameState implements GameStateData {
                 }
             }
         }
-        throw Error(`No flower of type ${type} found at (${x},${y})`);
+        return null;
+    }
+
+    getFlowerByTypeAt(type: string, x: number, y: number) {
+        const tile = this.getTileAt(x, y);
+        if (tile != null) {
+            return this.getFlowerByTypeAtTile(type, tile);
+        } else {
+            throw Error(`No tile exists at [${x},${y}] - getFlowerByTypeAt(${type})`)
+        }
     }
 
     getTileAt(x: number, y: number): Tile | null {

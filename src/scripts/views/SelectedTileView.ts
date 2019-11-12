@@ -60,6 +60,7 @@ export class SelectedTileView implements BaseUIObject {
     constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, selectedTileController: SelectedTileController) {
         this.popup = new UIContainer(scene, 8, 8, 412, 96, "Bottom")
             .setVisible(false)
+            .setInteractive()
             .setDepth(2)
             .setBackground(COLOURS.PURPLE_100)
             .setBorder(1, COLOURS.PURPLE_700);

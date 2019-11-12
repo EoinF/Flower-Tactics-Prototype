@@ -10,6 +10,7 @@
         "1": {
             "name": "Daisy",
             "growthRate": 10,
+            "plantingAmount": 5,
             "nitrogenRequirements": {
                 "min": 12, "max": 15
             },
@@ -75,6 +76,7 @@
     ],
     "flowers": [
         {
+            "index": 0,
             "x": 1,
             "y": 1,
             "type": "1",
@@ -82,6 +84,7 @@
             "mode": "Grow"
         },
         {
+            "index": 1,
             "x": 14,
             "y": 14,
             "type": "1",
@@ -89,6 +92,7 @@
             "mode": "Grow"
         },
         {
+            "index": 2,
             "x": 15,
             "y": 14,
             "type": "1",
@@ -96,6 +100,7 @@
             "mode": "Grow"
         },
         {
+            "index": 3,
             "x": 15,
             "y": 15,
             "type": "1",
@@ -103,6 +108,7 @@
             "mode": "Grow"
         },
         {
+            "index": 4,
             "x": 14,
             "y": 15,
             "type": "1",
@@ -110,6 +116,7 @@
             "mode": "Grow"
         },
         {
+            "index": 5,
             "x": 25,
             "y": 25,
             "type": "1",
@@ -117,6 +124,7 @@
             "mode": "Produce"
         },
         {
+            "index": 6,
             "x": 26,
             "y": 25,
             "type": "1",
@@ -124,6 +132,7 @@
             "mode": "Produce"
         },
         {
+            "index": 7,
             "x": 26,
             "y": 26,
             "type": "1",
@@ -131,6 +140,7 @@
             "mode": "Produce"
         },
         {
+            "index": 8,
             "x": 25,
             "y": 26,
             "type": "1",
