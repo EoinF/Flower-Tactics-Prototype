@@ -1,42 +1,75 @@
-import { VerticalAlignment, HorizontalAlignment } from "./constants";
+import { VerticalAlignment, HorizontalAlignment, COLOURS } from "./constants";
 import { getAlignedCoordinates } from "./utils";
 import { BaseUIObject } from "./BaseUIObject";
 
 export class UIContainer implements BaseUIObject {
-    protected backgroundImage: Phaser.GameObjects.Rectangle;
+    private scene: Phaser.Scene;
+    public backgroundImage: Phaser.GameObjects.Rectangle;
+    originalX: number;
+    originalY: number;
     x: number;
     y: number;
+    originX: number;
+    originY: number;
     width: number;
     height: number;
+    alpha: number;
+    private verticalAlignment: VerticalAlignment;
+    private horizontalAlignment: HorizontalAlignment;
+    private isWidthAuto: boolean;
+    private isHeightAuto: boolean;
     depth: number;
+    private isInteractive: boolean;
     isVisible: boolean;
 
     children: Array<BaseUIObject | UIContainer>;
 
     constructor(scene: Phaser.Scene,
         x: number, y: number,
-        width: number, height: number,
+        width: number | "auto" = "auto", height: number | "auto" = "auto",
         verticalAlignment: VerticalAlignment = "Top", 
         horizontalAlignment: HorizontalAlignment = "Left"
     ) {
-        const {
-            width: w, height: h
-        } = scene.game.canvas;
+        this.scene = scene;
+        this.originalX = this.x = x;
+        this.originalY = this.y = y;
 
-        const {x: ax, y: ay} = getAlignedCoordinates(x, y, width, height, w, h, verticalAlignment, horizontalAlignment);
-        this.backgroundImage = scene.add.rectangle(ax, ay, width, height, 0xccaaff, 0)
-            .setOrigin(0, 0)
-            .setDepth(0)
+        this.verticalAlignment = verticalAlignment;
+        this.horizontalAlignment = horizontalAlignment;
+        this.originX = this.originY = 0;
 
+        this.isWidthAuto = width === "auto";
+        this.isHeightAuto = height === "auto";
+        this.width = width === "auto" ? 0 : width;
+        this.height = height === "auto" ? 0 : height;
+        
+        this.alpha = 1;
         this.depth = 0;
         this.isVisible = true;
+        this.isInteractive = false;
         this.children = [];
-        this.x = ax;
-        this.y = ay;
-        this.width = width;
-        this.height = height;
+
+        this.createBackgroundImage();
     }
-    
+
+    createBackgroundImage() {
+        const {
+            width: w, height: h
+        } = this.scene.game.canvas;
+
+        const {x: ax, y: ay} = getAlignedCoordinates(
+            this.originalX, this.originalY, this.width, this.height,
+             w, h, 
+             this.verticalAlignment, this.horizontalAlignment,
+             this.originX, this.originY
+        );
+        this.backgroundImage = this.scene.add.rectangle(this.x, this.y, this.width, this.height, 0xccaaff, 0)
+            .setOrigin(0, 0)
+            .setDepth(0);
+        
+        this._setPosition(ax, ay);
+    }
+
     setBackground(color: Phaser.Display.Color) {
         this.backgroundImage.setFillStyle(color.color, color.alphaGL);
         return this;
@@ -51,17 +84,38 @@ export class UIContainer implements BaseUIObject {
         verticalAlignment: VerticalAlignment = "Top",
         horizontalAlignment: HorizontalAlignment = "Left"
     ) {
+        if (this.isWidthAuto) {
+            this.width += child.width;
+        }
+        if (this.isHeightAuto) {
+            this.height = Math.max(this.height, child.height);
+        }
+        if (this.isWidthAuto || this.isHeightAuto) {
+            const oldImage = this.backgroundImage;
+            this.createBackgroundImage();
+            this.backgroundImage
+                .setFillStyle(oldImage.fillColor, oldImage.fillAlpha)
+                .setStrokeStyle(oldImage.lineWidth, oldImage.strokeColor, oldImage.strokeAlpha)
+                .setAlpha(oldImage.alpha)
+            if (this.isInteractive)
+                this.backgroundImage.setInteractive();
+            oldImage.destroy();
+        }
+
+        const {x: ax, y: ay} = getAlignedCoordinates(
+            child.x, child.y, child.width, child.height,
+            this.width, this.height, verticalAlignment, horizontalAlignment,
+            child.originX, child.originY
+        );
+
         this.children.push(child);
-
-        const {x: ax, y: ay} = getAlignedCoordinates(child.x, child.y, child.width, child.height, this.width, this.height, verticalAlignment, horizontalAlignment);
-
         child.setPosition(ax + this.x, ay + this.y);
         child.setDepth(this.depth + 1);
         child.setVisible(this.isVisible);
         return this;
     }
-
-    setPosition(x: number, y: number) {
+    
+    private _setPosition(x: number, y: number) {
         const diffX = x - this.x;
         const diffY = y - this.y;
         this.x = x;
@@ -70,6 +124,12 @@ export class UIContainer implements BaseUIObject {
         this.children.forEach(child => {
             child.setPosition(child.x + diffX, child.y + diffY);
         });
+    }
+
+    setPosition(x: number, y: number) {
+        this.originalX = x;
+        this.originalY = y;
+        this._setPosition(x, y);
         return this;
     }
 
@@ -97,11 +157,13 @@ export class UIContainer implements BaseUIObject {
     }
 
     setInteractive() {
+        this.isInteractive = true;
         this.backgroundImage.setInteractive();
         return this;
     }
 
     removeInteractive() {
+        this.isInteractive = false;
         this.backgroundImage.removeInteractive();
         return this;
     }
@@ -129,5 +191,11 @@ export class UIContainer implements BaseUIObject {
             y >= this.y &&
             y < this.y + this.height
         );
+    }
+
+    setAlpha(alpha: number) {
+        this.alpha = alpha;
+        this.children.forEach(child => child.setAlpha(alpha));
+        return this;
     }
 }

@@ -16,13 +16,13 @@ export class ImageButton extends BaseButton {
         verticalAlignment: VerticalAlignment = "Top",
         horizontalAlignment: HorizontalAlignment = "Left"
     ) {
-        const image = scene.add.image(0, 0, imageTexture)
-            .setOrigin(0, 0);
+        const image = scene.add.image(0, 0, imageTexture);
+        
         super(scene, x, y, image.width, image.height, colourUp, colourDown, verticalAlignment, horizontalAlignment);
         this.image = image;
         this.colourImageUp = colourImageUp;
         this.colourImageDown = colourImageDown;
-        this.container.addChild(image);
+        this.container.addChild(image, "Middle", "Middle");
         this.image.setTint(this.colourImageUp.color);
     }
 

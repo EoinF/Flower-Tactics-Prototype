@@ -11,44 +11,11 @@ import { combineLatest } from "rxjs";
 import { filter } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 
-export class SelectedTileView implements BaseUIObject {
+export class SelectedTileView {
     x: number;
     y: number;
     width: number;
     height: number;
-
-    setPosition(x: number, y: number) {
-        this.x = x;
-        this.y = y;
-        this.popup.setPosition(x, y);
-        return this;
-    };
-    setVisible (isVisible: boolean) {
-        this.popup.setVisible(isVisible);
-        return this;
-    }
-    setDepth (depth: number) {
-        this.popup.setDepth(depth);
-        return this;
-    }
-    
-    getData(key: string) {
-        return this.popup.getData(key);
-    }
-
-    setData(key: string, value: any) {
-        this.popup.setData(key, value);
-        return this;
-    }
-    
-    removeInteractive() {
-        this.popup.removeInteractive();
-        return this;
-    }
-
-    destroy() {
-        this.popup.destroy();
-    }
 
     private popup: UIContainer;
     private popupText: Phaser.GameObjects.Text;
@@ -71,7 +38,7 @@ export class SelectedTileView implements BaseUIObject {
         this.height = this.popup.height;
 
         this.popupText = scene.add.text(8, 8, "...", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontStyle: 'bold' })
-            .setColor("#000");
+            .setColor(COLOURS.BLACK.rgba);
         
         this.npkTab = new ImageButton(scene, 2, 2, 'button-npk')
             .setBackground(COLOURS.PURPLE_200, COLOURS.PURPLE_400, COLOURS.WHITE, COLOURS.PURPLE_500)
@@ -89,7 +56,7 @@ export class SelectedTileView implements BaseUIObject {
         this.popup.addChild(this.npkTab, "Top", "Right");
         this.popup.addChild(this.flowerTab, "Top", "Right");
 
-        combineLatest(gameStateManager.nextStateObservable(), 
+        combineLatest(gameStateManager.nextStateObservable(),
             selectedTileController.activeTileObservable(),
             selectedTileController.activeTabObservable())
             .pipe(

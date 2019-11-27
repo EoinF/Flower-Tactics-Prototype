@@ -1,5 +1,4 @@
 import { VerticalAlignment, HorizontalAlignment, COLOURS } from "./constants";
-import { UIContainer } from "./UIContainer";
 import { BaseButton } from "./BaseButton";
 
 export class TextButton extends BaseButton {

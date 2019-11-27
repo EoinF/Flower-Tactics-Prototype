@@ -8,7 +8,9 @@ export function getAlignedCoordinates(
     parentWidth: number,
     parentHeight: number,
     verticalAlignment: VerticalAlignment,
-    horizontalAlignment: HorizontalAlignment
+    horizontalAlignment: HorizontalAlignment,
+    originX: number = 0.5,
+    originY: number = 0.5
 ) {
     let x2 = x;
     let y2 = y;
@@ -25,7 +27,7 @@ export function getAlignedCoordinates(
     }
 
     return {
-        x: x2,
-        y: y2
+        x: x2 + (width * originX),
+        y: y2 + (height * originY)
     }
 }

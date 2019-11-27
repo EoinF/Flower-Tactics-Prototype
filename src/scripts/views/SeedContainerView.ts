@@ -5,12 +5,14 @@ import { seedController } from "../game";
 import { GameState } from "../objects/GameState";
 import { COLOURS } from "../widgets/constants";
 import { combineLatest } from "rxjs";
-import { first } from "rxjs/operators";
+import { first, map } from "rxjs/operators";
 
-const SEEDS_PER_ROW = 16;
-const MAX_ROWS = 15;
+const SEEDS_PER_ROW = 32;
+const MAX_ROWS = 2;
 
-export class SeedView {
+export class SeedContainerView {
+    width: number;
+    height: number;
     scene: Phaser.Scene;
     gameStateManager: GameStateManager;
     seedContainer: UIContainer;
@@ -24,8 +26,10 @@ export class SeedView {
             .setBackground(COLOURS.withAlpha(COLOURS.GRAY, 0.1))
             .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.3))
             .setInteractive()
-            .setDepth(3)
+            .setDepth(3);
 
+        this.width = this.seedContainer.width;
+        this.height = this.seedContainer.height;
         scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
             if (this.seedContainer.hits(pointer.x, pointer.y)) {
                 seedController.setMouseOverSeedContainer(true);
@@ -39,15 +43,19 @@ export class SeedView {
             }
         });
 
-        seedController.mouseOverSeedContainerObservable().subscribe((isHighlighted) => {
+        combineLatest(seedController.mouseOverSeedContainerObservable(), seedController.mouseOverFlowerSelectorObservable())
+            .pipe(map(([o1, o2]) => o1 || o2))
+            .subscribe((isHighlighted) => {
             if (isHighlighted) {
                 this.seedContainer
                     .setBackground(COLOURS.withAlpha(COLOURS.PURPLE_300, 0.9))
                     .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.8))
+                    .setAlpha(1);
             } else {
                 this.seedContainer
                     .setBackground(COLOURS.withAlpha(COLOURS.GRAY, 0.1))
                     .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.3))
+                    .setAlpha(0.5);
             }
         })
 

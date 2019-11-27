@@ -25,6 +25,8 @@ export default class PreloadScene extends Phaser.Scene {
 
     this.load.image('button-npk', 'assets/img/button-npk.png');
     this.load.image('button-flower', 'assets/img/button-flower.png');
+
+    this.load.image('gui-arrow-left', 'assets/img/gui-arrow-left.png');
   }
   
   getMapImageData() {

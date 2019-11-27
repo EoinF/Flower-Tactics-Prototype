@@ -1,10 +1,10 @@
 import { withLatestFrom, map } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
-import { GameState } from './objects/GameState';
 import { GuiController } from './controllers/GuiController';
 import { GameStateManager } from './controllers/GameStateManager';
 import { SeedController } from './controllers/SeedController';
 import { MapController } from './controllers/MapController';
+import { FlowerSelectionController } from './controllers/FlowerSelectionController';
 
 interface TileLocation {
     tileX: number,
@@ -21,7 +21,13 @@ function guiPositionToTileLocation(camera: Phaser.Cameras.Scene2D.Camera, x: num
     return { tileX, tileY };
 }
 
-export function setupConnectors(guiController: GuiController, gameStateManager: GameStateManager, seedController: SeedController, mapController: MapController) {
+export function setupConnectors(
+    guiController: GuiController, 
+    gameStateManager: GameStateManager, 
+    seedController: SeedController, 
+    mapController: MapController,
+    flowerSelectionController: FlowerSelectionController
+) {
     const endTurn$ = guiController.endTurnObservable();
     const dragSeed$ = seedController.dragSeedObservable();
     const dropSeed$ = seedController.dropSeedObservable();
@@ -29,6 +35,25 @@ export function setupConnectors(guiController: GuiController, gameStateManager: 
     const mapCamera$ = mapController.cameraObservable();
     const isMouseOverSeedContainer$ = seedController.mouseOverSeedContainerObservable();
     const pickUpSeed$ = seedController.pickUpSeedObservable();
+    const selectedFlowerIndex$ = flowerSelectionController.selectedFlowerIndexObservable();
+
+    const flowerTypesArray$ = gameState$.pipe(
+        map(
+            state => Object.keys(state.flowerTypes)
+                .map(key => state.flowerTypes[key])
+        )
+    );
+    selectedFlowerIndex$.pipe(
+        withLatestFrom(flowerTypesArray$)
+    ).subscribe(([selectedIndex, flowerTypesArray]) => {
+        if (selectedIndex < 0) {
+            flowerSelectionController.selectFlowerByIndex(selectedIndex + flowerTypesArray.length);
+        } else if (selectedIndex >= flowerTypesArray.length) {
+            flowerSelectionController.selectFlowerByIndex(selectedIndex % flowerTypesArray.length);
+        } else {
+            flowerSelectionController.selectFlower(flowerTypesArray[selectedIndex]);
+        }
+    })
 
     endTurn$.subscribe(() => {
         gameStateManager.nextState();

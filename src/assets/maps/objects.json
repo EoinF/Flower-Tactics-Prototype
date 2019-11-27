@@ -4,11 +4,30 @@
             "type": "1",
             "quantity": 21,
             "progress": 0
+        },
+        "2": {
+            "type": "2",
+            "quantity": 3,
+            "progress": 0
         }
     },
     "flowerTypes": {
         "1": {
             "name": "Daisy",
+            "growthRate": 10,
+            "plantingAmount": 5,
+            "nitrogenRequirements": {
+                "min": 12, "max": 15
+            },
+            "phosphorousRequirements": {
+                "min": 10, "max": 15
+            },
+            "potassiumRequirements": {
+                "min": 7, "max": 10
+            }
+        },
+        "2": {
+            "name": "Tulip",
             "growthRate": 10,
             "plantingAmount": 5,
             "nitrogenRequirements": {

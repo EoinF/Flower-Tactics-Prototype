@@ -3,6 +3,10 @@ export interface BaseUIObject {
     y: number;
     width: number;
     height: number;
+    originX: number;
+    originY: number;
+    alpha: number;
+    setAlpha: (alpha: number) => BaseUIObject;
     setPosition: (x: number, y: number) => BaseUIObject;
     setVisible: (isVisible: boolean) => BaseUIObject;
     setDepth: (depth: number) => BaseUIObject;

@@ -8,6 +8,7 @@ import { SelectedTileController } from './controllers/SelectedTileController'
 import { SeedController } from './controllers/SeedController'
 import { MapController } from './controllers/MapController'
 import { setupConnectors } from './connectors'
+import { FlowerSelectionController } from './controllers/FlowerSelectionController'
 
 const DEFAULT_WIDTH = 1280
 const DEFAULT_HEIGHT = 720
@@ -42,4 +43,5 @@ export const selectedTileController = new SelectedTileController();
 export const guiController = new GuiController();
 export const mapController = new MapController();
 export const seedController = new SeedController();
-setupConnectors(guiController, gameStateManager, seedController, mapController);
+export const flowerSelectionController = new FlowerSelectionController();
+setupConnectors(guiController, gameStateManager, seedController, mapController, flowerSelectionController);

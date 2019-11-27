@@ -1,5 +1,5 @@
 import { ReplaySubject, Observable, Subject } from "rxjs";
-import { distinctUntilChanged } from "rxjs/operators";
+import { distinctUntilChanged, startWith } from "rxjs/operators";
 
 interface DragSeed {
     type: string,
@@ -20,7 +20,7 @@ export class SeedController {
     private dropSeed$: Subject<DragSeed>;
 
     private mouseOverSeedContainer$: Subject<boolean>;
-    private mouseOverSeedContainerDistinct$: Observable<boolean>;
+    private mouseOverFlowerSelector$: Subject<boolean>;
 
     constructor() {
         this.pickUpSeed$ = new ReplaySubject(1);
@@ -28,9 +28,7 @@ export class SeedController {
         this.dragSeed$ = new ReplaySubject(1);
         this.dropSeed$ = new Subject();
         this.mouseOverSeedContainer$ = new ReplaySubject(1);
-
-        this.mouseOverSeedContainerDistinct$ = this.mouseOverSeedContainer$
-            .pipe(distinctUntilChanged());
+        this.mouseOverFlowerSelector$ = new ReplaySubject(1);
     }
 
     pickUpSeed(type: string, x: number, y: number, origin: SeedOrigin) {
@@ -54,8 +52,12 @@ export class SeedController {
         this.dragSeed$.next(null);
     }
 
-    setMouseOverSeedContainer(isHighlighted: boolean) {
-        this.mouseOverSeedContainer$.next(isHighlighted);
+    setMouseOverFlowerSelector(isMouseOver: boolean) {
+        this.mouseOverFlowerSelector$.next(isMouseOver);
+    }
+
+    setMouseOverSeedContainer(isMouseOver: boolean) {
+        this.mouseOverSeedContainer$.next(isMouseOver);
     }
     
     pickUpSeedObservable(): Observable<PickedUpSeed> {
@@ -75,6 +77,18 @@ export class SeedController {
     }
 
     mouseOverSeedContainerObservable(): Observable<boolean> {
-        return this.mouseOverSeedContainerDistinct$;
+        return this.mouseOverSeedContainer$
+            .pipe(
+                startWith(false),
+                distinctUntilChanged()
+            );
+    }
+
+    mouseOverFlowerSelectorObservable(): Observable<boolean> {
+        return this.mouseOverFlowerSelector$
+            .pipe(
+                startWith(false),
+                distinctUntilChanged()
+            );
     }
 }
