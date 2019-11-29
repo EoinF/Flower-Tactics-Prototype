@@ -4,6 +4,7 @@ interface Requirements {
 }
 
 export interface FlowerType {
+    type: string;
     name: string;
     growthRate: number;
     plantingAmount: number;

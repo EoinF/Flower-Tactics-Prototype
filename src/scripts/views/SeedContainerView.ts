@@ -6,6 +6,8 @@ import { GameState } from "../objects/GameState";
 import { COLOURS } from "../widgets/constants";
 import { combineLatest } from "rxjs";
 import { first, map } from "rxjs/operators";
+import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
+import { FlowerType } from "../objects/FlowerType";
 
 const SEEDS_PER_ROW = 32;
 const MAX_ROWS = 2;
@@ -18,7 +20,13 @@ export class SeedContainerView {
     seedContainer: UIContainer;
     heldSeed: Phaser.GameObjects.Sprite | null;
 
-    constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, seedController: SeedController, offsetY: number) {
+    constructor(
+        scene: Phaser.Scene,
+        gameStateManager: GameStateManager,
+        seedController: SeedController,
+        flowerSelectionController: FlowerSelectionController, 
+        offsetY: number
+    ) {
         this.gameStateManager = gameStateManager;
         this.scene = scene;
 
@@ -48,7 +56,7 @@ export class SeedContainerView {
             .subscribe((isHighlighted) => {
             if (isHighlighted) {
                 this.seedContainer
-                    .setBackground(COLOURS.withAlpha(COLOURS.PURPLE_300, 0.9))
+                    .setBackground(COLOURS.withAlpha(COLOURS.PURPLE_100, 0.9))
                     .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.8))
                     .setAlpha(1);
             } else {
@@ -85,22 +93,23 @@ export class SeedContainerView {
                     });
             })
 
-        combineLatest(gameStateManager.nextStateObservable(), gameStateManager.nextDeltaObservable())
-            .subscribe(([nextState, nextDelta]) => {
+        combineLatest(gameStateManager.nextStateObservable(), gameStateManager.nextDeltaObservable(), flowerSelectionController.selectedFlowerObservable())
+            .subscribe(([nextState, nextDelta, selectedFlowerType]) => {
                 this.seedContainer.clear();
-                this.addSeedGUI(nextState, nextDelta);
+                this.addSeedGUI(nextState, nextDelta, selectedFlowerType);
             });
     }
 
-    addSeedGUI(gameState: GameState, gameStateDelta: GameStateDelta) {
-        Object.keys(gameState.seedStatus)
-            .map(key => gameState.seedStatus[key])
-            .forEach((status) => {
-                const amountAlreadyPlaced = gameStateDelta.placedSeeds[status.type].length;
-                for (let i = 0; i < status.quantity - amountAlreadyPlaced; i++) {
-                    this.addNewSeed(status.type);
-                }
-            });
+    addSeedGUI(gameState: GameState, gameStateDelta: GameStateDelta, selectedFlowerType: FlowerType) {
+        const selectedSeedStatus = gameState.seedStatus[
+            Object.keys(gameState.seedStatus)
+                .find(type => selectedFlowerType.type === type)!
+        ];
+
+        const amountAlreadyPlaced = gameStateDelta.placedSeeds[selectedSeedStatus.type].length;
+        for (let i = 0; i < selectedSeedStatus.quantity - amountAlreadyPlaced; i++) {
+            this.addNewSeed(selectedSeedStatus.type);
+        }
     }
 
     addNewSeed(type: string) {

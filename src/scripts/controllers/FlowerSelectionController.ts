@@ -1,5 +1,6 @@
 import { ReplaySubject, Observable, Subject, BehaviorSubject } from "rxjs";
 import { FlowerType } from "../objects/FlowerType";
+import { publishReplay, publish, shareReplay, startWith } from "rxjs/operators";
 
 export class FlowerSelectionController {
     private selectedFlowerType$: Subject<FlowerType>;
@@ -25,7 +26,10 @@ export class FlowerSelectionController {
     }
 
     selectedFlowerIndexObservable(): Observable<number> {
-        return this.selectedFlowerIndex$;
+        return this.selectedFlowerIndex$.pipe(
+            startWith(0),
+            shareReplay(1),
+        );
     }
 
     selectedFlowerObservable(): Observable<FlowerType> {

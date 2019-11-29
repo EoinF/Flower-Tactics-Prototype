@@ -13,6 +13,7 @@
     },
     "flowerTypes": {
         "1": {
+            "type": "1",
             "name": "Daisy",
             "growthRate": 10,
             "plantingAmount": 5,
@@ -27,6 +28,7 @@
             }
         },
         "2": {
+            "type": "2",
             "name": "Tulip",
             "growthRate": 10,
             "plantingAmount": 5,

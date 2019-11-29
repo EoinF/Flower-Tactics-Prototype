@@ -1,4 +1,4 @@
-import { withLatestFrom, map } from 'rxjs/operators';
+import { withLatestFrom, map, startWith } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
 import { GuiController } from './controllers/GuiController';
 import { GameStateManager } from './controllers/GameStateManager';
@@ -43,9 +43,9 @@ export function setupConnectors(
                 .map(key => state.flowerTypes[key])
         )
     );
-    selectedFlowerIndex$.pipe(
-        withLatestFrom(flowerTypesArray$)
-    ).subscribe(([selectedIndex, flowerTypesArray]) => {
+
+    combineLatest(selectedFlowerIndex$, flowerTypesArray$)
+        .subscribe(([selectedIndex, flowerTypesArray]) => {
         if (selectedIndex < 0) {
             flowerSelectionController.selectFlowerByIndex(selectedIndex + flowerTypesArray.length);
         } else if (selectedIndex >= flowerTypesArray.length) {

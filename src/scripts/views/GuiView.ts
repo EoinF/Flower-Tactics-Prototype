@@ -22,7 +22,7 @@ export class GuiView {
 
         const { height } = scene.game.canvas;
         const offsetY = height - selectedTileView.y;
-        const seedView = new SeedContainerView(scene, gameStateManager, seedController, offsetY);
+        const seedView = new SeedContainerView(scene, gameStateManager, seedController, flowerSelectionController, offsetY);
         const flowerSelectorView = new FlowerSelectorView(scene, gameStateManager, seedController, flowerSelectionController, offsetY + seedView.height, seedView.width);
 
         const endTurnButton = new TextButton(scene, 10, 10, 98, 24, "End Turn", COLOURS.WHITE, COLOURS.LIGHT_GRAY, "Bottom", "Right")

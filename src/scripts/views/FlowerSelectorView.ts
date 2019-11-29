@@ -5,13 +5,14 @@ import { COLOURS } from "../widgets/constants";
 import { combineLatest } from "rxjs";
 import { map, distinctUntilChanged } from "rxjs/operators";
 import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
+import { ImageButton } from "../widgets/ImageButton";
 
 export class FlowerSelectorView {
     scene: Phaser.Scene;
     gameStateManager: GameStateManager;
     flowerSelector: UIContainer;
-    flowerSelectLeft: Phaser.GameObjects.Image;
-    flowerSelectRight: Phaser.GameObjects.Image;
+    flowerSelectLeft: ImageButton;
+    flowerSelectRight: ImageButton;
     flowerText: Phaser.GameObjects.Text;
 
     constructor(scene: Phaser.Scene, 
@@ -30,8 +31,9 @@ export class FlowerSelectorView {
             .setInteractive()
             .setDepth(3);
         
-        this.flowerSelectLeft = scene.add.image(0, 0, "gui-arrow-left");
-        this.flowerSelectRight = scene.add.image(0, 0, "gui-arrow-left").setFlipX(true);
+        this.flowerSelectLeft = new ImageButton(scene, 0, 0, "gui-arrow-left", COLOURS.TRANSPARENT, COLOURS.TRANSPARENT, COLOURS.WHITE, COLOURS.GRAY);
+        this.flowerSelectRight = new ImageButton(scene, 0, 0, "gui-arrow-left", COLOURS.TRANSPARENT, COLOURS.TRANSPARENT, COLOURS.WHITE, COLOURS.GRAY);
+        this.flowerSelectRight.image.setFlipX(true);
         this.flowerText = scene.add.text(0, 0, "Selected flower name",
             { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontStyle: 'bold' })
             .setColor(COLOURS.BLACK.rgba)
@@ -41,10 +43,10 @@ export class FlowerSelectorView {
         this.flowerSelector.addChild(this.flowerText, "Middle", "Middle");
         this.flowerSelector.addChild(this.flowerSelectRight, "Middle", "Right");
 
-        this.flowerSelectLeft.setInteractive().on('pointerup', () => {
+        this.flowerSelectLeft.onClick(() => {
             flowerSelectionController.selectPreviousFlower();
         });
-        this.flowerSelectRight.setInteractive().on('pointerup', () => {
+        this.flowerSelectRight.onClick(() => {
             flowerSelectionController.selectNextFlower();
         });
 
@@ -62,12 +64,12 @@ export class FlowerSelectorView {
 
         combineLatest(seedController.mouseOverSeedContainerObservable(), seedController.mouseOverFlowerSelectorObservable())
             .pipe(
-                map(([o1, o2]) => o1 || o2), 
+                map(([o1, o2]) => o1 || o2),
                 distinctUntilChanged()
             ).subscribe((isHighlighted) => {
             if (isHighlighted) {
                 this.flowerSelector
-                    .setBackground(COLOURS.withAlpha(COLOURS.PURPLE_300, 0.9))
+                    .setBackground(COLOURS.withAlpha(COLOURS.PURPLE_100, 0.9))
                     .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.8))
                     .setAlpha(1);
             } else {
