@@ -21,17 +21,11 @@ export function calculateFlowerEffects(gameState: GameState, gameStateDelta: Gam
 
         deltas.seedDelta.forEach((seedDelta, type) => {
             const existingEntry = gameStateDelta.seedStatusDelta[type];
-            let newDelta: SeedStatusDelta;
-            if (existingEntry != null) {
-                newDelta = {
-                    quantity: existingEntry.quantity + seedDelta.quantity,
-                    progress: existingEntry.progress + seedDelta.progress,
-                    type: existingEntry.type
-                }
-            } else {
-                newDelta = seedDelta;
-            }
-            gameStateDelta.seedStatusDelta[type] = newDelta;
+            gameStateDelta.seedStatusDelta[type] = {
+                quantity: existingEntry.quantity + seedDelta.quantity,
+                progress: existingEntry.progress + seedDelta.progress,
+                type: existingEntry.type
+            };
         });
     });
 }

@@ -73,7 +73,16 @@ export class GameStateManager {
         return placedSeeds;
     }
 
-    private getBlankDelta() {
+    private getBlankSeedStatusDelta(): StringMap<SeedStatusDelta> {
+        const seedStatusDelta = {};
+        Object.keys(this.gameState.seedStatus).forEach(
+            key => {
+                seedStatusDelta[key] = {type: key, quantity: 0, progress: 0};
+            });
+        return seedStatusDelta;
+    }
+
+    private getBlankDelta(): GameStateDelta {
         return {
             newFlowerDelta: [],
             flowerDelta: this.gameState.flowers.map(_ => ({amount: 0})),
@@ -83,7 +92,7 @@ export class GameStateManager {
                     phosphorous: 0
                 })
             ),
-            seedStatusDelta: {},
+            seedStatusDelta: this.getBlankSeedStatusDelta(),
             placedSeeds: this.generatePlacedSeedsMap()
         };
     }
@@ -164,6 +173,7 @@ export class GameStateManager {
     }
 
     placeSeed(type: string, tileIndex: number) {
+        console.log(this.gameStateDelta);
         calculateSeedPlacementDelta(this.gameState, this.gameStateDelta, type, tileIndex);
         this.gameStateDelta.placedSeeds[type].push(tileIndex);
         this.nextDelta$.next(this.gameStateDelta);

@@ -76,6 +76,7 @@ export function setupConnectors(
         .pipe(
             withLatestFrom(combineLatest([isMouseOverSeedContainer$, gameState$, mapCamera$, pickedUpSeedTileLocation$]))
         ).subscribe(([droppedSeed, [isMouseOverSeedContainer, gameState, camera, pickedUpSeed]]) => {
+            console.log("drop", isMouseOverSeedContainer, droppedSeed);
             if (!isMouseOverSeedContainer) {
                 const tileXY = guiPositionToTileLocation(camera, droppedSeed.x, droppedSeed.y);
                 const tile = gameState.getTileAt(tileXY.tileX, tileXY.tileY);
