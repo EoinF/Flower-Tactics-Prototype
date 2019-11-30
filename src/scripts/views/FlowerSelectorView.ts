@@ -6,6 +6,7 @@ import { combineLatest } from "rxjs";
 import { map, distinctUntilChanged } from "rxjs/operators";
 import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
 import { ImageButton } from "../widgets/ImageButton";
+import { TextLabel } from "../widgets/TextLabel";
 
 export class FlowerSelectorView {
     scene: Phaser.Scene;
@@ -13,7 +14,7 @@ export class FlowerSelectorView {
     flowerSelector: UIContainer;
     flowerSelectLeft: ImageButton;
     flowerSelectRight: ImageButton;
-    flowerText: Phaser.GameObjects.Text;
+    flowerText: any;
 
     constructor(scene: Phaser.Scene, 
         gameStateManager: GameStateManager, 
@@ -34,9 +35,7 @@ export class FlowerSelectorView {
         this.flowerSelectLeft = new ImageButton(scene, 0, 0, "gui-arrow-left", COLOURS.TRANSPARENT, COLOURS.TRANSPARENT, COLOURS.WHITE, COLOURS.GRAY);
         this.flowerSelectRight = new ImageButton(scene, 0, 0, "gui-arrow-left", COLOURS.TRANSPARENT, COLOURS.TRANSPARENT, COLOURS.WHITE, COLOURS.GRAY);
         this.flowerSelectRight.image.setFlipX(true);
-        this.flowerText = scene.add.text(0, 0, "Selected flower name",
-            { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontStyle: 'bold' })
-            .setColor(COLOURS.BLACK.rgba)
+        this.flowerText = new TextLabel(scene, 0, 0, "Selected flower name", COLOURS.BLACK, true)
             .setOrigin(0.5, 0.5);
 
         this.flowerSelector.addChild(this.flowerSelectLeft, "Middle", "Left");
@@ -62,7 +61,7 @@ export class FlowerSelectorView {
             }
         });
 
-        combineLatest(seedController.mouseOverSeedContainerObservable(), seedController.mouseOverFlowerSelectorObservable())
+        combineLatest(seedController.mouseOverSeedContainerObservable(), seedController.mouseOverFlowerSelectionObservable())
             .pipe(
                 map(([o1, o2]) => o1 || o2),
                 distinctUntilChanged()

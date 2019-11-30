@@ -1,10 +1,11 @@
 import { VerticalAlignment, HorizontalAlignment, COLOURS } from "./constants";
 import { BaseButton } from "./BaseButton";
+import { TextLabel } from "./TextLabel";
 
 export class TextButton extends BaseButton {
     constructor(
-        scene: Phaser.Scene, 
-        x: number, y: number, 
+        scene: Phaser.Scene,
+        x: number, y: number,
         width: number, height: number,
         text: string,
         colourUp: Phaser.Display.Color = COLOURS.WHITE,
@@ -14,13 +15,8 @@ export class TextButton extends BaseButton {
 
         super(scene, x, y, width, height, colourUp, colourDown, verticalAlignment, horizontalAlignment);
         
-        const buttonText = scene.add.text(0, 0, text)
-            .setTint(0x0);
+        const buttonText = new TextLabel(scene, 0, 0, text, COLOURS.BLACK, true);
         
-        const differenceX = width - buttonText.width;
-        const differenceY = height - buttonText.height;
-        buttonText.setPadding(differenceX / 2, differenceY / 2, differenceX / 2, differenceY / 2);
-        
-        this.container.addChild(buttonText);
+        this.container.addChild(buttonText, "Middle", "Middle");
     }
 }

@@ -20,7 +20,7 @@ export class SeedController {
     private dropSeed$: Subject<DragSeed>;
 
     private mouseOverSeedContainer$: Subject<boolean>;
-    private mouseOverFlowerSelector$: Subject<boolean>;
+    private mouseOverFlowerSelection$: Subject<boolean>;
 
     constructor() {
         this.pickUpSeed$ = new ReplaySubject(1);
@@ -28,7 +28,7 @@ export class SeedController {
         this.dragSeed$ = new ReplaySubject(1);
         this.dropSeed$ = new Subject();
         this.mouseOverSeedContainer$ = new ReplaySubject(1);
-        this.mouseOverFlowerSelector$ = new ReplaySubject(1);
+        this.mouseOverFlowerSelection$ = new ReplaySubject(1);
     }
 
     pickUpSeed(type: string, x: number, y: number, origin: SeedOrigin) {
@@ -53,7 +53,7 @@ export class SeedController {
     }
 
     setMouseOverFlowerSelector(isMouseOver: boolean) {
-        this.mouseOverFlowerSelector$.next(isMouseOver);
+        this.mouseOverFlowerSelection$.next(isMouseOver);
     }
 
     setMouseOverSeedContainer(isMouseOver: boolean) {
@@ -84,8 +84,8 @@ export class SeedController {
             );
     }
 
-    mouseOverFlowerSelectorObservable(): Observable<boolean> {
-        return this.mouseOverFlowerSelector$
+    mouseOverFlowerSelectionObservable(): Observable<boolean> {
+        return this.mouseOverFlowerSelection$
             .pipe(
                 startWith(false),
                 distinctUntilChanged()

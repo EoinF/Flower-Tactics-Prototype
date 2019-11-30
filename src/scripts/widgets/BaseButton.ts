@@ -110,8 +110,17 @@ export class BaseButton implements BaseUIObject {
         return this;
     };
 
+    onHover(callback: Function) {
+        this.container.on('pointermove', callback);
+        return this;
+    };
+
     setAlpha(alpha: number) {
         this.container.setAlpha(alpha);
         return this;
+    }
+
+    hits(x: number, y: number) {
+        return this.container.hits(x, y);
     }
 }

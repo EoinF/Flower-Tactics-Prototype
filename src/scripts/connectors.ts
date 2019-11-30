@@ -36,6 +36,7 @@ export function setupConnectors(
     const isMouseOverSeedContainer$ = seedController.mouseOverSeedContainerObservable();
     const pickUpSeed$ = seedController.pickUpSeedObservable();
     const selectedFlowerIndex$ = flowerSelectionController.selectedFlowerIndexObservable();
+    const isMouseOverFlowerSelection$ = seedController.mouseOverFlowerSelectionObservable();
 
     const flowerTypesArray$ = gameState$.pipe(
         map(
@@ -74,10 +75,10 @@ export function setupConnectors(
 
     dropSeed$
         .pipe(
-            withLatestFrom(combineLatest([isMouseOverSeedContainer$, gameState$, mapCamera$, pickedUpSeedTileLocation$]))
-        ).subscribe(([droppedSeed, [isMouseOverSeedContainer, gameState, camera, pickedUpSeed]]) => {
+            withLatestFrom(combineLatest([isMouseOverSeedContainer$, isMouseOverFlowerSelection$, gameState$, mapCamera$, pickedUpSeedTileLocation$]))
+        ).subscribe(([droppedSeed, [isMouseOverSeedContainer, isMouseOverFlowerSelection, gameState, camera, pickedUpSeed]]) => {
             console.log("drop", isMouseOverSeedContainer, droppedSeed);
-            if (!isMouseOverSeedContainer) {
+            if (!isMouseOverSeedContainer && !isMouseOverFlowerSelection) {
                 const tileXY = guiPositionToTileLocation(camera, droppedSeed.x, droppedSeed.y);
                 const tile = gameState.getTileAt(tileXY.tileX, tileXY.tileY);
                 
@@ -100,15 +101,15 @@ export function setupConnectors(
             seedController.resetPickedUpSeed();
         });
 
-    combineLatest(dragSeed$, mapCamera$, isMouseOverSeedContainer$)
+    combineLatest(dragSeed$, mapCamera$, isMouseOverSeedContainer$, isMouseOverFlowerSelection$)
         .pipe(
             withLatestFrom(gameState$),
-        ).subscribe(([[draggedSeed, camera, isMouseOverContainer], gameState]) => {
+        ).subscribe(([[draggedSeed, camera, isMouseOverContainer, isMouseOverFlowerSelection], gameState]) => {
             if (draggedSeed != null) {
                 const tileXY = guiPositionToTileLocation(camera, draggedSeed.x, draggedSeed.y);
                 const tile = gameState.getTileAt(tileXY.tileX, tileXY.tileY);
 
-                if (!isMouseOverContainer && tile != null) {
+                if (!isMouseOverContainer  && !isMouseOverFlowerSelection && tile != null) {
                     mapController.dragSeedOverTile(tile);
                     return;
                 }

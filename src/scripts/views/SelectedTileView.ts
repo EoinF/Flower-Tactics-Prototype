@@ -1,15 +1,14 @@
 import { GameStateManager } from "../controllers/GameStateManager";
 import { Tile } from "../objects/Tile";
-import { Flower } from "../objects/Flower";
 import { SelectedTileController } from "../controllers/SelectedTileController";
 import { UIContainer } from "../widgets/UIContainer";
 import { ImageButton } from "../widgets/ImageButton";
 import { COLOURS } from "../widgets/constants";
 import { RadioButtonGroup } from "../widgets/RadioButtonGroup";
-import { BaseUIObject } from "../widgets/BaseUIObject";
 import { combineLatest } from "rxjs";
 import { filter } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
+import { TextLabel } from "../widgets/TextLabel";
 
 export class SelectedTileView {
     x: number;
@@ -18,7 +17,7 @@ export class SelectedTileView {
     height: number;
 
     private popup: UIContainer;
-    private popupText: Phaser.GameObjects.Text;
+    private popupText: TextLabel;
 
     private tabGroup: RadioButtonGroup;
     private npkTab: ImageButton;
@@ -37,8 +36,7 @@ export class SelectedTileView {
         this.width = this.popup.width;
         this.height = this.popup.height;
 
-        this.popupText = scene.add.text(8, 8, "...", { fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', fontStyle: 'bold' })
-            .setColor(COLOURS.BLACK.rgba);
+        this.popupText = new TextLabel(scene, 8, 8, "...", COLOURS.BLACK, true);
         
         this.npkTab = new ImageButton(scene, 2, 2, 'button-npk')
             .setBackground(COLOURS.PURPLE_200, COLOURS.PURPLE_400, COLOURS.WHITE, COLOURS.PURPLE_500)

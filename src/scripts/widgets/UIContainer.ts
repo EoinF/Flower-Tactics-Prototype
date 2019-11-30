@@ -196,6 +196,7 @@ export class UIContainer implements BaseUIObject {
 
     setAlpha(alpha: number) {
         this.alpha = alpha;
+        this.backgroundImage.setAlpha(alpha);
         this.children.forEach(child => child.setAlpha(alpha));
         return this;
     }
