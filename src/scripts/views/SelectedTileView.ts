@@ -1,12 +1,11 @@
 import { GameStateManager } from "../controllers/GameStateManager";
 import { Tile } from "../objects/Tile";
-import { SelectedTileController } from "../controllers/SelectedTileController";
+import { SelectedObjectController } from "../controllers/SelectedObjectController";
 import { UIContainer } from "../widgets/UIContainer";
 import { ImageButton } from "../widgets/ImageButton";
 import { COLOURS } from "../widgets/constants";
 import { RadioButtonGroup } from "../widgets/RadioButtonGroup";
 import { combineLatest } from "rxjs";
-import { filter } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { TextLabel } from "../widgets/TextLabel";
 
@@ -23,7 +22,7 @@ export class SelectedTileView {
     private npkTab: ImageButton;
     private flowerTab: ImageButton;
 
-    constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, selectedTileController: SelectedTileController) {
+    constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, SelectedObjectController: SelectedObjectController) {
         this.popup = new UIContainer(scene, 8, 8, 412, 96, "Bottom")
             .setVisible(false)
             .setInteractive()
@@ -47,7 +46,7 @@ export class SelectedTileView {
 
         this.tabGroup = new RadioButtonGroup([this.npkTab, this.flowerTab])
             .onChange((index) => {
-                selectedTileController.setActiveTabIndex(index);
+                SelectedObjectController.setActiveTabIndex(index);
             });
         
         this.popup.addChild(this.popupText);
@@ -55,19 +54,17 @@ export class SelectedTileView {
         this.popup.addChild(this.flowerTab, "Top", "Right");
 
         combineLatest(gameStateManager.nextStateObservable(),
-            selectedTileController.activeTileObservable(),
-            selectedTileController.activeTabObservable())
-            .pipe(
-                filter(([newState, activeTile]) => activeTile != null)
-            ).subscribe(([newState, activeTile, activeTab]) => {
-                if (activeTile != null) {
-                    this.popup.setVisible(true);
-                    const tile = newState.getTileAt(activeTile.x, activeTile.y)!;
-                    this.updatePopupText(newState, tile, activeTab);
-                } else {
-                    this.popup.setVisible(false);
-                }
-            });
+            SelectedObjectController.selectedTileObservable(),
+            SelectedObjectController.activeTabObservable()
+        ).subscribe(([newState, activeTile, activeTab]) => {
+            if (activeTile != null) {
+                this.popup.setVisible(true);
+                const tile = newState.getTileAt(activeTile.x, activeTile.y)!;
+                this.updatePopupText(newState, tile, activeTab);
+            } else {
+                this.popup.setVisible(false);
+            }
+        });
     }
 
     private updatePopupText(gameState: GameState, tile: Tile, activeTab: number) {

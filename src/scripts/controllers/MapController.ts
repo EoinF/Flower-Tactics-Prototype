@@ -1,7 +1,7 @@
 import { Observable, ReplaySubject, Subject } from "rxjs";
 import { Tile } from "../objects/Tile";
 
-interface MapLocation {
+export interface MapLocation {
     x: number;
     y: number;
 }

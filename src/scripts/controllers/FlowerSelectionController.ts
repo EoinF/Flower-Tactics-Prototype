@@ -32,7 +32,7 @@ export class FlowerSelectionController {
         );
     }
 
-    selectedFlowerObservable(): Observable<FlowerType> {
+    selectedFlowerTypeObservable(): Observable<FlowerType> {
         return this.selectedFlowerType$;
     }
 }

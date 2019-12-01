@@ -5,6 +5,7 @@ import { GameStateManager } from './controllers/GameStateManager';
 import { SeedController } from './controllers/SeedController';
 import { MapController } from './controllers/MapController';
 import { FlowerSelectionController } from './controllers/FlowerSelectionController';
+import { selectedObjectController } from './game';
 
 interface TileLocation {
     tileX: number,
@@ -36,7 +37,15 @@ export function setupConnectors(
     const isMouseOverSeedContainer$ = seedController.mouseOverSeedContainerObservable();
     const pickUpSeed$ = seedController.pickUpSeedObservable();
     const selectedFlowerIndex$ = flowerSelectionController.selectedFlowerIndexObservable();
+    const selectedFlowerType$ = flowerSelectionController.selectedFlowerTypeObservable();
     const isMouseOverFlowerSelection$ = seedController.mouseOverFlowerSelectionObservable();
+    const onClickInfoButton$ = guiController.onClickInfoButtonObservable();
+
+    onClickInfoButton$.pipe(
+        withLatestFrom(selectedFlowerType$)
+    ).subscribe(([_, flowerType]) => {
+        selectedObjectController.setSelectedFlowerType(flowerType.type);
+    })
 
     const flowerTypesArray$ = gameState$.pipe(
         map(

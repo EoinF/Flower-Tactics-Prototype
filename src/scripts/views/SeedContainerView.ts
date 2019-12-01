@@ -1,7 +1,7 @@
 import { GameStateManager, GameStateDelta } from "../controllers/GameStateManager";
 import { UIContainer } from "../widgets/UIContainer";
 import { SeedController } from "../controllers/SeedController";
-import { seedController, guiController } from "../game";
+import { seedController, guiController, selectedObjectController } from "../game";
 import { GameState } from "../objects/GameState";
 import { COLOURS } from "../widgets/constants";
 import { combineLatest } from "rxjs";
@@ -45,8 +45,8 @@ export class SeedContainerView {
         
         this.infoButton = new ImageButton(scene, 4, 4, 'button-info', COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW, COLOURS.RED, COLOURS.RED)
             .setBorder(1, COLOURS.BLACK)
-            .onHover(() => {
-                guiController.setMouseOverInfoButton(true);
+            .onClick(() => {
+                guiController.clickInfoButton();
             });
 
         this.mainContainer.addChild(this.seedContainer);
@@ -64,10 +64,6 @@ export class SeedContainerView {
                 seedController.setMouseOverSeedContainer(false);
             }
 
-            if (!this.infoButton.hits(pointer.x, pointer.y)) {
-                guiController.setMouseOverInfoButton(false);
-            }
-
             if (this.heldSeed != null) {
                 seedController.dragSeed(this.heldSeed.getData("pickedUpSeed").type, pointer.x, pointer.y);
                 this.heldSeed.setPosition(pointer.x, pointer.y);
@@ -75,7 +71,6 @@ export class SeedContainerView {
         });
 
         scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
-            console.log("dropped into container");
             if (this.heldSeed != null) {
                 const seedType = this.heldSeed.getData("pickedUpSeed").type;
                 const seedOrigin = this.heldSeed.getData("pickedUpSeed").origin;
@@ -122,7 +117,7 @@ export class SeedContainerView {
                     .setInteractive();
               });
 
-        combineLatest(gameStateManager.nextStateObservable(), gameStateManager.nextDeltaObservable(), flowerSelectionController.selectedFlowerObservable())
+        combineLatest(gameStateManager.nextStateObservable(), gameStateManager.nextDeltaObservable(), flowerSelectionController.selectedFlowerTypeObservable())
             .subscribe(([nextState, nextDelta, selectedFlowerType]) => {
                 this.seedContainer.clear();
                 this.addSeedGUI(nextState, nextDelta, selectedFlowerType);

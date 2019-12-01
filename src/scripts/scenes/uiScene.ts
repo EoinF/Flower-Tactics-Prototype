@@ -1,6 +1,5 @@
 import { GuiView } from "../views/GuiView";
-import { guiController, gameStateManager, selectedTileController, seedController, flowerSelectionController } from "../game";
-import { FlowerInfoView } from "../views/FlowerInfoView";
+import { guiController, gameStateManager, selectedObjectController, seedController, flowerSelectionController } from "../game";
 
 export default class UIScene extends Phaser.Scene {
     constructor() {
@@ -8,8 +7,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
   create() {
-    const guiView = new GuiView(this, gameStateManager, guiController, selectedTileController, flowerSelectionController, seedController);
-    const flowerInfoView = new FlowerInfoView(this, guiController);
+    const guiView = new GuiView(this, gameStateManager, guiController, selectedObjectController, flowerSelectionController, seedController);
   }
 }
   

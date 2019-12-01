@@ -8,13 +8,13 @@ import { FlowerSelectionController } from "../controllers/FlowerSelectionControl
 import { ImageButton } from "../widgets/ImageButton";
 import { TextLabel } from "../widgets/TextLabel";
 
-export class FlowerSelectorView {
+export class FlowerSelectionView {
     scene: Phaser.Scene;
     gameStateManager: GameStateManager;
     flowerSelector: UIContainer;
     flowerSelectLeft: ImageButton;
     flowerSelectRight: ImageButton;
-    flowerText: any;
+    flowerText: TextLabel;
 
     constructor(scene: Phaser.Scene, 
         gameStateManager: GameStateManager, 
@@ -49,7 +49,7 @@ export class FlowerSelectorView {
             flowerSelectionController.selectNextFlower();
         });
 
-        flowerSelectionController.selectedFlowerObservable().subscribe(flowerType => {
+        flowerSelectionController.selectedFlowerTypeObservable().subscribe(flowerType => {
             this.flowerText.setText(flowerType.name);
         })
 
