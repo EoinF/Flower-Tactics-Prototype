@@ -33,13 +33,13 @@
             "growthRate": 10,
             "plantingAmount": 5,
             "nitrogenRequirements": {
-                "min": 12, "max": 15
+                "min": 2, "max": 25
             },
             "phosphorousRequirements": {
-                "min": 10, "max": 15
+                "min": 1, "max": 29
             },
             "potassiumRequirements": {
-                "min": 7, "max": 10
+                "min": 14, "max": 15
             }
         }
     },

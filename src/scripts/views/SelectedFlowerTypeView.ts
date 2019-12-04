@@ -10,6 +10,8 @@ import { filter } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { TextLabel } from "../widgets/TextLabel";
 import { FlowerType } from "../objects/FlowerType";
+import { NumberRangeDisplay } from "../widgets/NumberRangeDisplay";
+import { FlexUIContainer } from "../widgets/FlexUIContainer";
 
 export class SelectedFlowerTypeView {
     x: number;
@@ -19,8 +21,12 @@ export class SelectedFlowerTypeView {
 
     private popup: UIContainer;
     private popupText: TextLabel;
+    private nitrogenDisplay: NumberRangeDisplay;
+    private phosphorousDisplay: NumberRangeDisplay;
+    private potassiumDisplay: NumberRangeDisplay;
 
     constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, SelectedObjectController: SelectedObjectController) {
+
         this.popup = new UIContainer(scene, 8, 8, 412, 96, "Bottom")
             .setVisible(false)
             .setInteractive()
@@ -33,11 +39,56 @@ export class SelectedFlowerTypeView {
         this.width = this.popup.width;
         this.height = this.popup.height;
 
-        this.popupText = new TextLabel(scene, 8, 8, "...", COLOURS.BLACK, true);
-        
-        this.popup.addChild(this.popupText);
+        const displayHeight = 16;
+        const displayWidth = 250;
+        const displayIndent = 10;
 
-        combineLatest(gameStateManager.nextStateObservable(),
+        const popupContent = new FlexUIContainer(scene, 0, 0, this.popup.width, "grow");
+        this.popupText = new TextLabel(scene, 8, 8, "...", COLOURS.BLACK, true);
+
+        // Labels
+        const nitrogenLabel = new TextLabel(scene, 4, 0, "Nitrogen: ", COLOURS.BLACK, false, 12);
+        const phosphorousLabel = new TextLabel(scene, 4, 0, "Phosphorous: ", COLOURS.BLACK, false, 12);
+        const potassiumLabel = new TextLabel(scene, 4, 0, "Potassium: ", COLOURS.BLACK, false, 12);
+
+        const labelColumnWidth = Math.max(nitrogenLabel.width, phosphorousLabel.width, potassiumLabel.width);
+
+        // Nitrogen section
+        this.nitrogenDisplay = new NumberRangeDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
+            COLOURS.WHITE, COLOURS.BLACK, {min: 0, max: 30},
+            { startLabelText: "0%", endLabelText: "30%" }
+        );
+        const nitrogenSection = new UIContainer(scene, displayIndent, 0, labelColumnWidth + displayWidth + 4, displayHeight);
+        nitrogenSection.addChild(nitrogenLabel, "Middle");
+        nitrogenSection.addChild(this.nitrogenDisplay, "Middle");
+
+        // Phosphorous section
+        this.phosphorousDisplay = new NumberRangeDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
+            COLOURS.GREEN, COLOURS.RED, {min: 0, max: 30},
+            { startLabelText: "0%", endLabelText: "30%" }
+        );
+        const phosphorousSection = new UIContainer(scene, displayIndent, 2, labelColumnWidth + displayWidth + 4, displayHeight);
+        phosphorousSection.addChild(phosphorousLabel, "Middle");
+        phosphorousSection.addChild(this.phosphorousDisplay, "Middle");
+
+        // Potassium section
+        this.potassiumDisplay = new NumberRangeDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
+            COLOURS.GRAY, COLOURS.BLUE, {min: 0, max: 30},
+            { startLabelText: "0%", endLabelText: "30%" }
+        );
+        const potassiumSection = new UIContainer(scene, displayIndent, 0, labelColumnWidth + displayWidth + 4, displayHeight);
+        potassiumSection.addChild(potassiumLabel, "Middle");
+        potassiumSection.addChild(this.potassiumDisplay, "Middle");
+
+        popupContent.addChild(this.popupText);
+        popupContent.addChild(nitrogenSection);
+        popupContent.addChild(phosphorousSection);
+        popupContent.addChild(potassiumSection);
+
+        this.popup.addChild(popupContent);
+
+        combineLatest(
+            gameStateManager.nextStateObservable(),
             SelectedObjectController.selectedFlowerTypeObservable()
         )
         .subscribe(([newState, selectedFlowerType]) => {
@@ -52,18 +103,11 @@ export class SelectedFlowerTypeView {
     }
 
     private updatePopupText(gameState: GameState, flowerTypeDetails: FlowerType) {
-        const nitrogenContent = (flowerTypeDetails.nitrogenRequirements.min).toFixed(2);
-        const phosphorousContent = (flowerTypeDetails.phosphorousRequirements.min).toFixed(2);
-        const potassiumContent = (flowerTypeDetails.potassiumRequirements.min).toFixed(2);
+        this.nitrogenDisplay.setValues(flowerTypeDetails.nitrogenRequirements);
+        this.phosphorousDisplay.setValues(flowerTypeDetails.phosphorousRequirements);
+        this.potassiumDisplay.setValues(flowerTypeDetails.potassiumRequirements);
         
-        let lines = [
-            flowerTypeDetails.name,
-            `N: ${nitrogenContent}%`,
-            `P: ${phosphorousContent}%`,
-            `K: ${potassiumContent}%`
-        ];
-
-
-        this.popupText.setText(lines);
+        this.popupText.setText(flowerTypeDetails.name + "  -  Soil Requirements");
+        // this.popup.setText(flowerTypeDetails.name + "  -  Soil Requirements");
     }
 }

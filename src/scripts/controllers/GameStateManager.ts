@@ -173,7 +173,6 @@ export class GameStateManager {
     }
 
     placeSeed(type: string, tileIndex: number) {
-        console.log(this.gameStateDelta);
         calculateSeedPlacementDelta(this.gameState, this.gameStateDelta, type, tileIndex);
         this.gameStateDelta.placedSeeds[type].push(tileIndex);
         this.nextDelta$.next(this.gameStateDelta);

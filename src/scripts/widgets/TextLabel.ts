@@ -16,12 +16,14 @@ export class TextLabel implements BaseUIObject {
     isVisible: boolean;
 
     constructor(scene: Phaser.Scene,
-        x: number, y: number, text: string, colour: Phaser.Display.Color = COLOURS.BLACK, isBold: boolean = false
+        x: number, y: number, text: string, 
+        colour: Phaser.Display.Color = COLOURS.BLACK, isBold: boolean = false, fontSize: number = 16
     ) {
-        this.scene = scene; 
+        this.scene = scene;
         this.textObject = this.scene.add.text(x, y, text, {
             fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', 
-            fontStyle: isBold ? 'bold' : ''
+            fontStyle: isBold ? 'bold' : '',
+            fontSize: `${fontSize}px`
         }).setColor(colour.rgba);
         this.x = x;
         this.y = y;

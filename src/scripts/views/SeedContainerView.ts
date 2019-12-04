@@ -105,7 +105,6 @@ export class SeedContainerView {
 
         seedController.pickUpSeedObservable()
             .subscribe(pickedUpSeed => {
-                console.log("picked up seed");
                 if (pickedUpSeed.origin == 'SEED_ORIGIN_INVENTORY') {
                     this.seedContainer.children[this.seedContainer.children.length - 1]
                         .destroy();

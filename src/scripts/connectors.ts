@@ -1,4 +1,4 @@
-import { withLatestFrom, map, startWith } from 'rxjs/operators';
+import { withLatestFrom, map, startWith, filter } from 'rxjs/operators';
 import { combineLatest } from 'rxjs';
 import { GuiController } from './controllers/GuiController';
 import { GameStateManager } from './controllers/GameStateManager';
@@ -41,8 +41,8 @@ export function setupConnectors(
     const isMouseOverFlowerSelection$ = seedController.mouseOverFlowerSelectionObservable();
     const onClickInfoButton$ = guiController.onClickInfoButtonObservable();
 
-    onClickInfoButton$.pipe(
-        withLatestFrom(selectedFlowerType$)
+    combineLatest(onClickInfoButton$, selectedFlowerType$).pipe(
+        filter(([_, flowerType]) => flowerType != null)
     ).subscribe(([_, flowerType]) => {
         selectedObjectController.setSelectedFlowerType(flowerType.type);
     })
@@ -86,7 +86,6 @@ export function setupConnectors(
         .pipe(
             withLatestFrom(combineLatest([isMouseOverSeedContainer$, isMouseOverFlowerSelection$, gameState$, mapCamera$, pickedUpSeedTileLocation$]))
         ).subscribe(([droppedSeed, [isMouseOverSeedContainer, isMouseOverFlowerSelection, gameState, camera, pickedUpSeed]]) => {
-            console.log("drop", isMouseOverSeedContainer, droppedSeed);
             if (!isMouseOverSeedContainer && !isMouseOverFlowerSelection) {
                 const tileXY = guiPositionToTileLocation(camera, droppedSeed.x, droppedSeed.y);
                 const tile = gameState.getTileAt(tileXY.tileX, tileXY.tileY);

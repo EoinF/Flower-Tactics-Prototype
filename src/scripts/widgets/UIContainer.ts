@@ -16,18 +16,17 @@ export class UIContainer implements BaseUIObject {
     alpha: number;
     private verticalAlignment: VerticalAlignment;
     private horizontalAlignment: HorizontalAlignment;
-    private isWidthAuto: boolean;
-    private isHeightAuto: boolean;
     depth: number;
-    private isInteractive: boolean;
+    strokeThickness: number;
+    protected isInteractive: boolean;
     isVisible: boolean;
 
     children: Array<BaseUIObject | UIContainer>;
 
     constructor(scene: Phaser.Scene,
         x: number, y: number,
-        width: number | "auto" = "auto", height: number | "auto" = "auto",
-        verticalAlignment: VerticalAlignment = "Top", 
+        width: number, height: number,
+        verticalAlignment: VerticalAlignment = "Top",
         horizontalAlignment: HorizontalAlignment = "Left"
     ) {
         this.scene = scene;
@@ -38,13 +37,11 @@ export class UIContainer implements BaseUIObject {
         this.horizontalAlignment = horizontalAlignment;
         this.originX = this.originY = 0;
 
-        this.isWidthAuto = width === "auto";
-        this.isHeightAuto = height === "auto";
-        this.width = width === "auto" ? 0 : width;
-        this.height = height === "auto" ? 0 : height;
-        
         this.alpha = 1;
         this.depth = 0;
+        this.width = width;
+        this.height = height;
+        this.strokeThickness = 0;
         this.isVisible = true;
         this.isInteractive = false;
         this.children = [];
@@ -65,7 +62,7 @@ export class UIContainer implements BaseUIObject {
         );
         this.backgroundImage = this.scene.add.rectangle(this.x, this.y, this.width, this.height, 0xccaaff, 0)
             .setOrigin(0, 0)
-            .setDepth(0);
+            .setDepth(this.depth);
         
         this._setPosition(ax, ay);
     }
@@ -76,32 +73,21 @@ export class UIContainer implements BaseUIObject {
     }
 
     setBorder(thickness: number, color: Phaser.Display.Color) {
+        this.strokeThickness = thickness;
         this.backgroundImage.setStrokeStyle(thickness, color.color, color.alphaGL);
         return this;
     }
 
-    addChild(child: BaseUIObject | UIContainer,
+    removeChild(childToDelete: BaseUIObject): BaseUIObject {
+        const index = this.children.findIndex(child => childToDelete === child);
+        this.children.splice(index, 1);
+        return childToDelete;
+    }
+
+    addChild(child: BaseUIObject,
         verticalAlignment: VerticalAlignment = "Top",
         horizontalAlignment: HorizontalAlignment = "Left"
     ) {
-        if (this.isWidthAuto) {
-            this.width += child.width;
-        }
-        if (this.isHeightAuto) {
-            this.height = Math.max(this.height, child.height);
-        }
-        if (this.isWidthAuto || this.isHeightAuto) {
-            const oldImage = this.backgroundImage;
-            this.createBackgroundImage();
-            this.backgroundImage
-                .setFillStyle(oldImage.fillColor, oldImage.fillAlpha)
-                .setStrokeStyle(oldImage.lineWidth, oldImage.strokeColor, oldImage.strokeAlpha)
-                .setAlpha(oldImage.alpha)
-            if (this.isInteractive)
-                this.backgroundImage.setInteractive();
-            oldImage.destroy();
-        }
-
         const {x: ax, y: ay} = getAlignedCoordinates(
             child.x, child.y, child.width, child.height,
             this.width, this.height, verticalAlignment, horizontalAlignment,

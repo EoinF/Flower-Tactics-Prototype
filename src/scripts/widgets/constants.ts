@@ -7,6 +7,9 @@ export const COLOURS = {
     WHITE: new Phaser.Display.Color(255, 255, 255),
     LIGHT_GRAY: new Phaser.Display.Color(200, 200, 200),
     GRAY: new Phaser.Display.Color(128, 128, 128),
+    DARK_GRAY: new Phaser.Display.Color(64, 64, 64),
+    PINK: new Phaser.Display.Color(255, 120, 140),
+    BLUE: new Phaser.Display.Color(0, 0, 128),
 
     PURPLE_100: new Phaser.Display.Color(220, 186, 255),
     PURPLE_200: new Phaser.Display.Color(197, 167, 229),
@@ -20,6 +23,7 @@ export const COLOURS = {
 
     GREEN: new Phaser.Display.Color(50, 200, 50),
     RED: new Phaser.Display.Color(255, 0, 0),
+    LIGHT_RED: new Phaser.Display.Color(255, 50, 50),
 
     YELLOW: new Phaser.Display.Color(255, 242, 0),
     LIGHT_YELLOW: new Phaser.Display.Color(255, 255, 94),

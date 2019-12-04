@@ -7,6 +7,7 @@ import { map, distinctUntilChanged } from "rxjs/operators";
 import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
 import { ImageButton } from "../widgets/ImageButton";
 import { TextLabel } from "../widgets/TextLabel";
+import { FlexUIContainer } from "../widgets/FlexUIContainer";
 
 export class FlowerSelectionView {
     scene: Phaser.Scene;
@@ -26,7 +27,7 @@ export class FlowerSelectionView {
         this.gameStateManager = gameStateManager;
         this.scene = scene;
 
-        this.flowerSelector = new UIContainer(scene, 8, offsetY + 8, width, "auto", "Bottom")
+        this.flowerSelector = new FlexUIContainer(scene, 8, offsetY + 8, width, "auto", "Bottom")
             .setBackground(COLOURS.withAlpha(COLOURS.GRAY, 0.1))
             .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.3))
             .setInteractive()
