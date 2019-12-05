@@ -1,5 +1,5 @@
-import { withLatestFrom, map, startWith, filter } from 'rxjs/operators';
-import { combineLatest } from 'rxjs';
+import { withLatestFrom, map, filter, flatMap } from 'rxjs/operators';
+import { combineLatest, merge } from 'rxjs';
 import { GuiController } from './controllers/GuiController';
 import { GameStateManager } from './controllers/GameStateManager';
 import { SeedController } from './controllers/SeedController';
@@ -41,9 +41,14 @@ export function setupConnectors(
     const isMouseOverFlowerSelection$ = seedController.mouseOverFlowerSelectionObservable();
     const onClickInfoButton$ = guiController.onClickInfoButtonObservable();
 
-    combineLatest(onClickInfoButton$, selectedFlowerType$).pipe(
-        filter(([_, flowerType]) => flowerType != null)
-    ).subscribe(([_, flowerType]) => {
+    const flowerTypeOnClickingInfoButton$ = onClickInfoButton$.pipe(
+        flatMap(() => selectedFlowerType$),
+        filter(selectedFlowerType => selectedFlowerType != null)
+    );
+
+    merge(flowerTypeOnClickingInfoButton$, selectedFlowerType$).pipe(
+        filter((flowerType) => flowerType != null)
+    ).subscribe((flowerType) => {
         selectedObjectController.setSelectedFlowerType(flowerType.type);
     })
 
