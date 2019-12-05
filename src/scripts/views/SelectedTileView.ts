@@ -8,6 +8,8 @@ import { RadioButtonGroup } from "../widgets/RadioButtonGroup";
 import { combineLatest } from "rxjs";
 import { GameState } from "../objects/GameState";
 import { TextLabel } from "../widgets/TextLabel";
+import { FlexUIContainer } from "../widgets/FlexUIContainer";
+import { NumberPointDisplay } from "../widgets/NumberDisplay/NumberPointDisplay";
 
 export class SelectedTileView {
     x: number;
@@ -17,6 +19,10 @@ export class SelectedTileView {
 
     private popup: UIContainer;
     private popupText: TextLabel;
+    
+    private nitrogenDisplay: NumberPointDisplay;
+    private phosphorousDisplay: NumberPointDisplay;
+    private potassiumDisplay: NumberPointDisplay;
 
     private tabGroup: RadioButtonGroup;
     private npkTab: ImageButton;
@@ -34,8 +40,6 @@ export class SelectedTileView {
         this.y = this.popup.y;
         this.width = this.popup.width;
         this.height = this.popup.height;
-
-        this.popupText = new TextLabel(scene, 8, 8, "...", COLOURS.BLACK, true);
         
         this.npkTab = new ImageButton(scene, 2, 2, 'button-npk')
             .setBackground(COLOURS.PURPLE_200, COLOURS.PURPLE_400, COLOURS.WHITE, COLOURS.PURPLE_500)
@@ -48,8 +52,57 @@ export class SelectedTileView {
             .onChange((index) => {
                 SelectedObjectController.setActiveTabIndex(index);
             });
-        
+
+        const displayHeight = 16;
+        const displayWidth = 250;
+        const displayIndent = 10;
+
+        this.popupText = new TextLabel(scene, 8, 8, "...", COLOURS.BLACK, true);
+        const popupContent = new FlexUIContainer(scene, 0, this.popupText.height + 16, this.popup.width, "grow");
+
+        // Labels
+        const nitrogenLabel = new TextLabel(scene, 4, 0, "Nitrogen: ", COLOURS.BLACK, false, 12);
+        const phosphorousLabel = new TextLabel(scene, 4, 0, "Phosphorous: ", COLOURS.BLACK, false, 12);
+        const potassiumLabel = new TextLabel(scene, 4, 0, "Potassium: ", COLOURS.BLACK, false, 12);
+
+        const labelColumnWidth = Math.max(nitrogenLabel.width, phosphorousLabel.width, potassiumLabel.width);
+
+        // Nitrogen section
+        this.nitrogenDisplay = new NumberPointDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
+            COLOURS.WHITE, COLOURS.BLACK,
+            { startLabelText: "0%", endLabelText: "30%" },
+            { min: 0, max: 30 }
+        );
+        const nitrogenSection = new UIContainer(scene, displayIndent, 0, labelColumnWidth + displayWidth + 4, displayHeight);
+        nitrogenSection.addChild(nitrogenLabel, "Middle");
+        nitrogenSection.addChild(this.nitrogenDisplay, "Middle");
+
+        // Phosphorous section
+        this.phosphorousDisplay = new NumberPointDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
+            COLOURS.GREEN, COLOURS.RED,
+            { startLabelText: "0%", endLabelText: "30%" },
+            { min: 0, max: 30 }
+        );
+        const phosphorousSection = new UIContainer(scene, displayIndent, 2, labelColumnWidth + displayWidth + 4, displayHeight);
+        phosphorousSection.addChild(phosphorousLabel, "Middle");
+        phosphorousSection.addChild(this.phosphorousDisplay, "Middle");
+
+        // Potassium section
+        this.potassiumDisplay = new NumberPointDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
+            COLOURS.GRAY, COLOURS.BLUE,
+            { startLabelText: "0%", endLabelText: "30%" },
+            { min: 0, max: 30 }
+        );
+        const potassiumSection = new UIContainer(scene, displayIndent, 0, labelColumnWidth + displayWidth + 4, displayHeight);
+        potassiumSection.addChild(potassiumLabel, "Middle");
+        potassiumSection.addChild(this.potassiumDisplay, "Middle");
+
+        popupContent.addChild(nitrogenSection);
+        popupContent.addChild(phosphorousSection);
+        popupContent.addChild(potassiumSection);
+
         this.popup.addChild(this.popupText);
+        this.popup.addChild(popupContent);
         this.popup.addChild(this.npkTab, "Top", "Right");
         this.popup.addChild(this.flowerTab, "Top", "Right");
 
@@ -76,9 +129,11 @@ export class SelectedTileView {
     }
 
     private setSoilText(gameState: GameState, tile: Tile) {
-        const nitrogenContent = (tile.soil.nitrogenContent).toFixed(2);
-        const phosphorousContent = (tile.soil.phosphorousContent).toFixed(2);
-        const potassiumContent = (tile.soil.potassiumContent).toFixed(2);
+        const { 
+            nitrogenContent, 
+            phosphorousContent,
+            potassiumContent
+        } = tile.soil;
         
         let titleText = "Plains";
         if (gameState.getRiverAtTile(tile) != null) {
@@ -86,13 +141,12 @@ export class SelectedTileView {
         } else if (gameState.getMountainAtTile(tile) != null) {
             titleText = "Mountains";
         }
-        
-        let lines = [
-            titleText,
-            `N|P|K :   ${nitrogenContent}% | ${phosphorousContent}% | ${potassiumContent}%`
-        ];
 
-        this.popupText.setText(lines);
+        this.nitrogenDisplay.setValue(nitrogenContent);
+        this.phosphorousDisplay.setValue(phosphorousContent);
+        this.potassiumDisplay.setValue(potassiumContent);
+
+        this.popupText.setText(titleText);
     }
     
     private setFlowerText(gameState: GameState, tile: Tile) {

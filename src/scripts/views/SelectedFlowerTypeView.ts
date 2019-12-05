@@ -10,7 +10,7 @@ import { filter } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { TextLabel } from "../widgets/TextLabel";
 import { FlowerType } from "../objects/FlowerType";
-import { NumberRangeDisplay } from "../widgets/NumberRangeDisplay";
+import { NumberRangeDisplay } from "../widgets/NumberDisplay/NumberRangeDisplay";
 import { FlexUIContainer } from "../widgets/FlexUIContainer";
 
 export class SelectedFlowerTypeView {
@@ -55,8 +55,9 @@ export class SelectedFlowerTypeView {
 
         // Nitrogen section
         this.nitrogenDisplay = new NumberRangeDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
-            COLOURS.WHITE, COLOURS.BLACK, {min: 0, max: 30},
-            { startLabelText: "0%", endLabelText: "30%" }
+            COLOURS.WHITE, COLOURS.BLACK,
+            { startLabelText: "0%", endLabelText: "30%" },
+            { min: 0, max: 30 }
         );
         const nitrogenSection = new UIContainer(scene, displayIndent, 0, labelColumnWidth + displayWidth + 4, displayHeight);
         nitrogenSection.addChild(nitrogenLabel, "Middle");
@@ -64,8 +65,9 @@ export class SelectedFlowerTypeView {
 
         // Phosphorous section
         this.phosphorousDisplay = new NumberRangeDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
-            COLOURS.GREEN, COLOURS.RED, {min: 0, max: 30},
-            { startLabelText: "0%", endLabelText: "30%" }
+            COLOURS.GREEN, COLOURS.RED,
+            { startLabelText: "0%", endLabelText: "30%" },
+            { min: 0, max: 30 }
         );
         const phosphorousSection = new UIContainer(scene, displayIndent, 2, labelColumnWidth + displayWidth + 4, displayHeight);
         phosphorousSection.addChild(phosphorousLabel, "Middle");
@@ -73,8 +75,9 @@ export class SelectedFlowerTypeView {
 
         // Potassium section
         this.potassiumDisplay = new NumberRangeDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
-            COLOURS.GRAY, COLOURS.BLUE, {min: 0, max: 30},
-            { startLabelText: "0%", endLabelText: "30%" }
+            COLOURS.GRAY, COLOURS.BLUE,
+            { startLabelText: "0%", endLabelText: "30%" },
+            { min: 0, max: 30 }
         );
         const potassiumSection = new UIContainer(scene, displayIndent, 0, labelColumnWidth + displayWidth + 4, displayHeight);
         potassiumSection.addChild(potassiumLabel, "Middle");
