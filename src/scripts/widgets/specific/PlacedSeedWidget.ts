@@ -16,9 +16,9 @@ export class PlacedSeedWidget {
 			.setInteractive()
 			.setDepth(99);
         this.amountText = new TextLabel(scene, x + 20, y + 4, seedAmount.toString(), COLOURS.WHITE, false, 14, 2)
-             .setOrigin(1, 0)
+             .setOrigin(1, 0);
 
-        if (this.amount < 2) { 
+        if (this.amount < 2) {
             this.amountText.setVisible(false);
         }
     }

@@ -1,18 +1,10 @@
 import { GameState, GameStateData } from "../objects/GameState";
-import { Flower } from "../objects/Flower";
 import { StringMap } from "../types";
 import { Observable, ReplaySubject } from "rxjs";
 import { calculateRiverEffects } from "../deltaCalculators/calculateRiverDelta";
 import { calculateFlowerEffects } from "../deltaCalculators/calculateFlowerDelta";
-import { calculateSeedPlacementDelta, revertSeedPlacementDelta } from "../deltaCalculators/calculateSeedPlacementDelta";
 
 export interface FlowerDelta {
-    amount: number;
-}
-
-export interface NewFlowerDelta {
-    tileIndex: number;
-    type: string;
     amount: number;
 }
 
@@ -28,14 +20,8 @@ export interface SeedStatusDelta {
     progress: number;
 }
 
-interface PlacedSeed {
-    tileIndex: number,
-    amount: number
-}
-
 export interface GameStateDelta {
     tileSoilDelta: Array<SoilDelta>;
-    newFlowerDelta: Array<NewFlowerDelta>;
     flowerDelta: Array<FlowerDelta>;
     seedStatusDelta: StringMap<SeedStatusDelta>;
     placedSeeds: StringMap<Map<number, number>>;
@@ -88,7 +74,6 @@ export class GameStateManager {
 
     private getBlankDelta(): GameStateDelta {
         return {
-            newFlowerDelta: [],
             flowerDelta: this.gameState.flowers.map(_ => ({amount: 0})),
             tileSoilDelta: this.gameState.tiles.map((_, index, array) => ({
                     nitrogen: 0,
@@ -115,7 +100,7 @@ export class GameStateManager {
             tileSoilDelta,
             flowerDelta,
             seedStatusDelta,
-            newFlowerDelta
+            placedSeeds
         } = this.gameStateDelta;
 
         tileSoilDelta.forEach((soilDelta, index) => {
@@ -129,18 +114,21 @@ export class GameStateManager {
             copiedFlower.amount += amount;
         });
 
-        newFlowerDelta
-            .filter(newFlower => newFlower.amount > 0)
-            .forEach(newFlower => {
-                copiedData.flowers.push({
-                    index: copiedData.flowers.length,
-                    type: newFlower.type,
-                    x: newFlower.tileIndex % copiedData.numTilesX,
-                    y: Math.floor(newFlower.tileIndex / copiedData.numTilesX),
-                    amount: newFlower.amount,
-                    mode: 'Grow'
-                });
-            });
+        
+        Object.keys(placedSeeds).forEach(type => {
+            placedSeeds[type].forEach((seedAmount, tileIndex) => {
+                if (seedAmount > 0) {
+                    copiedData.flowers.push({
+                        index: tileIndex,
+                        x: tileIndex % this.gameState.numTilesX,
+                        y: Math.floor(tileIndex / this.gameState.numTilesX),
+                        type,
+                        amount: 0,
+                        mode: 'Grow'
+                    })
+                }
+            })
+        });
 
         Object.keys(seedStatusDelta).forEach((type) => {
             const seedDelta = seedStatusDelta[type];
@@ -168,31 +156,31 @@ export class GameStateManager {
     }
 
     moveSeed(type: string, previousTileIndex: number, nextTileIndex: number) {
-        revertSeedPlacementDelta(this.gameState, this.gameStateDelta, type, previousTileIndex);
-        calculateSeedPlacementDelta(this.gameState, this.gameStateDelta, type, nextTileIndex);
-        
-        this.gameStateDelta.placedSeeds[type].set(previousTileIndex, this.gameStateDelta.placedSeeds[type].get(previousTileIndex)! -1);
-        if (this.gameStateDelta.placedSeeds[type].has(nextTileIndex)) {
-            this.gameStateDelta.placedSeeds[type].set(nextTileIndex, this.gameStateDelta.placedSeeds[type].get(nextTileIndex)! + 1);
-        } else {
-            this.gameStateDelta.placedSeeds[type].set(nextTileIndex, 1);
-        }
+        this._removeSeed(type, previousTileIndex);
+        this._addSeed(type, nextTileIndex);
         this.nextDelta$.next(this.gameStateDelta);
     }
 
     placeSeed(type: string, tileIndex: number) {
-        calculateSeedPlacementDelta(this.gameState, this.gameStateDelta, type, tileIndex);
-        if (this.gameStateDelta.placedSeeds[type].has(tileIndex)) {
-            this.gameStateDelta.placedSeeds[type].set(tileIndex, this.gameStateDelta.placedSeeds[type].get(tileIndex)! + 1);
-        } else {
-            this.gameStateDelta.placedSeeds[type].set(tileIndex, 1);
-        }
+        this.gameStateDelta.seedStatusDelta[type].quantity--;
+        this._addSeed(type, tileIndex);
         this.nextDelta$.next(this.gameStateDelta);
     }
 
     removeSeed(type: string, tileIndex: number) {
-        revertSeedPlacementDelta(this.gameState, this.gameStateDelta, type, tileIndex);
-        this.gameStateDelta.placedSeeds[type].set(tileIndex, this.gameStateDelta.placedSeeds[type].get(tileIndex)! -1);
+        this.gameStateDelta.seedStatusDelta[type].quantity++;
+        this._removeSeed(type, tileIndex);
         this.nextDelta$.next(this.gameStateDelta);
+    }
+
+    _addSeed(type: string, tileIndex: number) {
+        let existingAmount = 0;
+        if (this.gameStateDelta.placedSeeds[type].has(tileIndex)) {
+            existingAmount = this.gameStateDelta.placedSeeds[type].get(tileIndex)!;
+        }
+        this.gameStateDelta.placedSeeds[type].set(tileIndex, existingAmount + 1);
+    }
+    _removeSeed(type: string, tileIndex: number) {
+        this.gameStateDelta.placedSeeds[type].set(tileIndex, this.gameStateDelta.placedSeeds[type].get(tileIndex)! -1);
     }
 }
