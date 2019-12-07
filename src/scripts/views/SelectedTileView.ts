@@ -10,6 +10,7 @@ import { GameState } from "../objects/GameState";
 import { TextLabel } from "../widgets/generic/TextLabel";
 import { FlexUIContainer } from "../widgets/generic/FlexUIContainer";
 import { NumberPointDisplay } from "../widgets/generic/NumberDisplay/NumberPointDisplay";
+import { NITROGEN_VALUE_RANGE, PHOSPHOROUS_VALUE_RANGE, POTASSIUM_VALUE_RANGE } from "../constants";
 
 export class SelectedTileView {
     x: number;
@@ -71,7 +72,7 @@ export class SelectedTileView {
         this.nitrogenDisplay = new NumberPointDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
             COLOURS.WHITE, COLOURS.BLACK,
             { startLabelText: "0%", endLabelText: "30%" },
-            { min: 0, max: 30 }
+            NITROGEN_VALUE_RANGE
         );
         const nitrogenSection = new UIContainer(scene, displayIndent, 0, labelColumnWidth + displayWidth + 4, displayHeight);
         nitrogenSection.addChild(nitrogenLabel, "Middle");
@@ -81,7 +82,7 @@ export class SelectedTileView {
         this.phosphorousDisplay = new NumberPointDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
             COLOURS.GREEN, COLOURS.RED,
             { startLabelText: "0%", endLabelText: "30%" },
-            { min: 0, max: 30 }
+            PHOSPHOROUS_VALUE_RANGE
         );
         const phosphorousSection = new UIContainer(scene, displayIndent, 2, labelColumnWidth + displayWidth + 4, displayHeight);
         phosphorousSection.addChild(phosphorousLabel, "Middle");
@@ -91,7 +92,7 @@ export class SelectedTileView {
         this.potassiumDisplay = new NumberPointDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
             COLOURS.GRAY, COLOURS.BLUE,
             { startLabelText: "0%", endLabelText: "30%" },
-            { min: 0, max: 30 }
+            POTASSIUM_VALUE_RANGE
         );
         const potassiumSection = new UIContainer(scene, displayIndent, 0, labelColumnWidth + displayWidth + 4, displayHeight);
         potassiumSection.addChild(potassiumLabel, "Middle");
@@ -141,6 +142,8 @@ export class SelectedTileView {
         } else if (gameState.getMountainAtTile(tile) != null) {
             titleText = "Mountains";
         }
+
+        console.log(tile.soil);
 
         this.nitrogenDisplay.setValue(nitrogenContent);
         this.phosphorousDisplay.setValue(phosphorousContent);

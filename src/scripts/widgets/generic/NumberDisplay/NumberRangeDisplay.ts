@@ -16,7 +16,7 @@ export class NumberRangeDisplay extends NumberDisplayBase {
     ) {
         super(scene, x, y, width, height, colourStart, colourEnd, labels);
         this.numberRange = numberRange;
-        this.currentValues = { min: 5, max: 10};
+        this.currentValues = { min: 500, max: 1000};
 
         this.rangeValuesImageSides = scene.add.rectangle(1, 1, this.backgroundImage.width, this.backgroundImage.height - 9)
             .setOrigin(0,0)

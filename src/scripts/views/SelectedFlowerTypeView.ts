@@ -12,6 +12,7 @@ import { TextLabel } from "../widgets/generic/TextLabel";
 import { FlowerType } from "../objects/FlowerType";
 import { NumberRangeDisplay } from "../widgets/generic/NumberDisplay/NumberRangeDisplay";
 import { FlexUIContainer } from "../widgets/generic/FlexUIContainer";
+import { POTASSIUM_VALUE_RANGE, NITROGEN_VALUE_RANGE, PHOSPHOROUS_VALUE_RANGE } from "../constants";
 
 export class SelectedFlowerTypeView {
     x: number;
@@ -57,7 +58,7 @@ export class SelectedFlowerTypeView {
         this.nitrogenDisplay = new NumberRangeDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
             COLOURS.WHITE, COLOURS.BLACK,
             { startLabelText: "0%", endLabelText: "30%" },
-            { min: 0, max: 30 }
+            NITROGEN_VALUE_RANGE
         );
         const nitrogenSection = new UIContainer(scene, displayIndent, 0, labelColumnWidth + displayWidth + 4, displayHeight);
         nitrogenSection.addChild(nitrogenLabel, "Middle");
@@ -67,7 +68,7 @@ export class SelectedFlowerTypeView {
         this.phosphorousDisplay = new NumberRangeDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
             COLOURS.GREEN, COLOURS.RED,
             { startLabelText: "0%", endLabelText: "30%" },
-            { min: 0, max: 30 }
+            PHOSPHOROUS_VALUE_RANGE
         );
         const phosphorousSection = new UIContainer(scene, displayIndent, 2, labelColumnWidth + displayWidth + 4, displayHeight);
         phosphorousSection.addChild(phosphorousLabel, "Middle");
@@ -77,7 +78,7 @@ export class SelectedFlowerTypeView {
         this.potassiumDisplay = new NumberRangeDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
             COLOURS.GRAY, COLOURS.BLUE,
             { startLabelText: "0%", endLabelText: "30%" },
-            { min: 0, max: 30 }
+            POTASSIUM_VALUE_RANGE
         );
         const potassiumSection = new UIContainer(scene, displayIndent, 0, labelColumnWidth + displayWidth + 4, displayHeight);
         potassiumSection.addChild(potassiumLabel, "Middle");

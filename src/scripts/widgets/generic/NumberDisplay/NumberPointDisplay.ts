@@ -17,7 +17,7 @@ export class NumberPointDisplay extends NumberDisplayBase {
         this.numberRange = numberRange;
         this.currentValue = 0;
 
-        this.rangeValueImage = scene.add.circle(1, 1, 4)
+        this.rangeValueImage = scene.add.circle(0, 1, 4)
             .setOrigin(0,0)
             .setFillStyle(colourEnd.color, 1)
             .setStrokeStyle(1, colourStart.color);
@@ -29,7 +29,8 @@ export class NumberPointDisplay extends NumberDisplayBase {
         this.currentValue = value;
         
         const totalRangeAmount = this.numberRange.max - this.numberRange.min;
-        const rangeX = this.width * (this.currentValue / totalRangeAmount);
+        const rangeX = (this.backgroundImage.width - 2 - this.rangeValueImage.width) * (this.currentValue / totalRangeAmount);
+        
         this.rangeValueImage.setPosition(this.backgroundImage.x + rangeX + 1, this.rangeValueImage.y);
     }
 }
