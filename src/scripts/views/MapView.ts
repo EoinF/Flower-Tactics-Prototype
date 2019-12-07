@@ -2,10 +2,12 @@ import { SoilColourConverter } from "../SoilColourConverter";
 import { GameStateManager } from "../controllers/GameStateManager";
 import { SelectedObjectController } from "../controllers/SelectedObjectController";
 import { SeedController } from "../controllers/SeedController";
-import { COLOURS } from "../widgets/constants";
+import { COLOURS } from "../widgets/generic/constants";
 import { MapController } from "../controllers/MapController";
 import { startWith, pairwise, distinctUntilChanged, withLatestFrom, first } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
+import { TextLabel } from "../widgets/generic/TextLabel";
+import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
 
 export class MapView {
     scene: Phaser.Scene;
@@ -15,7 +17,7 @@ export class MapView {
     flowerSprites: Phaser.GameObjects.Image[];
     mountainSprites: Phaser.GameObjects.Image[];
 	riverSprites: Phaser.GameObjects.Image[];
-	placedSeedSprites: Phaser.GameObjects.Image[];
+	placedSeedSprites: Map<number, PlacedSeedWidget>;
 
     constructor(
       scene: Phaser.Scene, 
@@ -31,7 +33,7 @@ export class MapView {
 		this.flowerSprites = [];
 		this.mountainSprites = [];
 		this.riverSprites = [];
-		this.placedSeedSprites = [];
+		this.placedSeedSprites = new Map<number, PlacedSeedWidget>();
         this.setupSprites(scene, gameStateManager);
         this.setupCallbacks(gameStateManager, SelectedObjectController, seedController, mapController);
     }
@@ -52,7 +54,7 @@ export class MapView {
 				return img;
 			});
 			this.placedSeedSprites.forEach(s => s.destroy());
-			this.placedSeedSprites = [];
+			this.placedSeedSprites.clear();
 		});
     }
 
@@ -121,12 +123,14 @@ export class MapView {
 			)
 			.subscribe(([newStateDelta, newState]) => {
 				this.placedSeedSprites.forEach(sprite => sprite.destroy());
-				this.placedSeedSprites = [];
+				this.placedSeedSprites.clear();
 				Object.keys(newStateDelta.placedSeeds)
 					.forEach(type => {
 						newStateDelta.placedSeeds[type]
-							.forEach(tileIndex => {
-								this.addNewSeed(tileIndex, type, newState, seedController);
+							.forEach((seedAmount, tileIndex) => {
+								if (seedAmount > 0) {
+									this.addNewSeed(tileIndex, type, seedAmount, newState, seedController);
+								}
 							})
 					});
 			});
@@ -150,25 +154,28 @@ export class MapView {
 			});
 	}
 	
-	addNewSeed(tileIndex: number, seedType: string, newState: GameState, seedController: SeedController) {
+	addNewSeed(tileIndex: number, seedType: string, seedAmount: number, newState: GameState, seedController: SeedController) {
 		const location = this.indexToMapCoordinates(tileIndex, newState.numTilesX);
-		const seedSprite = this.scene.add.image(location.x * 48, location.y * 48, "seed2")
-			.setInteractive({draggable: true})
-			.setDepth(99);
 		
-		seedSprite.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+		const placedSeedWidget = new PlacedSeedWidget(this.scene, location.x * 48, location.y * 48, seedAmount);
+		placedSeedWidget.onClick((pointer: Phaser.Input.Pointer) => {
 			seedController.pickUpSeed(seedType, pointer.x, pointer.y, 'SEED_ORIGIN_MAP');
-			this.placedSeedSprites = this.placedSeedSprites.filter(s => s != seedSprite);
-			seedSprite.destroy();
-			
-			const subscription = seedController.resetPickedUpSeedObservable()
-				.pipe(first())
-				.subscribe(() => this.addNewSeed(tileIndex, seedType, newState, seedController));
-			seedController.dropSeedObservable()
-				.pipe(first())
-				.subscribe(() => subscription.unsubscribe());
+			const currentSeedAmount = placedSeedWidget.getAmount();
+			if (currentSeedAmount === 1) {
+				this.placedSeedSprites.delete(tileIndex);
+				placedSeedWidget.destroy();
+					
+				const subscription = seedController.resetPickedUpSeedObservable()
+					.pipe(first())
+					.subscribe(() => this.addNewSeed(tileIndex, seedType, 1, newState, seedController));
+				seedController.dropSeedObservable()
+					.pipe(first())
+					.subscribe(() => subscription.unsubscribe());
+			} else {
+				placedSeedWidget.setAmount(seedAmount - 1);
+			}
 		});
 		
-		this.placedSeedSprites.push(seedSprite);
+		this.placedSeedSprites.set(tileIndex, placedSeedWidget);
 	}
 }

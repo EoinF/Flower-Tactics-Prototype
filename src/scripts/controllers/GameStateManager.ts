@@ -28,12 +28,17 @@ export interface SeedStatusDelta {
     progress: number;
 }
 
+interface PlacedSeed {
+    tileIndex: number,
+    amount: number
+}
+
 export interface GameStateDelta {
     tileSoilDelta: Array<SoilDelta>;
     newFlowerDelta: Array<NewFlowerDelta>;
     flowerDelta: Array<FlowerDelta>;
     seedStatusDelta: StringMap<SeedStatusDelta>;
-    placedSeeds: StringMap<Array<number>>;
+    placedSeeds: StringMap<Map<number, number>>;
 }
 
 export class GameStateManager {
@@ -57,7 +62,6 @@ export class GameStateManager {
             this.gameState = new GameState(gameStateOrData);
         }
         
-        const totalTiles = this.gameState.tiles.length;
         this.gameStateDelta = this.getBlankDelta();
         this.nextState$.next(this.gameState);
         this.loadMap$.next(this.gameState);
@@ -65,10 +69,10 @@ export class GameStateManager {
     }
 
     private generatePlacedSeedsMap() {
-        const placedSeeds: StringMap<Array<number>> = {};
+        const placedSeeds: StringMap<Map<number, number>> = {};
         
         Object.keys(this.gameState.flowerTypes).forEach(type => {
-            placedSeeds[type] = [];
+            placedSeeds[type] = new Map<number, number>();
         })
         return placedSeeds;
     }
@@ -166,22 +170,29 @@ export class GameStateManager {
     moveSeed(type: string, previousTileIndex: number, nextTileIndex: number) {
         revertSeedPlacementDelta(this.gameState, this.gameStateDelta, type, previousTileIndex);
         calculateSeedPlacementDelta(this.gameState, this.gameStateDelta, type, nextTileIndex);
-        const arrayIndex = this.gameStateDelta.placedSeeds[type].findIndex(existing => existing == previousTileIndex);
-        this.gameStateDelta.placedSeeds[type] = this.gameStateDelta.placedSeeds[type].filter((existing, index) => index != arrayIndex);
-        this.gameStateDelta.placedSeeds[type].push(nextTileIndex);
+        
+        this.gameStateDelta.placedSeeds[type].set(previousTileIndex, this.gameStateDelta.placedSeeds[type].get(previousTileIndex)! -1);
+        if (this.gameStateDelta.placedSeeds[type].has(nextTileIndex)) {
+            this.gameStateDelta.placedSeeds[type].set(nextTileIndex, this.gameStateDelta.placedSeeds[type].get(nextTileIndex)! + 1);
+        } else {
+            this.gameStateDelta.placedSeeds[type].set(nextTileIndex, 1);
+        }
         this.nextDelta$.next(this.gameStateDelta);
     }
 
     placeSeed(type: string, tileIndex: number) {
         calculateSeedPlacementDelta(this.gameState, this.gameStateDelta, type, tileIndex);
-        this.gameStateDelta.placedSeeds[type].push(tileIndex);
+        if (this.gameStateDelta.placedSeeds[type].has(tileIndex)) {
+            this.gameStateDelta.placedSeeds[type].set(tileIndex, this.gameStateDelta.placedSeeds[type].get(tileIndex)! + 1);
+        } else {
+            this.gameStateDelta.placedSeeds[type].set(tileIndex, 1);
+        }
         this.nextDelta$.next(this.gameStateDelta);
     }
 
     removeSeed(type: string, tileIndex: number) {
         revertSeedPlacementDelta(this.gameState, this.gameStateDelta, type, tileIndex);
-        const arrayIndex = this.gameStateDelta.placedSeeds[type].findIndex(existing => existing == tileIndex);
-        this.gameStateDelta.placedSeeds[type] = this.gameStateDelta.placedSeeds[type].filter((existing, index) => index != arrayIndex);
+        this.gameStateDelta.placedSeeds[type].set(tileIndex, this.gameStateDelta.placedSeeds[type].get(tileIndex)! -1);
         this.nextDelta$.next(this.gameStateDelta);
     }
 }

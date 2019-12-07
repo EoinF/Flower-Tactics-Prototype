@@ -1,5 +1,5 @@
 import { VerticalAlignment, HorizontalAlignment, COLOURS } from "./constants";
-import { getAlignedCoordinates } from "./utils";
+import { getAlignedCoordinates } from "../utils";
 import { BaseUIObject } from "./BaseUIObject";
 
 export class TextLabel implements BaseUIObject {
@@ -17,13 +17,18 @@ export class TextLabel implements BaseUIObject {
 
     constructor(scene: Phaser.Scene,
         x: number, y: number, text: string, 
-        colour: Phaser.Display.Color = COLOURS.BLACK, isBold: boolean = false, fontSize: number = 16
+        colour: Phaser.Display.Color = COLOURS.BLACK, isBold: boolean = false, 
+        fontSize: number = 16,
+        strokeThickness: number = 0,
+        strokeColour: Phaser.Display.Color = COLOURS.BLACK
     ) {
         this.scene = scene;
         this.textObject = this.scene.add.text(x, y, text, {
             fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', 
             fontStyle: isBold ? 'bold' : '',
-            fontSize: `${fontSize}px`
+            fontSize: `${fontSize}px`,
+            strokeThickness,
+            stroke: strokeColour
         }).setColor(colour.rgba);
         this.x = x;
         this.y = y;

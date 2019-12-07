@@ -1,4 +1,4 @@
-import { VerticalAlignment, HorizontalAlignment } from "./constants";
+import { VerticalAlignment, HorizontalAlignment } from "./generic/constants";
 
 export function getAlignedCoordinates(
     x: number,

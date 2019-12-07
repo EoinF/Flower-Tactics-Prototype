@@ -1,5 +1,5 @@
 import { VerticalAlignment, HorizontalAlignment, COLOURS } from "./constants";
-import { getAlignedCoordinates } from "./utils";
+import { getAlignedCoordinates } from "../utils";
 import { BaseUIObject } from "./BaseUIObject";
 
 export class UIContainer implements BaseUIObject {

@@ -1,15 +1,15 @@
 import { GameStateManager } from "../controllers/GameStateManager";
 import { Tile } from "../objects/Tile";
 import { SelectedObjectController } from "../controllers/SelectedObjectController";
-import { UIContainer } from "../widgets/UIContainer";
-import { ImageButton } from "../widgets/ImageButton";
-import { COLOURS } from "../widgets/constants";
-import { RadioButtonGroup } from "../widgets/RadioButtonGroup";
+import { UIContainer } from "../widgets/generic/UIContainer";
+import { ImageButton } from "../widgets/generic/ImageButton";
+import { COLOURS } from "../widgets/generic/constants";
+import { RadioButtonGroup } from "../widgets/generic/RadioButtonGroup";
 import { combineLatest } from "rxjs";
 import { GameState } from "../objects/GameState";
-import { TextLabel } from "../widgets/TextLabel";
-import { FlexUIContainer } from "../widgets/FlexUIContainer";
-import { NumberPointDisplay } from "../widgets/NumberDisplay/NumberPointDisplay";
+import { TextLabel } from "../widgets/generic/TextLabel";
+import { FlexUIContainer } from "../widgets/generic/FlexUIContainer";
+import { NumberPointDisplay } from "../widgets/generic/NumberDisplay/NumberPointDisplay";
 
 export class SelectedTileView {
     x: number;

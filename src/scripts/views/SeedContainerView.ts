@@ -1,15 +1,15 @@
 import { GameStateManager, GameStateDelta } from "../controllers/GameStateManager";
-import { UIContainer } from "../widgets/UIContainer";
+import { UIContainer } from "../widgets/generic/UIContainer";
 import { SeedController } from "../controllers/SeedController";
 import { seedController, guiController, selectedObjectController } from "../game";
 import { GameState } from "../objects/GameState";
-import { COLOURS } from "../widgets/constants";
+import { COLOURS } from "../widgets/generic/constants";
 import { combineLatest } from "rxjs";
 import { first, map } from "rxjs/operators";
 import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
 import { FlowerType } from "../objects/FlowerType";
-import { ImageButton } from "../widgets/ImageButton";
-import { TextLabel } from "../widgets/TextLabel";
+import { ImageButton } from "../widgets/generic/ImageButton";
+import { TextLabel } from "../widgets/generic/TextLabel";
 
 const SEEDS_PER_ROW = 32;
 const MAX_ROWS = 2;
@@ -129,7 +129,13 @@ export class SeedContainerView {
                 .find(type => selectedFlowerType.type === type)!
         ];
 
-        const amountAlreadyPlaced = gameStateDelta.placedSeeds[selectedSeedStatus.type].length;
+        let amountAlreadyPlaced = 0;
+        const valuesIterator = gameStateDelta.placedSeeds[selectedSeedStatus.type].values();
+        let value = valuesIterator.next();
+        while (!value.done) {
+            amountAlreadyPlaced += value.value;
+            value = valuesIterator.next();
+        }
         for (let i = 0; i < selectedSeedStatus.quantity - amountAlreadyPlaced; i++) {
             this.addNewSeed(selectedSeedStatus.type);
         }

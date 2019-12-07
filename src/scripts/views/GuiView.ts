@@ -1,7 +1,7 @@
 import { GuiController } from "../controllers/GuiController";
 import { GameStateManager } from "../controllers/GameStateManager";
-import { TextButton } from "../widgets/TextButton";
-import { COLOURS } from "../widgets/constants";
+import { TextButton } from "../widgets/generic/TextButton";
+import { COLOURS } from "../widgets/generic/constants";
 import { SeedContainerView } from "./SeedContainerView";
 import { SelectedObjectController } from "../controllers/SelectedObjectController";
 import { SeedController } from "../controllers/SeedController";
