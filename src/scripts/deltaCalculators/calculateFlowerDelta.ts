@@ -6,8 +6,8 @@ import { SoilDelta, FlowerDelta, SeedStatusDelta, GameStateDelta } from "../cont
 import { GameState } from "../objects/GameState";
 
 export function calculateFlowerEffects(gameState: GameState, gameStateDelta: GameStateDelta) {
-    gameState.tileToFlowerMap.forEach((flowers, tile) => {
-        const deltas = getFlowerEffect(tile, flowers, gameState.flowerTypes);
+    gameState.tileToFlowerMap.forEach((flower, tile) => {
+        const deltas = getFlowerEffect(tile, flower, gameState.flowerTypes);
         gameStateDelta.tileSoilDelta[tile.index].nitrogen += deltas.soilDelta.nitrogen;
         gameStateDelta.tileSoilDelta[tile.index].phosphorous += deltas.soilDelta.phosphorous;
         gameStateDelta.tileSoilDelta[tile.index].potassium += deltas.soilDelta.potassium;
@@ -30,10 +30,7 @@ export function calculateFlowerEffects(gameState: GameState, gameStateDelta: Gam
     });
 }
 
-export function getFlowerEffect(tile: Tile, flowers: Flower[], flowerTypes: StringMap<FlowerType>): {soilDelta: SoilDelta, flowerDeltaMap: Map<number, FlowerDelta>, seedDelta: Map<string, SeedStatusDelta>} {
-    const flower = {
-        ...flowers[0]
-    };
+export function getFlowerEffect(tile: Tile, flower: Flower, flowerTypes: StringMap<FlowerType>): {soilDelta: SoilDelta, flowerDeltaMap: Map<number, FlowerDelta>, seedDelta: Map<string, SeedStatusDelta>} {
     const {
         turnsUntilGrown,
         soilConsumptionRate,

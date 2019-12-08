@@ -6,7 +6,6 @@ import { COLOURS } from "../widgets/generic/constants";
 import { MapController } from "../controllers/MapController";
 import { startWith, pairwise, distinctUntilChanged, withLatestFrom, first } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
-import { TextLabel } from "../widgets/generic/TextLabel";
 import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
 
 export class MapView {
@@ -78,7 +77,6 @@ export class MapView {
 			img.setScale(0.2 + 0.8 * flower.growth / flowerType.turnsUntilGrown);
 			img.setData("x", flower.x);
 			img.setData("y", flower.y);
-			img.setData("type", flower.type);
 			return img;
 		});
 	}
@@ -112,7 +110,7 @@ export class MapView {
 				this.setupFlowerSprites(newState);
 			} else {
 				this.flowerSprites.forEach(img => {
-					const flower = newState.getFlowerByTypeAt(img.getData("type"), img.getData("x"), img.getData("y"))!;
+					const flower = newState.getFlowerAt(img.getData("x"), img.getData("y"))!;
 					const flowerType = newState.getFlowerType(flower);
 					img.setScale(0.2 + 0.8 * flower.growth / flowerType.turnsUntilGrown);
 				});

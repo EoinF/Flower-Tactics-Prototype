@@ -26,7 +26,7 @@ export class GameState implements GameStateData {
     rivers: River[];
     flowerTypes: StringMap<FlowerType>;
 
-    tileToFlowerMap: Map<Tile, Flower[]>;
+    tileToFlowerMap: Map<Tile, Flower>;
     tileToRiverMap: Map<Tile, River>;
     tileToMountainMap: Map<Tile, Mountain>;
     seedStatus: StringMap<SeedStatusDelta>;
@@ -35,23 +35,25 @@ export class GameState implements GameStateData {
         Object.keys(data).forEach(key => {
             this[key] = data[key];
         });
-        this.tileToFlowerMap = new Map<Tile, Flower[]>();
+        this.tileToFlowerMap = new Map<Tile, Flower>();
         this.tileToRiverMap = new Map<Tile, River>();
         this.tileToMountainMap = new Map<Tile, Mountain>();
 
-        this.mapTilesToFlowersArray(data.flowers, this.tileToFlowerMap);
+        this.mapTilesToFlowers(data.flowers, this.tileToFlowerMap);
         this.mapTilesToRivers(data.rivers, this.tileToRiverMap);
         this.mapTilesToMountains(data.mountains, this.tileToMountainMap);
     }
 
-    private mapTilesToFlowersArray(flowers: Flower[], map: Map<Tile, Flower[]>) {
+    private mapTilesToFlowers(flowers: Flower[], map: Map<Tile, Flower>) {
         flowers.forEach(flower => {
             const tile = this.getTileAt(flower.x, flower.y)!;
-            const flowerArray = map.get(tile);
-            if (flowerArray != null) {
-                map.set(tile, [flower, ...flowerArray]);
+            const existingFlower = map.get(tile);
+            if (existingFlower != null) {
+                throw new Error("Two flowers cannot exist on the same tile! " 
+                    + JSON.stringify(existingFlower)
+                    + JSON.stringify(flower));
             } else {
-                map.set(tile, [flower]);
+                map.set(tile, flower);
             }
         });
     }
@@ -77,29 +79,16 @@ export class GameState implements GameStateData {
         return this.tileToMountainMap.get(tile);
     }
     
-    getFlowersAtTile(tile: Tile): Array<Flower> {
-        return this.tileToFlowerMap.get(tile) || [];
-    }
-    
-    getFlowerByTypeAtTile(type: string, tile: Tile) {
-        if (tile != null) {
-            const flowers = this.tileToFlowerMap.get(tile);
-            if (flowers != null) {
-                const flower = flowers.find(f => f.type === type);
-                if (flower != null) {
-                    return flower;
-                }
-            }
-        }
-        return null;
+    getFlowerAtTile(tile: Tile): Flower | null {
+        return this.tileToFlowerMap.get(tile) || null;
     }
 
-    getFlowerByTypeAt(type: string, x: number, y: number) {
+    getFlowerAt(x: number, y: number) {
         const tile = this.getTileAt(x, y);
         if (tile != null) {
-            return this.getFlowerByTypeAtTile(type, tile);
+            return this.getFlowerAtTile(tile);
         } else {
-            throw Error(`No tile exists at [${x},${y}] - getFlowerByTypeAt(${type})`)
+            throw Error(`No tile exists at [${x},${y}] - getFlowerAt`)
         }
     }
 

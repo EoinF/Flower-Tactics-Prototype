@@ -20,23 +20,15 @@ export class FlowerTab implements SelectedTileTab {
     
     show(gameState: GameState, tile: Tile) {
         this.mainContainer.setVisible(true);
-        const flowers = gameState.getFlowersAtTile(tile);
-        let titleText = "Plains";
-        if (gameState.getRiverAtTile(tile) != null) {
-            titleText = "River";
-        } else if (gameState.getMountainAtTile(tile) != null) {
-            titleText = "Mountains";
-        }
+        const flower = gameState.getFlowerAtTile(tile);
+        let text = "No flower";
         
-        let lines = [
-            titleText,
-            ...flowers.map(flower => {
-                const flowerTypeData = gameState.flowerTypes[flower.type];
-                return `${flowerTypeData.name}: ${flower.growth} / ${flowerTypeData.turnsUntilGrown}`;
-            })
-        ];
+        if (flower != null) {
+            const flowerTypeData = gameState.flowerTypes[flower.type];
+            text = `${flowerTypeData.name}: ${flower.growth} / ${flowerTypeData.turnsUntilGrown}`;
+        }
 
-        this.titleText.setText(lines);
+        this.titleText.setText(text);
     }
 
     hide() {
