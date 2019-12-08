@@ -9,7 +9,7 @@ import { first, map } from "rxjs/operators";
 import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
 import { FlowerType } from "../objects/FlowerType";
 import { ImageButton } from "../widgets/generic/ImageButton";
-import { TextLabel } from "../widgets/generic/TextLabel";
+import { ProgressBar } from "../widgets/generic/ProgressBar";
 
 const SEEDS_PER_ROW = 32;
 const MAX_ROWS = 2;
@@ -48,15 +48,22 @@ export class SeedContainerView {
             .onClick(() => {
                 guiController.clickInfoButton();
             });
+            
+        const seedProgressBar = new ProgressBar(scene, 4, this.infoButton.height + 8, 0, 100);
 
         this.mainContainer.addChild(this.seedContainer);
         this.mainContainer.addChild(
             this.infoButton,
             "Top", "Right"
         );
+        this.mainContainer.addChild(
+            seedProgressBar,
+            "Top", "Right"
+        );
 
         this.width = this.mainContainer.width;
         this.height = this.mainContainer.height;
+
         scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
             if (this.seedContainer.hits(pointer.x, pointer.y)) {
                 seedController.setMouseOverSeedContainer(true);
@@ -121,6 +128,11 @@ export class SeedContainerView {
                 this.seedContainer.clear();
                 this.addSeedGUI(nextState, nextDelta, selectedFlowerType);
             });
+
+        combineLatest(gameStateManager.nextStateObservable(), flowerSelectionController.selectedFlowerTypeObservable())
+            .subscribe(([nextDelta, selectedFlowerType]) => {
+                seedProgressBar.setValue(nextDelta.seedStatus[selectedFlowerType.type].progress);
+            })
     }
 
     addSeedGUI(gameState: GameState, gameStateDelta: GameStateDelta, selectedFlowerType: FlowerType) {

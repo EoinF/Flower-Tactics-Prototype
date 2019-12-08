@@ -34,7 +34,7 @@ export abstract class NumberDisplayBase implements BaseUIObject {
         this.endLabel = new TextLabel(scene, 0, 0, labels.endLabelText, COLOURS.BLACK, true, 10);
 
         this.backgroundImage = new RectangleSprite(scene, 2 + this.startLabel.width, 0,
-            width - this.startLabel.width - this.endLabel.width - 4, height, 0.3)
+            width - this.startLabel.width - this.endLabel.width - 4, height, 0.75)
             .setTint(
                 colourStart.color, colourEnd.color,
                 colourStart.color, colourEnd.color

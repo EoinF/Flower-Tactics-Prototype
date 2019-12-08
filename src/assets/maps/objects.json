@@ -3,12 +3,12 @@
         "1": {
             "type": "1",
             "quantity": 21,
-            "progress": 0
+            "progress": 99
         },
         "2": {
             "type": "2",
             "quantity": 3,
-            "progress": 0
+            "progress": 7
         }
     },
     "flowerTypes": {

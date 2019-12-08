@@ -30,12 +30,13 @@ export class RectangleSprite extends Phaser.GameObjects.Sprite {
             { x: width, y: height},
             { x: 0, y: height }
         ]
+        const tempTextureName = '_temp_RectangleSprite' + Math.random();
         graphics.fillPoints(rectanglePoints, true);
         graphics.strokePoints(rectanglePoints, true);
-        graphics.generateTexture('_temp_NumberRangeDisplay', width, height);
+        graphics.generateTexture(tempTextureName, width, height);
         graphics.destroy();
     
-        super(scene, x, y, '_temp_NumberRangeDisplay');
+        super(scene, x, y, tempTextureName);
         scene.add.existing(this);
     }
 }

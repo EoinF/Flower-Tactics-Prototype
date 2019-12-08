@@ -4,7 +4,8 @@ import { BaseUIObject } from "./BaseUIObject";
 
 export class TextLabel implements BaseUIObject {
     private scene: Phaser.Scene;
-    public textObject: Phaser.GameObjects.Text;
+    private textObject: Phaser.GameObjects.Text;
+    private depthOffset: number;
     x: number;
     y: number;
     originX: number;
@@ -34,6 +35,7 @@ export class TextLabel implements BaseUIObject {
         this.y = y;
         
         this.depth = 0;
+        this.depthOffset = 0;
         this.isVisible = true;
 
         this.width = this.textObject.width;
@@ -55,9 +57,15 @@ export class TextLabel implements BaseUIObject {
         this.textObject.setPosition(x, y);
         return this;
     }
+
+    setDepthOffset(depthOffset: number) {
+        this.depthOffset = depthOffset;
+        return this.setDepth(this.depth);
+    }
+
     setDepth(depth: number) {
-        this.depth = depth;
-        this.textObject.setDepth(depth);
+        this.depth = depth + this.depthOffset;
+        this.textObject.setDepth(depth + this.depthOffset);
         return this;
     }
 
