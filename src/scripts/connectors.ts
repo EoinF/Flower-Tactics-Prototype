@@ -33,6 +33,7 @@ export function setupConnectors(
     const dragSeed$ = seedController.dragSeedObservable();
     const dropSeed$ = seedController.dropSeedObservable();
     const gameState$ = gameStateManager.nextStateObservable();
+    const gameStateDelta$ = gameStateManager.nextDeltaObservable();
     const mapCamera$ = mapController.cameraObservable();
     const isMouseOverSeedContainer$ = seedController.mouseOverSeedContainerObservable();
     const pickUpSeed$ = seedController.pickUpSeedObservable();
@@ -89,20 +90,34 @@ export function setupConnectors(
 
     dropSeed$
         .pipe(
-            withLatestFrom(combineLatest([isMouseOverSeedContainer$, isMouseOverFlowerSelection$, gameState$, mapCamera$, pickedUpSeedTileLocation$]))
-        ).subscribe(([droppedSeed, [isMouseOverSeedContainer, isMouseOverFlowerSelection, gameState, camera, pickedUpSeed]]) => {
+            withLatestFrom(combineLatest([isMouseOverSeedContainer$, isMouseOverFlowerSelection$, gameState$, gameStateDelta$, mapCamera$, pickedUpSeedTileLocation$]))
+        ).subscribe(([droppedSeed, [isMouseOverSeedContainer, isMouseOverFlowerSelection, gameState, gameStateDelta, camera, pickedUpSeed]]) => {
             if (!isMouseOverSeedContainer && !isMouseOverFlowerSelection) {
                 const tileXY = guiPositionToTileLocation(camera, droppedSeed.x, droppedSeed.y);
                 const tile = gameState.getTileAt(tileXY.tileX, tileXY.tileY);
-                
                 if (tile != null) {
-                    if (pickedUpSeed.origin == 'SEED_ORIGIN_INVENTORY') {
-                        gameStateManager.placeSeed(droppedSeed.type, tile.index);
-                    } else { // SEED_ORIGIN_MAP
-                        const pickedUpTile = gameState.getTileAt(pickedUpSeed.x, pickedUpSeed.y)!;
-                        gameStateManager.moveSeed(droppedSeed.type, pickedUpTile.index, tile.index);
+                    const isTileOccupiedByOtherSeedType = Object.keys(gameStateDelta.placedSeeds)
+                        .filter(type => type != droppedSeed.type)
+                        .some(type => {
+                            return gameStateDelta.placedSeeds[type].has(tile.index)
+                                && gameStateDelta.placedSeeds[type].get(tile.index)! > 0;
+                        });
+
+                    const isTileOccupiedByFlower = (gameState.getFlowerAtTile(tile) != null)
+
+                    if (isTileOccupiedByOtherSeedType) {
+                        guiController.createAlertMessage("Only one type of seed can be placed on a single tile.");
+                    } else if (isTileOccupiedByFlower) {
+                        guiController.createAlertMessage("Seeds can only be placed on empty tiles.");
+                    } else {
+                        if (pickedUpSeed.origin == 'SEED_ORIGIN_INVENTORY') {
+                            gameStateManager.placeSeed(droppedSeed.type, tile.index);
+                        } else { // SEED_ORIGIN_MAP
+                            const pickedUpTile = gameState.getTileAt(pickedUpSeed.x, pickedUpSeed.y)!;
+                            gameStateManager.moveSeed(droppedSeed.type, pickedUpTile.index, tile.index);
+                        }
+                        return;
                     }
-                    return;
                 }
             } else if (pickedUpSeed.origin == 'SEED_ORIGIN_MAP') {
                 const pickedUpTile = gameState.getTileAt(pickedUpSeed.x, pickedUpSeed.y);
