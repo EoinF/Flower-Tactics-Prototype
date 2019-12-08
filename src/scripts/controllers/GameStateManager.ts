@@ -5,7 +5,7 @@ import { calculateRiverEffects } from "../deltaCalculators/calculateRiverDelta";
 import { calculateFlowerEffects } from "../deltaCalculators/calculateFlowerDelta";
 
 export interface FlowerDelta {
-    amount: number;
+    growth: number;
 }
 
 export interface SoilDelta {
@@ -74,7 +74,7 @@ export class GameStateManager {
 
     private getBlankDelta(): GameStateDelta {
         return {
-            flowerDelta: this.gameState.flowers.map(_ => ({amount: 0})),
+            flowerDelta: this.gameState.flowers.map(_ => ({growth: 0})),
             tileSoilDelta: this.gameState.tiles.map((_, index, array) => ({
                     nitrogen: 0,
                     potassium: 0,
@@ -110,20 +110,19 @@ export class GameStateManager {
         });
 
         copiedData.flowers.forEach((copiedFlower, flowerIndex) => {
-            const { amount } = flowerDelta[flowerIndex];
-            copiedFlower.amount += amount;
+            const { growth } = flowerDelta[flowerIndex];
+            copiedFlower.growth += growth;
         });
-
         
         Object.keys(placedSeeds).forEach(type => {
             placedSeeds[type].forEach((seedAmount, tileIndex) => {
                 if (seedAmount > 0) {
                     copiedData.flowers.push({
-                        index: tileIndex,
+                        index: copiedData.flowers.length,
                         x: tileIndex % this.gameState.numTilesX,
                         y: Math.floor(tileIndex / this.gameState.numTilesX),
                         type,
-                        amount: 0,
+                        growth: 0,
                         mode: 'Grow'
                     })
                 }

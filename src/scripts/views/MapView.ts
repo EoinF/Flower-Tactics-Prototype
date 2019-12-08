@@ -74,7 +74,8 @@ export class MapView {
 		this.flowerSprites.forEach(s => s.destroy());
 		this.flowerSprites = gameState.flowers.map((flower) => {
 			const img = this.scene.add.image(flower.x * 48, flower.y * 48, 'flower');
-			img.setScale(0.2 + 0.8 * flower.amount / 100);
+			const flowerType = gameState.getFlowerType(flower);
+			img.setScale(0.2 + 0.8 * flower.growth / flowerType.turnsUntilGrown);
 			img.setData("x", flower.x);
 			img.setData("y", flower.y);
 			img.setData("type", flower.type);
@@ -112,7 +113,8 @@ export class MapView {
 			} else {
 				this.flowerSprites.forEach(img => {
 					const flower = newState.getFlowerByTypeAt(img.getData("type"), img.getData("x"), img.getData("y"))!;
-					img.setScale(0.2 + 0.8 * flower.amount / 100);
+					const flowerType = newState.getFlowerType(flower);
+					img.setScale(0.2 + 0.8 * flower.growth / flowerType.turnsUntilGrown);
 				});
 			}
 		});

@@ -1,9 +1,10 @@
-import { NumberDisplayBase, NumberRange } from "./NumberDisplayBase";
+import { NumberDisplayBase } from "./NumberDisplayBase";
+import { NumberRange } from "../../../types";
 
 export class NumberPointDisplay extends NumberDisplayBase {
     private rangeValueImage: Phaser.GameObjects.Rectangle;
 
-    private numberRange: NumberRange;
+    private rangeBounds: NumberRange;
     private currentValue: number;
 
     constructor(
@@ -11,10 +12,10 @@ export class NumberPointDisplay extends NumberDisplayBase {
         width: number, height: number,
         colourStart: Phaser.Display.Color, colourEnd: Phaser.Display.Color,
         labels: { startLabelText: string, endLabelText: string },
-        numberRange: NumberRange
+        rangeBounds: NumberRange
     ) {
         super(scene, x, y, width, height, colourStart, colourEnd, labels);
-        this.numberRange = numberRange;
+        this.rangeBounds = rangeBounds;
         this.currentValue = 0;
 
         this.rangeValueImage = scene.add.circle(0, 1, 4)
@@ -28,7 +29,7 @@ export class NumberPointDisplay extends NumberDisplayBase {
     setValue(value: number) {
         this.currentValue = value;
         
-        const totalRangeAmount = this.numberRange.max - this.numberRange.min;
+        const totalRangeAmount = this.rangeBounds.max - this.rangeBounds.min;
         const rangeX = (this.backgroundImage.width - 2 - this.rangeValueImage.width) * (this.currentValue / totalRangeAmount);
         
         this.rangeValueImage.setPosition(this.backgroundImage.x + rangeX + 1, this.rangeValueImage.y);

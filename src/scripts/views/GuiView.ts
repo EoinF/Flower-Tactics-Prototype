@@ -5,7 +5,7 @@ import { COLOURS } from "../widgets/generic/constants";
 import { SeedContainerView } from "./SeedContainerView";
 import { SelectedObjectController } from "../controllers/SelectedObjectController";
 import { SeedController } from "../controllers/SeedController";
-import { SelectedTileView } from "./SelectedTileView";
+import { SelectedTileView } from "./SelectedTileView/SelectedTileView";
 import { FlowerSelectionView } from "./FlowerSelectionView";
 import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
 import { SelectedFlowerTypeView } from "./SelectedFlowerTypeView";

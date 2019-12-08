@@ -1,14 +1,13 @@
-interface Requirements {
-    min: number;
-    max: number;
-}
+import { NumberRange } from "../types";
 
 export interface FlowerType {
     type: string;
     name: string;
-    growthRate: number;
-    plantingAmount: number;
-    nitrogenRequirements: Requirements;
-    phosphorousRequirements: Requirements;
-    potassiumRequirements: Requirements;
+    turnsUntilGrown: number;
+    soilConsumptionRate: number,
+    seedProductionRate: number,
+    
+    nitrogenRequirements: NumberRange;
+    phosphorousRequirements: NumberRange;
+    potassiumRequirements: NumberRange;
 }

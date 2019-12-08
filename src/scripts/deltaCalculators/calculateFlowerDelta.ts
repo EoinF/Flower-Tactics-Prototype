@@ -15,7 +15,7 @@ export function calculateFlowerEffects(gameState: GameState, gameStateDelta: Gam
         deltas.flowerDeltaMap.forEach((flowerDelta, flowerIndex) => {
             const existingDelta = gameStateDelta.flowerDelta[flowerIndex];
             gameStateDelta.flowerDelta[flowerIndex] = {
-                amount: existingDelta.amount + flowerDelta.amount
+                growth: existingDelta.growth + flowerDelta.growth
             };
         });
 
@@ -35,7 +35,9 @@ export function getFlowerEffect(tile: Tile, flowers: Flower[], flowerTypes: Stri
         ...flowers[0]
     };
     const {
-        growthRate,
+        turnsUntilGrown,
+        soilConsumptionRate,
+        seedProductionRate,
         nitrogenRequirements,
         phosphorousRequirements,
         potassiumRequirements
@@ -48,20 +50,18 @@ export function getFlowerEffect(tile: Tile, flowers: Flower[], flowerTypes: Stri
         && phosphorousRequirements.min <= tile.soil.phosphorousContent && tile.soil.phosphorousContent <= phosphorousRequirements.max
         && potassiumRequirements.min <= tile.soil.potassiumContent && tile.soil.potassiumContent <= potassiumRequirements.max) {
         
-        if (flower.mode == "Grow") {
-            flowerDeltaMap.set(flower.index, {amount: growthRate});
+        if (flower.growth < turnsUntilGrown) {
+            flowerDeltaMap.set(flower.index, { growth: 1 });
         } else {
             seedDelta.set(flower.type, {
                 quantity: 0,
-                progress: Math.floor(growthRate * flower.amount * 0.1),
+                progress: seedProductionRate,
                 type: flower.type
             })
         }
     }
 
-    const growthDelta = 0.0002 * growthRate;
-    const flowerDelta = 0.0001 * flower.amount;
-    const totalDelta = growthDelta + flowerDelta;
+    const totalDelta = soilConsumptionRate;
     const soilDelta = {
         nitrogen: -totalDelta,
         potassium: -totalDelta,

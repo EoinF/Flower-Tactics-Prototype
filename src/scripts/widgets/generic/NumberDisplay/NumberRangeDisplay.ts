@@ -1,4 +1,5 @@
-import { NumberDisplayBase, NumberRange } from "./NumberDisplayBase";
+import { NumberDisplayBase } from "./NumberDisplayBase";
+import { NumberRange } from "../../../types";
 
 export class NumberRangeDisplay extends NumberDisplayBase {
     private rangeValuesImageFront: Phaser.GameObjects.Rectangle;
@@ -34,7 +35,7 @@ export class NumberRangeDisplay extends NumberDisplayBase {
         
         const totalRangeAmount = this.numberRange.max - this.numberRange.min;
         const rangeScale = ((this.currentValues.max - this.currentValues.min) / totalRangeAmount);
-        const rangeX = this.width * (this.currentValues.min / totalRangeAmount);
+        const rangeX = this.backgroundImage.width * (this.currentValues.min / totalRangeAmount);
         this.rangeValuesImageFront.setPosition(this.backgroundImage.x + rangeX + 1, this.rangeValuesImageFront.y);
         this.rangeValuesImageFront.setScale(rangeScale - (2 / this.width), 1);
         this.rangeValuesImageSides.setPosition(this.backgroundImage.x + rangeX, this.rangeValuesImageFront.y);

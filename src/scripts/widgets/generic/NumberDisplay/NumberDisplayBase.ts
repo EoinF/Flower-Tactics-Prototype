@@ -4,11 +4,6 @@ import { COLOURS } from "../constants";
 import { UIContainer } from "../UIContainer";
 import { RectangleSprite } from "../RectangleSprite";
 
-export interface NumberRange {
-    min: number;
-    max: number;
-}
-
 export abstract class NumberDisplayBase implements BaseUIObject {
     protected mainContainer: UIContainer;
     protected backgroundImage: Phaser.GameObjects.Sprite;
