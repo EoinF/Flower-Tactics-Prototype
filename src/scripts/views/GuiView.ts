@@ -10,6 +10,7 @@ import { FlowerSelectionView } from "./FlowerSelectionView";
 import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
 import { SelectedFlowerTypeView } from "./SelectedFlowerTypeView";
 import { selectedObjectController } from "../game";
+import { AlertMessageView } from "./AlertMessageView";
 
 export class GuiView {
     constructor(
@@ -21,7 +22,8 @@ export class GuiView {
         seedController: SeedController
     ) {
         const selectedTileView = new SelectedTileView(scene, gameStateManager, SelectedObjectController);
-        const selectedFlowerTypeView = new SelectedFlowerTypeView(scene, gameStateManager, selectedObjectController);
+        new SelectedFlowerTypeView(scene, gameStateManager, selectedObjectController);
+        new AlertMessageView(scene, guiController);
 
         const { height } = scene.game.canvas;
         const offsetY = height - selectedTileView.y;

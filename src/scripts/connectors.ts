@@ -96,19 +96,22 @@ export function setupConnectors(
                 const tileXY = guiPositionToTileLocation(camera, droppedSeed.x, droppedSeed.y);
                 const tile = gameState.getTileAt(tileXY.tileX, tileXY.tileY);
                 if (tile != null) {
-                    const isTileOccupiedByOtherSeedType = Object.keys(gameStateDelta.placedSeeds)
+                    const isOtherSeedTypeBlockingTile = Object.keys(gameStateDelta.placedSeeds)
                         .filter(type => type != droppedSeed.type)
                         .some(type => {
                             return gameStateDelta.placedSeeds[type].has(tile.index)
                                 && gameStateDelta.placedSeeds[type].get(tile.index)! > 0;
                         });
 
-                    const isTileOccupiedByFlower = (gameState.getFlowerAtTile(tile) != null)
+                    const isFlowerBlockingTile = (gameState.getFlowerAtTile(tile) != null);
+                    const isMountainBlockingTile = (gameState.getMountainAtTile(tile) != null);
 
-                    if (isTileOccupiedByOtherSeedType) {
-                        guiController.createAlertMessage("Only one type of seed can be placed on a single tile.");
-                    } else if (isTileOccupiedByFlower) {
-                        guiController.createAlertMessage("Seeds can only be placed on empty tiles.");
+                    if (isOtherSeedTypeBlockingTile) {
+                        guiController.createAlertMessage("Another type of seed is already placed on this tile.");
+                    } else if (isFlowerBlockingTile) {
+                        guiController.createAlertMessage("A flower is blocking seed placement.");
+                    } else if (isMountainBlockingTile) {
+                        guiController.createAlertMessage("A mountain is blocking seed placement.");
                     } else {
                         if (pickedUpSeed.origin == 'SEED_ORIGIN_INVENTORY') {
                             gameStateManager.placeSeed(droppedSeed.type, tile.index);

@@ -164,6 +164,7 @@ export class UIContainer implements BaseUIObject {
         this.children
             .forEach(child => child.destroy());
         this.children = [];
+        return this;
     }
 
     on(event: string | symbol, fn: Function, context: any = undefined) {
