@@ -8,12 +8,13 @@ import { startWith, pairwise, distinctUntilChanged, withLatestFrom, first, filte
 import { GameState } from "../objects/GameState";
 import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
 import { Subject, merge, forkJoin } from "rxjs";
+import { ImageButton } from "../widgets/generic/ImageButton";
 
 export class MapView {
     scene: Phaser.Scene;
 	soilColourConverter: SoilColourConverter;
 
-    tileSprites: Phaser.GameObjects.Image[];
+    tileButtons: ImageButton[];
     flowerSprites: Phaser.GameObjects.Image[];
     mountainSprites: Phaser.GameObjects.Image[];
 	riverSprites: Phaser.GameObjects.Image[];
@@ -29,7 +30,7 @@ export class MapView {
     ) {
 		this.scene = scene;
 		this.soilColourConverter = soilColourConverter;
-		this.tileSprites = [];
+		this.tileButtons = [];
 		this.flowerSprites = [];
 		this.mountainSprites = [];
 		this.riverSprites = [];
@@ -45,12 +46,14 @@ export class MapView {
 		
 			this.mountainSprites.forEach(s => s.destroy());
 			this.mountainSprites = gameState.mountains.map((mountain) => {
-				const img = scene.add.image(mountain.x * 48, mountain.y * 48, 'mountain');
+				const img = scene.add.image(mountain.x * 48, mountain.y * 48, 'mountain')
+					.setDepth(5);
 				return img;
 			});
 			this.riverSprites.forEach(s => s.destroy());
 			this.riverSprites = gameState.rivers.map((river) => {
-				const img = scene.add.image(river.x * 48, river.y * 48, 'river');
+				const img = scene.add.image(river.x * 48, river.y * 48, 'river')
+					.setDepth(5);
 				return img;
 			});
 			this.placedSeedSprites.forEach(s => s.destroy());
@@ -59,14 +62,15 @@ export class MapView {
     }
 
 	setupTileSprites(gameState: GameState) {
-		this.tileSprites.forEach(s => s.destroy());
-		this.tileSprites = gameState.tiles.map((tile, index) => {
+		this.tileButtons.forEach(s => s.destroy());
+		this.tileButtons = gameState.tiles.map((tile, index) => {
 			const {x, y} = this.indexToMapCoordinates(index, gameState.numTilesX);
-			const img = this.scene.add.image(x * 48, y * 48, 'blank-tile');
-			img.setTint(this.soilColourConverter.soilToColour(tile.soil).color);
-			img.setData("x", x);
-			img.setData("y", y);
-			return img;
+			const button = new ImageButton(this.scene, x * 48 - 24, y * 48 - 24, "blank-tile");
+			const colour = this.soilColourConverter.soilToColour(tile.soil);
+			button.setBackground(colour, colour, colour, COLOURS.PURPLE_500);
+			button.setData("x", x);
+			button.setData("y", y);
+			return button;
 		});
 	}
 
@@ -76,6 +80,7 @@ export class MapView {
 			const img = this.scene.add.image(flower.x * 48, flower.y * 48, 'flower');
 			const flowerType = gameState.getFlowerType(flower);
 			img.setScale(0.2 + 0.8 * flower.growth / flowerType.turnsUntilGrown);
+			img.setDepth(5);
 			img.setData("x", flower.x);
 			img.setData("y", flower.y);
 			return img;
@@ -93,19 +98,19 @@ export class MapView {
 		gameStateManager: GameStateManager, selectedObjectController: SelectedObjectController, 
 		seedController: SeedController, mapController: MapController
 	) {
-        this.tileSprites.forEach(img => {
-            img.setInteractive().on('pointerup', () => {
+        this.tileButtons.forEach(button => {
+            button.onClick(() => {
                 selectedObjectController.setSelectedTile(
-                    img.getData("x"),
-                    img.getData("y")
+                    button.getData("x"),
+                    button.getData("y")
                 );
             });
         });
 
         gameStateManager.nextStateObservable().subscribe((newState) => {
-			this.tileSprites.forEach(img => {
-				const tile = newState.getTileAt(img.getData("x"), img.getData("y"))!;
-				img.setTint(this.soilColourConverter.soilToColour(tile.soil).color);
+			this.tileButtons.forEach(button => {
+				const tile = newState.getTileAt(button.getData("x"), button.getData("y"))!;
+				button.image.setTint(this.soilColourConverter.soilToColour(tile.soil).color);
 			});
 			if (newState.flowers.length != this.flowerSprites.length) {
 				this.setupFlowerSprites(newState);
@@ -113,7 +118,8 @@ export class MapView {
 				this.flowerSprites.forEach(img => {
 					const flower = newState.getFlowerAt(img.getData("x"), img.getData("y"))!;
 					const flowerType = newState.getFlowerType(flower);
-					img.setScale(0.2 + 0.8 * flower.growth / flowerType.turnsUntilGrown);
+					img.setScale(0.2 + 0.8 * flower.growth / flowerType.turnsUntilGrown)
+						.setDepth(5);
 				});
 			}
 		});
@@ -144,13 +150,14 @@ export class MapView {
 			)
 			.subscribe(([oldTile, newTile]) => {
 				if (oldTile != null) {
-					this.tileSprites[oldTile.index]
-						.setTint(this.soilColourConverter.soilToColour(oldTile.soil).color);
+					const colour = this.soilColourConverter.soilToColour(oldTile.soil);
+					this.tileButtons[oldTile.index]
+						.image.setTint(colour.color);
 				}
 
 				if (newTile != null) {
-					const sprite = this.tileSprites[newTile.index];
-					sprite.setTint(COLOURS.PURPLE_200.color);
+					this.tileButtons[newTile.index]
+						.image.setTint(COLOURS.PURPLE_200.color);
 				}
 			});
 	}

@@ -135,7 +135,7 @@ export class UIContainer implements BaseUIObject {
     }
 
     getData(key: string) {
-        this.backgroundImage.getData(key);
+        return this.backgroundImage.getData(key);
     }
     
     setData(key: string, value: any) {
