@@ -1,6 +1,14 @@
 import { VerticalAlignment, HorizontalAlignment, COLOURS } from "./constants";
 import { UIContainer } from "./UIContainer";
 import { BaseUIObject } from "./BaseUIObject";
+import { Subject } from "rxjs";
+import { pairwise, filter, switchMap, tap, distinctUntilChanged, map } from "rxjs/operators";
+
+type PointerAction = "pointerUp" | "pointerDown" | "pointerUpOverButton"
+interface PointerState {
+    actionType: PointerAction,
+    pointer: { x: number, y: number }
+}
 
 export class BaseButton implements BaseUIObject {
     x: number;
@@ -18,6 +26,8 @@ export class BaseButton implements BaseUIObject {
     colourUp: Phaser.Display.Color;
     colourDown: Phaser.Display.Color;
     protected container: UIContainer;
+
+    protected pointerState$: Subject<PointerState>;
 
     constructor(
         scene: Phaser.Scene, 
@@ -43,11 +53,27 @@ export class BaseButton implements BaseUIObject {
         this.container.setInteractive()
             .setBackground(this.colourUp);
 
-        scene.input.on('pointerup', () => {
+        this.pointerState$ = new Subject<PointerState>();
+        
+        scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+            this.pointerState$.next({
+                pointer,
+                actionType: "pointerUp"
+            });
             this.onPointerUp();
         });
-        this.container.on('pointerdown', () => {
+        this.container.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+            this.pointerState$.next({
+                pointer,
+                actionType: "pointerDown"
+            });
             this.onPointerDown();
+        });
+        this.container.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+            this.pointerState$.next({
+                pointer,
+                actionType: "pointerUpOverButton"
+            });
         });
     }
 
@@ -105,12 +131,20 @@ export class BaseButton implements BaseUIObject {
         return this;
     }
 
-    onClick(callback: Function) {
-        this.container.on('pointerup', callback);
+    onClick(callback: (pointer: {x: number, y: number}) => void) {
+        this.pointerState$.pipe(
+            distinctUntilChanged(),
+            pairwise(),
+            filter(([previousState, currentState]) => 
+                previousState.actionType === "pointerDown"
+                && currentState.actionType == "pointerUpOverButton"),
+            map(([_, currentState]) => ({x: currentState.pointer.x, y: currentState.pointer.y}))
+        ).subscribe(pointerLocation => callback(pointerLocation));
+    
         return this;
-    };
+    }
 
-    onHover(callback: Function) {
+    onHover(callback: (pointer: Phaser.Input.Pointer) => void) {
         this.container.on('pointermove', callback);
         return this;
     };

@@ -33,8 +33,8 @@ export class FlowerSelectionView {
             .setInteractive()
             .setDepth(3);
         
-        this.flowerSelectLeft = new ImageButton(scene, 0, 0, "gui-arrow-left", COLOURS.TRANSPARENT, COLOURS.TRANSPARENT, COLOURS.WHITE, COLOURS.GRAY);
-        this.flowerSelectRight = new ImageButton(scene, 0, 0, "gui-arrow-left", COLOURS.TRANSPARENT, COLOURS.TRANSPARENT, COLOURS.WHITE, COLOURS.GRAY);
+        this.flowerSelectLeft = new ImageButton(scene, 0, 0, "gui-arrow-left", "auto", "auto", COLOURS.TRANSPARENT, COLOURS.TRANSPARENT, COLOURS.WHITE, COLOURS.GRAY);
+        this.flowerSelectRight = new ImageButton(scene, 0, 0, "gui-arrow-left", "auto", "auto", COLOURS.TRANSPARENT, COLOURS.TRANSPARENT, COLOURS.WHITE, COLOURS.GRAY);
         this.flowerSelectRight.image.setFlipX(true);
         this.flowerText = new TextLabel(scene, 0, 0, "Selected flower name", COLOURS.BLACK, true)
             .setOrigin(0.5, 0.5);

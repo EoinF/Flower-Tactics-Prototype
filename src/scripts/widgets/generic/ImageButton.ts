@@ -9,6 +9,7 @@ export class ImageButton extends BaseButton {
         scene: Phaser.Scene, 
         x: number, y: number,
         imageTexture: string,
+        width: number | "auto" = "auto", height: number | "auto" = "auto",
         colourUp: Phaser.Display.Color = COLOURS.WHITE,
         colourDown: Phaser.Display.Color = COLOURS.LIGHT_GRAY,
         colourImageUp: Phaser.Display.Color = COLOURS.WHITE,
@@ -16,9 +17,14 @@ export class ImageButton extends BaseButton {
         verticalAlignment: VerticalAlignment = "Top",
         horizontalAlignment: HorizontalAlignment = "Left"
     ) {
-        const image = scene.add.image(0, 0, imageTexture);
+        const image = scene.add.image(0, 0, imageTexture).setOrigin(0,0);
         
-        super(scene, x, y, image.width, image.height, colourUp, colourDown, verticalAlignment, horizontalAlignment);
+        super(scene, x, y, 
+            width === "auto" ? image.width : width, 
+            height === "auto" ? image.height : height, 
+            colourUp, colourDown,
+            verticalAlignment, horizontalAlignment
+        );
         this.image = image;
         this.colourImageUp = colourImageUp;
         this.colourImageDown = colourImageDown;

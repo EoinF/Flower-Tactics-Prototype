@@ -43,7 +43,7 @@ export class SeedContainerView {
             .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.3))
             .setInteractive();
         
-        this.infoButton = new ImageButton(scene, 4, 4, 'button-info', COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW, COLOURS.RED, COLOURS.RED)
+        this.infoButton = new ImageButton(scene, 4, 4, 'button-info', "auto", "auto", COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW, COLOURS.RED, COLOURS.RED)
             .setBorder(1, COLOURS.BLACK)
             .onClick(() => {
                 guiController.clickInfoButton();
@@ -117,7 +117,7 @@ export class SeedContainerView {
                         .destroy();
                     this.seedContainer.children = this.seedContainer.children.filter((c, index) => index != this.seedContainer.children.length - 1);
                 }
-                this.heldSeed = this.scene.add.sprite(pickedUpSeed.x, pickedUpSeed.y, 'seed2')
+                this.heldSeed = this.scene.add.sprite(scene.input.activePointer.x, scene.input.activePointer.y, 'seed2')
                     .setData("pickedUpSeed", pickedUpSeed)
                     .setDepth(5)
                     .setInteractive();
@@ -163,7 +163,7 @@ export class SeedContainerView {
             .setData("type", type);
         
         seedSprite.on('dragstart', (pointer: Phaser.Input.Pointer) => {
-            seedController.pickUpSeed(type, pointer.x, pointer.y, 'SEED_ORIGIN_INVENTORY');
+            seedController.pickUpSeed(type, null, 'SEED_ORIGIN_INVENTORY');
         });
 
         this.seedContainer.addChild(seedSprite);

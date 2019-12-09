@@ -9,7 +9,9 @@ interface DragSeed {
 
 type SeedOrigin = 'SEED_ORIGIN_MAP' | 'SEED_ORIGIN_INVENTORY';
 
-type PickedUpSeed = DragSeed & {
+type PickedUpSeed = {
+    tileIndex: number | null;
+    type: string;
     origin: SeedOrigin;
 }
 
@@ -31,8 +33,8 @@ export class SeedController {
         this.mouseOverFlowerSelection$ = new ReplaySubject(1);
     }
 
-    pickUpSeed(type: string, x: number, y: number, origin: SeedOrigin) {
-        this.pickUpSeed$.next({type, x, y, origin})
+    pickUpSeed(type: string, tileIndex: number | null, origin: SeedOrigin) {
+        this.pickUpSeed$.next({type, tileIndex, origin});
     }
 
     resetPickedUpSeed() {

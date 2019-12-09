@@ -23,7 +23,7 @@ function guiPositionToTileLocation(camera: Phaser.Cameras.Scene2D.Camera, x: num
 }
 
 export function setupConnectors(
-    guiController: GuiController, 
+    guiController: GuiController,
     gameStateManager: GameStateManager, 
     seedController: SeedController, 
     mapController: MapController,
@@ -36,7 +36,7 @@ export function setupConnectors(
     const gameStateDelta$ = gameStateManager.nextDeltaObservable();
     const mapCamera$ = mapController.cameraObservable();
     const isMouseOverSeedContainer$ = seedController.mouseOverSeedContainerObservable();
-    const pickUpSeed$ = seedController.pickUpSeedObservable();
+    const pickedUpSeed$ = seedController.pickUpSeedObservable();
     const selectedFlowerIndex$ = flowerSelectionController.selectedFlowerIndexObservable();
     const selectedFlowerType$ = flowerSelectionController.selectedFlowerTypeObservable();
     const isMouseOverFlowerSelection$ = seedController.mouseOverFlowerSelectionObservable();
@@ -75,22 +75,9 @@ export function setupConnectors(
         gameStateManager.nextState();
     });
 
-    const pickedUpSeedTileLocation$ = pickUpSeed$.pipe(
-        withLatestFrom(mapCamera$),
-        map(([pickedUpSeed, camera]) => {
-            const tileXY = guiPositionToTileLocation(camera, pickedUpSeed.x, pickedUpSeed.y);
-            return {
-                x: tileXY.tileX,
-                y: tileXY.tileY,
-                type: pickedUpSeed.type,
-                origin: pickedUpSeed.origin
-            }
-        })
-    )
-
     dropSeed$
         .pipe(
-            withLatestFrom(combineLatest([isMouseOverSeedContainer$, isMouseOverFlowerSelection$, gameState$, gameStateDelta$, mapCamera$, pickedUpSeedTileLocation$]))
+            withLatestFrom(combineLatest([isMouseOverSeedContainer$, isMouseOverFlowerSelection$, gameState$, gameStateDelta$, mapCamera$, pickedUpSeed$]))
         ).subscribe(([droppedSeed, [isMouseOverSeedContainer, isMouseOverFlowerSelection, gameState, gameStateDelta, camera, pickedUpSeed]]) => {
             if (!isMouseOverSeedContainer && !isMouseOverFlowerSelection) {
                 const tileXY = guiPositionToTileLocation(camera, droppedSeed.x, droppedSeed.y);
@@ -116,16 +103,14 @@ export function setupConnectors(
                         if (pickedUpSeed.origin == 'SEED_ORIGIN_INVENTORY') {
                             gameStateManager.placeSeed(droppedSeed.type, tile.index);
                         } else { // SEED_ORIGIN_MAP
-                            const pickedUpTile = gameState.getTileAt(pickedUpSeed.x, pickedUpSeed.y)!;
-                            gameStateManager.moveSeed(droppedSeed.type, pickedUpTile.index, tile.index);
+                            gameStateManager.moveSeed(droppedSeed.type, pickedUpSeed.tileIndex!, tile.index);
                         }
                         return;
                     }
                 }
             } else if (pickedUpSeed.origin == 'SEED_ORIGIN_MAP') {
-                const pickedUpTile = gameState.getTileAt(pickedUpSeed.x, pickedUpSeed.y);
-                if (pickedUpTile != null) {
-                    gameStateManager.removeSeed(pickedUpSeed.type, pickedUpTile.index);
+                if (pickedUpSeed.tileIndex != null) {
+                    gameStateManager.removeSeed(pickedUpSeed.type, pickedUpSeed.tileIndex);
                     return;
                 }
             }

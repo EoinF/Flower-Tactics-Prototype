@@ -4,9 +4,10 @@ import { SelectedObjectController } from "../controllers/SelectedObjectControlle
 import { SeedController } from "../controllers/SeedController";
 import { COLOURS } from "../widgets/generic/constants";
 import { MapController } from "../controllers/MapController";
-import { startWith, pairwise, distinctUntilChanged, withLatestFrom, first } from "rxjs/operators";
+import { startWith, pairwise, distinctUntilChanged, withLatestFrom, first, filter } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
+import { Subject, merge, forkJoin } from "rxjs";
 
 export class MapView {
     scene: Phaser.Scene;
@@ -22,7 +23,7 @@ export class MapView {
       scene: Phaser.Scene, 
       gameStateManager: GameStateManager, 
       soilColourConverter: SoilColourConverter,
-      SelectedObjectController: SelectedObjectController,
+      selectedObjectController: SelectedObjectController,
 	  seedController: SeedController,
 	  mapController: MapController
     ) {
@@ -34,7 +35,7 @@ export class MapView {
 		this.riverSprites = [];
 		this.placedSeedSprites = new Map<number, PlacedSeedWidget>();
         this.setupSprites(scene, gameStateManager);
-        this.setupCallbacks(gameStateManager, SelectedObjectController, seedController, mapController);
+        this.setupCallbacks(gameStateManager, selectedObjectController, seedController, mapController);
     }
 
     setupSprites(scene: Phaser.Scene, gameStateManager: GameStateManager) {
@@ -129,7 +130,7 @@ export class MapView {
 						newStateDelta.placedSeeds[type]
 							.forEach((seedAmount, tileIndex) => {
 								if (seedAmount > 0) {
-									this.addNewSeed(tileIndex, type, seedAmount, newState, seedController);
+									this.addNewSeed(tileIndex, type, seedAmount, newState, seedController, selectedObjectController);
 								}
 							})
 					});
@@ -154,12 +155,17 @@ export class MapView {
 			});
 	}
 	
-	addNewSeed(tileIndex: number, seedType: string, seedAmount: number, newState: GameState, seedController: SeedController) {
+	addNewSeed(tileIndex: number, seedType: string, seedAmount: number, newState: GameState, seedController: SeedController, selectedObjectController: SelectedObjectController) {
 		const location = this.indexToMapCoordinates(tileIndex, newState.numTilesX);
-		
-		const placedSeedWidget = new PlacedSeedWidget(this.scene, location.x * 48, location.y * 48, seedAmount);
-		placedSeedWidget.onClick((pointer: Phaser.Input.Pointer) => {
-			seedController.pickUpSeed(seedType, pointer.x, pointer.y, 'SEED_ORIGIN_MAP');
+		const placedSeedWidget = new PlacedSeedWidget(this.scene, (location.x * 48) - 24, (location.y * 48) - 24, 48, 48, seedAmount);
+		placedSeedWidget.onClick(() => {
+			selectedObjectController.setSelectedTile(
+				location.x,
+				location.y
+			);
+		});
+		placedSeedWidget.onHold(() => {
+			seedController.pickUpSeed(seedType, tileIndex, 'SEED_ORIGIN_MAP');
 			const currentSeedAmount = placedSeedWidget.getAmount();
 			if (currentSeedAmount === 1) {
 				this.placedSeedSprites.delete(tileIndex);
@@ -167,7 +173,7 @@ export class MapView {
 					
 				const subscription = seedController.resetPickedUpSeedObservable()
 					.pipe(first())
-					.subscribe(() => this.addNewSeed(tileIndex, seedType, 1, newState, seedController));
+					.subscribe(() => this.addNewSeed(tileIndex, seedType, 1, newState, seedController, selectedObjectController));
 				seedController.dropSeedObservable()
 					.pipe(first())
 					.subscribe(() => subscription.unsubscribe());

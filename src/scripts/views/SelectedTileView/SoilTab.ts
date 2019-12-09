@@ -64,8 +64,6 @@ export class SoilTab implements SelectedTileTab {
         potassiumSection.addChild(this.potassiumDisplay, "Middle");
 
         this.mainContainer.addChild(this.titleText);
-        
-        console.log(this.mainContainer.depth);
         this.mainContainer.addChild(nitrogenSection);
         this.mainContainer.addChild(phosphorousSection);
         this.mainContainer.addChild(potassiumSection);
