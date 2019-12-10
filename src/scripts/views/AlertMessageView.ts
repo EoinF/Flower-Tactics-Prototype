@@ -1,10 +1,9 @@
 import { GuiController } from "../controllers/GuiController";
 import { UIContainer } from "../widgets/generic/UIContainer";
 import { TextLabel } from "../widgets/generic/TextLabel";
-import { COLOURS } from "../widgets/generic/constants";
 import { of } from "rxjs";
 import { delay } from "rxjs/operators";
-import { ALERT_MESSAGE_TIMEOUT } from "../constants";
+import { ALERT_MESSAGE_TIMEOUT, COLOURS } from "../constants";
 
 export class AlertMessageView {
     constructor(scene: Phaser.Scene, guiController: GuiController) {

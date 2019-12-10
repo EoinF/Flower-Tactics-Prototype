@@ -1,8 +1,8 @@
 import { TextLabel } from "../generic/TextLabel";
-import { COLOURS } from "../generic/constants";
 import { ImageButton } from "../generic/ImageButton";
 import { pairwise, filter, delay, map } from "rxjs/operators";
 import { merge } from "rxjs";
+import { COLOURS } from "../../constants";
 
 export class PlacedSeedWidget extends ImageButton {
     private amount: number;

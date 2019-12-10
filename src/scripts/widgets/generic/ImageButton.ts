@@ -1,5 +1,6 @@
-import { VerticalAlignment, HorizontalAlignment, COLOURS } from "./constants";
 import { BaseButton } from "./BaseButton";
+import { COLOURS } from "../../constants";
+import { VerticalAlignment, HorizontalAlignment } from "../../types";
 
 export class ImageButton extends BaseButton {
     image: Phaser.GameObjects.Image;

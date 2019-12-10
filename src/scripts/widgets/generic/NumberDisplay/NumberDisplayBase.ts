@@ -1,8 +1,8 @@
 import { BaseUIObject } from "../BaseUIObject";
 import { TextLabel } from "../TextLabel";
-import { COLOURS } from "../constants";
 import { UIContainer } from "../UIContainer";
 import { RectangleSprite } from "../RectangleSprite";
+import { COLOURS } from "../../../constants";
 
 export abstract class NumberDisplayBase implements BaseUIObject {
     protected mainContainer: UIContainer;

@@ -3,13 +3,13 @@ import { UIContainer } from "../widgets/generic/UIContainer";
 import { SeedController } from "../controllers/SeedController";
 import { seedController, guiController, selectedObjectController } from "../game";
 import { GameState } from "../objects/GameState";
-import { COLOURS } from "../widgets/generic/constants";
 import { combineLatest } from "rxjs";
 import { first, map } from "rxjs/operators";
 import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
 import { FlowerType } from "../objects/FlowerType";
 import { ImageButton } from "../widgets/generic/ImageButton";
 import { ProgressBar } from "../widgets/generic/ProgressBar";
+import { COLOURS } from "../constants";
 
 const SEEDS_PER_ROW = 32;
 const MAX_ROWS = 2;

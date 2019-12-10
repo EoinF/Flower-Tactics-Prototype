@@ -1,7 +1,6 @@
-import { VerticalAlignment, HorizontalAlignment, COLOURS } from "./constants";
-import { BaseUIObject } from "./BaseUIObject";
-import { Subject } from "rxjs";
 import { ClickableWidget } from "./ClickableWidget";
+import { VerticalAlignment, HorizontalAlignment } from "../../types";
+import { COLOURS } from "../../constants";
 
 
 export class BaseButton extends ClickableWidget {

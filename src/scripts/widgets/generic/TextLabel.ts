@@ -1,6 +1,5 @@
-import { VerticalAlignment, HorizontalAlignment, COLOURS } from "./constants";
-import { getAlignedCoordinates } from "../utils";
 import { BaseUIObject } from "./BaseUIObject";
+import { COLOURS } from "../../constants";
 
 export class TextLabel implements BaseUIObject {
     private scene: Phaser.Scene;

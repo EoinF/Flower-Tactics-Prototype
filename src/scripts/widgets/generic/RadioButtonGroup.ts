@@ -1,6 +1,6 @@
 import { BaseButton } from "./BaseButton";
-import { COLOURS } from "./constants";
 import { ImageButton } from "./ImageButton";
+import { COLOURS } from "../../constants";
 
 export class RadioButtonGroup {
     selectedButtonIndex: number;

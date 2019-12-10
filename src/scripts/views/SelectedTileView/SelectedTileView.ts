@@ -3,12 +3,12 @@ import { Tile } from "../../objects/Tile";
 import { SelectedObjectController } from "../../controllers/SelectedObjectController";
 import { UIContainer } from "../../widgets/generic/UIContainer";
 import { ImageButton } from "../../widgets/generic/ImageButton";
-import { COLOURS } from "../../widgets/generic/constants";
 import { RadioButtonGroup } from "../../widgets/generic/RadioButtonGroup";
 import { combineLatest } from "rxjs";
 import { GameState } from "../../objects/GameState";
 import { FlowerTab } from "./FlowerTab";
 import { SoilTab } from "./SoilTab";
+import { COLOURS } from "../../constants";
 
 export interface SelectedTileTab {
     show: (gameState: GameState, tile: Tile) => void;

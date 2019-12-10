@@ -1,9 +1,9 @@
 import { GameState } from "../../objects/GameState";
 import { Tile } from "../../objects/Tile";
 import { TextLabel } from "../../widgets/generic/TextLabel";
-import { COLOURS } from "../../widgets/generic/constants";
 import { FlexUIContainer } from "../../widgets/generic/FlexUIContainer";
 import { SelectedTileTab } from "./SelectedTileView";
+import { COLOURS } from "../../constants";
 
 export class FlowerTab implements SelectedTileTab {
     private mainContainer: FlexUIContainer;

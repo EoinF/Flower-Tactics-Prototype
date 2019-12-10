@@ -1,6 +1,6 @@
-import { VerticalAlignment, HorizontalAlignment, COLOURS } from "./constants";
 import { getAlignedCoordinates } from "../utils";
 import { BaseUIObject } from "./BaseUIObject";
+import { VerticalAlignment, HorizontalAlignment } from "../../types";
 
 export class UIContainer implements BaseUIObject {
     private scene: Phaser.Scene;

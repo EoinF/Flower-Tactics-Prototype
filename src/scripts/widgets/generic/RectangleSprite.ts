@@ -1,4 +1,4 @@
-import { COLOURS } from "./constants";
+import { COLOURS } from "../../constants";
 
 export class RectangleSprite extends Phaser.GameObjects.Sprite {
 

@@ -1,8 +1,8 @@
 import { Soil } from "../../objects/Tile";
 import { SoilColourConverter } from "../../SoilColourConverter";
-import { COLOURS } from "../generic/constants";
 import { indexToMapCoordinates } from "../utils";
 import { ClickableWidget } from "../generic/ClickableWidget";
+import { COLOURS } from "../../constants";
 
 type TilePlacementState = "blocked" | "allowed" | "n/a"
 type TileViabilityState = "viable" | "unviable" | "n/a"
@@ -10,8 +10,6 @@ type TileViabilityState = "viable" | "unviable" | "n/a"
 export class TileWidget extends ClickableWidget {
     private soilColourConverter: SoilColourConverter;
     private soilImage: Phaser.GameObjects.Image;
-    private allowedSprite: Phaser.GameObjects.Image;
-    private blockedSprite: Phaser.GameObjects.Image;
     private viableSprite: Phaser.GameObjects.Image;
 
     private isHovering: boolean;
@@ -34,16 +32,6 @@ export class TileWidget extends ClickableWidget {
         this.soilColourConverter = soilColourConverter;
         this.soilImage =  scene.add.image(0, 0, "blank-tile");
 
-        this.allowedSprite = scene.add.image(x, y, "tile-allowed")
-            .setVisible(false)
-            .setAlpha(1)
-            .setScale(0.5)
-            .setDepth(7);
-        this.blockedSprite = scene.add.image(x, y, "tile-blocked")
-            .setVisible(false)
-            .setAlpha(1)
-            .setScale(0.5)
-            .setDepth(7);
         this.viableSprite = scene.add.image(x, y, "tile-viable")
             .setTint(COLOURS.LIGHT_YELLOW.color)
             .setVisible(false)
@@ -90,12 +78,9 @@ export class TileWidget extends ClickableWidget {
         }
         
         const finalColour = Phaser.Display.Color.ObjectToColor(
-            Phaser.Display.Color.Interpolate.ColorWithColor(this.soilColour, tintColour, 100, 80)
+            Phaser.Display.Color.Interpolate.ColorWithColor(this.soilColour, tintColour, 100, 70)
         );
         this.soilImage.setTint(finalColour.color);
-
-        this.allowedSprite.setVisible(this.placementState === "allowed");
-        this.blockedSprite.setVisible(this.placementState === "blocked");
         this.viableSprite.setVisible(this.viabilityState === "viable");
     }
 }

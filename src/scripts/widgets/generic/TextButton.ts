@@ -1,6 +1,7 @@
-import { VerticalAlignment, HorizontalAlignment, COLOURS } from "./constants";
 import { BaseButton } from "./BaseButton";
 import { TextLabel } from "./TextLabel";
+import { COLOURS } from "../../constants";
+import { HorizontalAlignment, VerticalAlignment } from "../../types";
 
 export class TextButton extends BaseButton {
     constructor(

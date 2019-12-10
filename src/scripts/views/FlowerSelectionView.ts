@@ -1,13 +1,13 @@
 import { GameStateManager, GameStateDelta } from "../controllers/GameStateManager";
 import { UIContainer } from "../widgets/generic/UIContainer";
 import { SeedController } from "../controllers/SeedController";
-import { COLOURS } from "../widgets/generic/constants";
 import { combineLatest } from "rxjs";
 import { map, distinctUntilChanged } from "rxjs/operators";
 import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
 import { ImageButton } from "../widgets/generic/ImageButton";
 import { TextLabel } from "../widgets/generic/TextLabel";
 import { FlexUIContainer } from "../widgets/generic/FlexUIContainer";
+import { COLOURS } from "../constants";
 
 export class FlowerSelectionView {
     scene: Phaser.Scene;

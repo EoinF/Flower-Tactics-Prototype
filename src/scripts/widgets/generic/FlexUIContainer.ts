@@ -1,7 +1,7 @@
 import { UIContainer } from "./UIContainer";
-import { VerticalAlignment, HorizontalAlignment } from "./constants";
 import { BaseUIObject } from "./BaseUIObject";
 import { getAlignedCoordinates } from "../utils";
+import { VerticalAlignment, HorizontalAlignment } from "../../types";
 
 type FlexType = "auto" | "grow" | "manual";
 export class FlexUIContainer extends UIContainer {

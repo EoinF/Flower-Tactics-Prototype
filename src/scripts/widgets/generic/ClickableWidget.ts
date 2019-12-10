@@ -1,8 +1,8 @@
-import { VerticalAlignment, HorizontalAlignment } from "./constants";
 import { UIContainer } from "./UIContainer";
 import { Subject } from "rxjs";
 import { BaseUIObject } from "./BaseUIObject";
 import { distinctUntilChanged, pairwise, filter, map } from "rxjs/operators";
+import { VerticalAlignment, HorizontalAlignment } from "../../types";
 
 type PointerAction = "pointerUp" | "pointerDown" | "pointerUpOverButton"
 interface PointerState {

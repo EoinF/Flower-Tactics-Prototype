@@ -1,7 +1,6 @@
 import { GuiController } from "../controllers/GuiController";
 import { GameStateManager } from "../controllers/GameStateManager";
 import { TextButton } from "../widgets/generic/TextButton";
-import { COLOURS } from "../widgets/generic/constants";
 import { SeedContainerView } from "./SeedContainerView";
 import { SelectedObjectController } from "../controllers/SelectedObjectController";
 import { SeedController } from "../controllers/SeedController";
@@ -11,6 +10,7 @@ import { FlowerSelectionController } from "../controllers/FlowerSelectionControl
 import { SelectedFlowerTypeView } from "./SelectedFlowerTypeView";
 import { selectedObjectController } from "../game";
 import { AlertMessageView } from "./AlertMessageView";
+import { COLOURS } from "../constants";
 
 export class GuiView {
     constructor(

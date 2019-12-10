@@ -1,9 +1,8 @@
 import { TextLabel } from "../../widgets/generic/TextLabel";
 import { FlexUIContainer } from "../../widgets/generic/FlexUIContainer";
-import { COLOURS } from "../../widgets/generic/constants";
 import { NumberPointDisplay } from "../../widgets/generic/NumberDisplay/NumberPointDisplay";
 import { UIContainer } from "../../widgets/generic/UIContainer";
-import { NITROGEN_VALUE_RANGE, POTASSIUM_VALUE_RANGE, PHOSPHOROUS_VALUE_RANGE } from "../../constants";
+import { NITROGEN_VALUE_RANGE, POTASSIUM_VALUE_RANGE, PHOSPHOROUS_VALUE_RANGE, COLOURS } from "../../constants";
 import { GameState } from "../../objects/GameState";
 import { Tile } from "../../objects/Tile";
 import { SelectedTileTab } from "./SelectedTileView";

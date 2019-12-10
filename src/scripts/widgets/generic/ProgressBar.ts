@@ -1,8 +1,8 @@
 import { BaseUIObject } from "./BaseUIObject";
-import { COLOURS } from "./constants";
 import { TextLabel } from "./TextLabel";
 import { UIContainer } from "./UIContainer";
 import { RectangleSprite } from "./RectangleSprite";
+import { COLOURS } from "../../constants";
 
 export class ProgressBar implements BaseUIObject {
     private value: number;
