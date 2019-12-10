@@ -31,3 +31,10 @@ export function getAlignedCoordinates(
         y: y2 + (height * originY)
     }
 }
+
+export function indexToMapCoordinates(index: number, numTilesX: number) {
+    return { 
+      x: (index % numTilesX),
+      y: Math.floor(index / numTilesX)
+    };
+}

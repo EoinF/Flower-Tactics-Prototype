@@ -4,17 +4,19 @@ import { SelectedObjectController } from "../controllers/SelectedObjectControlle
 import { SeedController } from "../controllers/SeedController";
 import { COLOURS } from "../widgets/generic/constants";
 import { MapController } from "../controllers/MapController";
-import { startWith, pairwise, distinctUntilChanged, withLatestFrom, first, filter } from "rxjs/operators";
+import { startWith, pairwise, distinctUntilChanged, withLatestFrom, first, filter, switchMap, mapTo } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
 import { Subject, merge, forkJoin } from "rxjs";
 import { ImageButton } from "../widgets/generic/ImageButton";
+import { TileWidget } from "../widgets/specific/TileWidget";
+import { indexToMapCoordinates } from "../widgets/utils";
 
 export class MapView {
     scene: Phaser.Scene;
 	soilColourConverter: SoilColourConverter;
 
-    tileButtons: ImageButton[];
+    tileButtons: TileWidget[];
     flowerSprites: Phaser.GameObjects.Image[];
     mountainSprites: Phaser.GameObjects.Image[];
 	riverSprites: Phaser.GameObjects.Image[];
@@ -64,13 +66,7 @@ export class MapView {
 	setupTileSprites(gameState: GameState) {
 		this.tileButtons.forEach(s => s.destroy());
 		this.tileButtons = gameState.tiles.map((tile, index) => {
-			const {x, y} = this.indexToMapCoordinates(index, gameState.numTilesX);
-			const button = new ImageButton(this.scene, x * 48 - 24, y * 48 - 24, "blank-tile");
-			const colour = this.soilColourConverter.soilToColour(tile.soil);
-			button.setBackground(colour, colour, colour, COLOURS.PURPLE_500);
-			button.setData("x", x);
-			button.setData("y", y);
-			return button;
+			return new TileWidget(this.scene, index, gameState.numTilesX, tile.soil, this.soilColourConverter);
 		});
 	}
 
@@ -87,13 +83,6 @@ export class MapView {
 		});
 	}
 
-    indexToMapCoordinates(index: number, numTilesX: number) {
-        return { 
-          x: (index % numTilesX),
-          y: Math.floor(index / numTilesX)
-        };
-    }
-
 	setupCallbacks(
 		gameStateManager: GameStateManager, selectedObjectController: SelectedObjectController, 
 		seedController: SeedController, mapController: MapController
@@ -101,16 +90,16 @@ export class MapView {
         this.tileButtons.forEach(button => {
             button.onClick(() => {
                 selectedObjectController.setSelectedTile(
-                    button.getData("x"),
-                    button.getData("y")
+                    button.tileX,
+                    button.tileY
                 );
             });
         });
 
         gameStateManager.nextStateObservable().subscribe((newState) => {
 			this.tileButtons.forEach(button => {
-				const tile = newState.getTileAt(button.getData("x"), button.getData("y"))!;
-				button.image.setTint(this.soilColourConverter.soilToColour(tile.soil).color);
+				const tile = newState.getTileAt(button.tileX, button.tileY)!;
+				button.setSoil(tile.soil);
 			});
 			if (newState.flowers.length != this.flowerSprites.length) {
 				this.setupFlowerSprites(newState);
@@ -141,6 +130,35 @@ export class MapView {
 							})
 					});
 			});
+		
+		seedController.pickUpSeedObservable().pipe(
+			withLatestFrom(gameStateManager.nextStateObservable())
+		).subscribe(([pickedUpSeed, gameState]) => {
+			gameState.tiles.forEach((tile) => {
+				const {
+					nitrogenRequirements,
+					potassiumRequirements,
+					phosphorousRequirements
+				} = gameState.flowerTypes[pickedUpSeed.type]
+				
+				if (
+					gameState.getMountainAtTile(tile) == null &&
+					gameState.getFlowerAtTile(tile) == null &&
+					(nitrogenRequirements.min <= tile.soil.nitrogenContent && tile.soil.nitrogenContent <= nitrogenRequirements.max
+					&& phosphorousRequirements.min <= tile.soil.phosphorousContent && tile.soil.phosphorousContent <= phosphorousRequirements.max
+					&& potassiumRequirements.min <= tile.soil.potassiumContent && tile.soil.potassiumContent <= potassiumRequirements.max))
+					{
+						this.tileButtons[tile.index].setPlacementState("allowed")
+					} else {
+						this.tileButtons[tile.index].setPlacementState("blocked")
+					}
+			});
+		});
+
+		seedController.dropSeedObservable()
+			.subscribe(() => {
+				this.tileButtons.forEach(button => button.setPlacementState("n/a"));
+			});
 
 		mapController.dragSeedOverTileObservable()
 			.pipe(
@@ -150,20 +168,17 @@ export class MapView {
 			)
 			.subscribe(([oldTile, newTile]) => {
 				if (oldTile != null) {
-					const colour = this.soilColourConverter.soilToColour(oldTile.soil);
-					this.tileButtons[oldTile.index]
-						.image.setTint(colour.color);
+					this.tileButtons[oldTile.index].setIsHovering(false);
 				}
-
 				if (newTile != null) {
-					this.tileButtons[newTile.index]
-						.image.setTint(COLOURS.PURPLE_200.color);
+					this.tileButtons[newTile.index].setIsHovering(true);
+
 				}
 			});
 	}
 	
 	addNewSeed(tileIndex: number, seedType: string, seedAmount: number, newState: GameState, seedController: SeedController, selectedObjectController: SelectedObjectController) {
-		const location = this.indexToMapCoordinates(tileIndex, newState.numTilesX);
+		const location = indexToMapCoordinates(tileIndex, newState.numTilesX);
 		const placedSeedWidget = new PlacedSeedWidget(this.scene, (location.x * 48) - 24, (location.y * 48) - 24, 48, 48, seedAmount);
 		placedSeedWidget.onClick(() => {
 			selectedObjectController.setSelectedTile(
