@@ -100,12 +100,20 @@ export function setupConnectors(
                     } else if (isMountainBlockingTile) {
                         guiController.createAlertMessage("A mountain is blocking seed placement.");
                     } else {
-                        if (pickedUpSeed.origin == 'SEED_ORIGIN_INVENTORY') {
-                            gameStateManager.placeSeed(droppedSeed.type, tile.index);
-                        } else { // SEED_ORIGIN_MAP
-                            gameStateManager.moveSeed(droppedSeed.type, pickedUpSeed.tileIndex!, tile.index);
+                        const isFlowerAdjacent = gameState.getTilesAdjacent(tileXY.tileX, tileXY.tileY).some(
+                            adjacentTile => gameState.getFlowerAtTile(adjacentTile) != null
+                        );
+                        if (!isFlowerAdjacent) {
+                            guiController.createAlertMessage("You can only place seeds near your existing flowers.");
                         }
-                        return;
+                        else {
+                            if (pickedUpSeed.origin == 'SEED_ORIGIN_INVENTORY') {
+                                gameStateManager.placeSeed(droppedSeed.type, tile.index);
+                            } else { // SEED_ORIGIN_MAP
+                                gameStateManager.moveSeed(droppedSeed.type, pickedUpSeed.tileIndex!, tile.index);
+                            }
+                            return;
+                        }
                     }
                 }
             } else if (pickedUpSeed.origin == 'SEED_ORIGIN_MAP') {

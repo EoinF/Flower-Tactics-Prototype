@@ -3,7 +3,7 @@ import { GameStateManager } from "../controllers/GameStateManager";
 import { SelectedObjectController } from "../controllers/SelectedObjectController";
 import { SeedController } from "../controllers/SeedController";
 import { MapController } from "../controllers/MapController";
-import { startWith, pairwise, distinctUntilChanged, withLatestFrom, first } from "rxjs/operators";
+import { startWith, pairwise, distinctUntilChanged, withLatestFrom, first, timeout } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
 import { TileWidget } from "../widgets/specific/TileWidget";
@@ -139,8 +139,13 @@ export class MapView {
 					phosphorousRequirements
 				} = gameState.flowerTypes[pickedUpSeed.type]
 
+				const x = tile.index % gameState.numTilesX;
+				const y = Math.floor(tile.index / gameState.numTilesX);
 				const isPlaceable = (gameState.getMountainAtTile(tile) == null 
-					&& gameState.getFlowerAtTile(tile) == null);
+					&& gameState.getFlowerAtTile(tile) == null)
+					&& gameState.getTilesAdjacent(x, y).some(
+						adjacentTile => gameState.getFlowerAtTile(adjacentTile) != null
+					);
 					
 				const isViable = (
 					nitrogenRequirements.min <= tile.soil.nitrogenContent && tile.soil.nitrogenContent <= nitrogenRequirements.max
