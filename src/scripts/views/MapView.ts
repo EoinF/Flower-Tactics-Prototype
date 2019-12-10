@@ -2,13 +2,10 @@ import { SoilColourConverter } from "../SoilColourConverter";
 import { GameStateManager } from "../controllers/GameStateManager";
 import { SelectedObjectController } from "../controllers/SelectedObjectController";
 import { SeedController } from "../controllers/SeedController";
-import { COLOURS } from "../widgets/generic/constants";
 import { MapController } from "../controllers/MapController";
-import { startWith, pairwise, distinctUntilChanged, withLatestFrom, first, filter, switchMap, mapTo } from "rxjs/operators";
+import { startWith, pairwise, distinctUntilChanged, withLatestFrom, first } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
-import { Subject, merge, forkJoin } from "rxjs";
-import { ImageButton } from "../widgets/generic/ImageButton";
 import { TileWidget } from "../widgets/specific/TileWidget";
 import { indexToMapCoordinates } from "../widgets/utils";
 
@@ -134,30 +131,32 @@ export class MapView {
 		seedController.pickUpSeedObservable().pipe(
 			withLatestFrom(gameStateManager.nextStateObservable())
 		).subscribe(([pickedUpSeed, gameState]) => {
-			gameState.tiles.forEach((tile) => {
+			for (let i = 0; i < gameState.tiles.length; i++) {
+				const tile = gameState.tiles[i];
 				const {
 					nitrogenRequirements,
 					potassiumRequirements,
 					phosphorousRequirements
 				} = gameState.flowerTypes[pickedUpSeed.type]
-				
-				if (
-					gameState.getMountainAtTile(tile) == null &&
-					gameState.getFlowerAtTile(tile) == null &&
-					(nitrogenRequirements.min <= tile.soil.nitrogenContent && tile.soil.nitrogenContent <= nitrogenRequirements.max
+
+				const isPlaceable = (gameState.getMountainAtTile(tile) == null 
+					&& gameState.getFlowerAtTile(tile) == null);
+					
+				const isViable = (
+					nitrogenRequirements.min <= tile.soil.nitrogenContent && tile.soil.nitrogenContent <= nitrogenRequirements.max
 					&& phosphorousRequirements.min <= tile.soil.phosphorousContent && tile.soil.phosphorousContent <= phosphorousRequirements.max
-					&& potassiumRequirements.min <= tile.soil.potassiumContent && tile.soil.potassiumContent <= potassiumRequirements.max))
-					{
-						this.tileButtons[tile.index].setPlacementState("allowed")
-					} else {
-						this.tileButtons[tile.index].setPlacementState("blocked")
-					}
-			});
+					&& potassiumRequirements.min <= tile.soil.potassiumContent && tile.soil.potassiumContent <= potassiumRequirements.max
+				);
+
+				this.tileButtons[tile.index].setState(isPlaceable ? "allowed": "blocked", isViable ? "viable" : "unviable");
+			};
 		});
 
 		seedController.dropSeedObservable()
 			.subscribe(() => {
-				this.tileButtons.forEach(button => button.setPlacementState("n/a"));
+				for (let i = 0; i < this.tileButtons.length; i++) {
+					this.tileButtons[i].setState("n/a", "n/a");
+				}
 			});
 
 		mapController.dragSeedOverTileObservable()
@@ -172,7 +171,6 @@ export class MapView {
 				}
 				if (newTile != null) {
 					this.tileButtons[newTile.index].setIsHovering(true);
-
 				}
 			});
 	}

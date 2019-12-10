@@ -22,6 +22,7 @@ export class ClickableWidget implements BaseUIObject {
     alpha: number;
     borderThickness: number;
     borderColour: Phaser.Display.Color;
+    visible: boolean;
 
     protected container: UIContainer;
 
@@ -37,6 +38,7 @@ export class ClickableWidget implements BaseUIObject {
         this.container.setInteractive();
 
         this.pointerState$ = new Subject<PointerState>();
+        this.visible = true;
         
         scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
             this.pointerState$.next({
@@ -72,6 +74,7 @@ export class ClickableWidget implements BaseUIObject {
     }
 
     setVisible (isVisible: boolean) {
+        this.visible = isVisible;
         this.container.setVisible(isVisible);
         return this;
     }

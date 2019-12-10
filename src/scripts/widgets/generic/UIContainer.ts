@@ -19,7 +19,7 @@ export class UIContainer implements BaseUIObject {
     depth: number;
     strokeThickness: number;
     protected isInteractive: boolean;
-    isVisible: boolean;
+    visible: boolean;
 
     children: Array<BaseUIObject | UIContainer>;
 
@@ -42,7 +42,7 @@ export class UIContainer implements BaseUIObject {
         this.width = width;
         this.height = height;
         this.strokeThickness = 0;
-        this.isVisible = true;
+        this.visible = true;
         this.isInteractive = false;
         this.children = [];
 
@@ -98,7 +98,7 @@ export class UIContainer implements BaseUIObject {
         child.setPosition(ax + this.x, ay + this.y);
         child.setAlpha(this.alpha);
         child.setDepth(this.depth + 1);
-        child.setVisible(this.isVisible);
+        child.setVisible(this.visible && child.visible);
         return this;
     }
     
@@ -128,9 +128,9 @@ export class UIContainer implements BaseUIObject {
     }
 
     setVisible(isVisible: boolean) {
-        this.isVisible = isVisible;
-        this.children.forEach(child => child.setVisible(this.isVisible));
-        this.backgroundImage.setVisible(this.isVisible);
+        this.visible = isVisible;
+        this.children.forEach(child => child.setVisible(this.visible));
+        this.backgroundImage.setVisible(this.visible);
         return this;
     }
 

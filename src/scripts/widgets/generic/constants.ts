@@ -21,6 +21,9 @@ export const COLOURS = {
     PURPLE_800: new Phaser.Display.Color(65, 55, 76),
     PURPLE_900: new Phaser.Display.Color(43, 37, 51),
 
+    PINK_100: new Phaser.Display.Color(220, 24, 152),
+    TURQUOISE: new Phaser.Display.Color(75, 231, 163),
+
     GREEN: new Phaser.Display.Color(50, 200, 50),
     RED: new Phaser.Display.Color(255, 0, 0),
     LIGHT_RED: new Phaser.Display.Color(255, 50, 50),

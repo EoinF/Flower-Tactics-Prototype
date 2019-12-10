@@ -17,6 +17,7 @@ export abstract class NumberDisplayBase implements BaseUIObject {
     originX: number;
     originY: number;
     alpha: number;
+    visible: boolean;
 
     constructor(
         scene: Phaser.Scene, x: number, y: number,
@@ -29,6 +30,7 @@ export abstract class NumberDisplayBase implements BaseUIObject {
         this.width = width;
         this.height = height;
         this.originX = this.originY = 0;
+        this.visible = true;
 
         this.startLabel = new TextLabel(scene, 0, 0, labels.startLabelText, COLOURS.BLACK, true, 10);
         this.endLabel = new TextLabel(scene, 0, 0, labels.endLabelText, COLOURS.BLACK, true, 10);
@@ -58,6 +60,7 @@ export abstract class NumberDisplayBase implements BaseUIObject {
         return this;
     }
     setVisible (isVisible: boolean) : BaseUIObject {
+        this.visible = isVisible;
         this.mainContainer.setVisible(isVisible);
         return this;
     }

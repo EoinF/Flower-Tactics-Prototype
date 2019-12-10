@@ -6,6 +6,7 @@ export interface BaseUIObject {
     originX: number;
     originY: number;
     alpha: number;
+    visible: boolean;
     setAlpha: (alpha: number) => BaseUIObject;
     setPosition: (x: number, y: number) => BaseUIObject;
     setVisible: (isVisible: boolean) => BaseUIObject;

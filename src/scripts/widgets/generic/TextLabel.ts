@@ -14,7 +14,7 @@ export class TextLabel implements BaseUIObject {
     height: number;
     alpha: number;
     depth: number;
-    isVisible: boolean;
+    visible: boolean;
 
     constructor(scene: Phaser.Scene,
         x: number, y: number, text: string, 
@@ -36,7 +36,7 @@ export class TextLabel implements BaseUIObject {
         
         this.depth = 0;
         this.depthOffset = 0;
-        this.isVisible = true;
+        this.visible = true;
 
         this.width = this.textObject.width;
         this.height = this.textObject.height;
@@ -70,7 +70,7 @@ export class TextLabel implements BaseUIObject {
     }
 
     setVisible(isVisible: boolean) {
-        this.isVisible = isVisible;
+        this.visible = isVisible;
         this.textObject.setVisible(isVisible);
         return this;
     }
@@ -108,6 +108,11 @@ export class TextLabel implements BaseUIObject {
         this.originX = x;
         this.originY = y;
         this.textObject.setOrigin(x, y);
+        return this;
+    }
+
+    setColor(colour: Phaser.Display.Color) {
+        this.textObject.setColor(colour.rgba);
         return this;
     }
 }

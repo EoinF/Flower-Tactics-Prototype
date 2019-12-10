@@ -19,6 +19,7 @@ export class ProgressBar implements BaseUIObject {
     alpha: number;
     borderThickness: number;
     borderColour: Phaser.Display.Color;
+    visible: boolean;
     
     protected container: UIContainer;
     protected progressLabel: TextLabel;
@@ -49,6 +50,7 @@ export class ProgressBar implements BaseUIObject {
         this.originX = 0;
         this.originY = 0;
         this.alpha = 1;
+        this.visible = true;
         this.borderThickness = 0;
         this.borderColour = COLOURS.BLACK;
     }
@@ -61,6 +63,7 @@ export class ProgressBar implements BaseUIObject {
     }
 
     setVisible (isVisible: boolean) {
+        this.visible = isVisible;
         this.container.setVisible(isVisible);
         return this;
     }

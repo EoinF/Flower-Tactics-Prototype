@@ -1,20 +1,21 @@
 import { Soil } from "../../objects/Tile";
-import { ImageButton } from "../generic/ImageButton";
 import { SoilColourConverter } from "../../SoilColourConverter";
 import { COLOURS } from "../generic/constants";
 import { indexToMapCoordinates } from "../utils";
-import { BaseButton } from "../generic/BaseButton";
-import { UIContainer } from "../generic/UIContainer";
-import { distinctUntilChanged, pairwise } from "rxjs/operators";
 import { ClickableWidget } from "../generic/ClickableWidget";
 
 type TilePlacementState = "blocked" | "allowed" | "n/a"
+type TileViabilityState = "viable" | "unviable" | "n/a"
 
 export class TileWidget extends ClickableWidget {
     private soilColourConverter: SoilColourConverter;
-    private image: Phaser.GameObjects.Image;
+    private soilImage: Phaser.GameObjects.Image;
+    private allowedSprite: Phaser.GameObjects.Image;
+    private blockedSprite: Phaser.GameObjects.Image;
+    private viableSprite: Phaser.GameObjects.Image;
 
     private isHovering: boolean;
+    private viabilityState: TileViabilityState;
     private placementState: TilePlacementState;
     readonly tileX: number;
     readonly tileY: number;
@@ -22,24 +23,51 @@ export class TileWidget extends ClickableWidget {
     private soilColour: Phaser.Display.Color;
 
     constructor(scene: Phaser.Scene, tileIndex: number, numTilesX: number, soil: Soil, soilColourConverter: SoilColourConverter) {
-        const {x, y} = indexToMapCoordinates(tileIndex, numTilesX);
-        super(scene, x * 48 - 24, y * 48 - 24, 48, 48);
+        const {x: tileX, y: tileY} = indexToMapCoordinates(tileIndex, numTilesX);
+        const x = tileX * 48;
+        const y = tileY * 48
+        super(scene, x - 24, y - 24, 48, 48);
+
+        this.tileX = tileX;
+        this.tileY = tileY;
+
         this.soilColourConverter = soilColourConverter;
-        this.image =  scene.add.image(0, 0, "blank-tile")
-        this.container.addChild(this.image, "Middle", "Middle")
+        this.soilImage =  scene.add.image(0, 0, "blank-tile");
+
+        this.allowedSprite = scene.add.image(x, y, "tile-allowed")
+            .setVisible(false)
+            .setAlpha(1)
+            .setScale(0.5)
+            .setDepth(7);
+        this.blockedSprite = scene.add.image(x, y, "tile-blocked")
+            .setVisible(false)
+            .setAlpha(1)
+            .setScale(0.5)
+            .setDepth(7);
+        this.viableSprite = scene.add.image(x, y, "tile-viable")
+            .setTint(COLOURS.LIGHT_YELLOW.color)
+            .setVisible(false)
+            .setDepth(8);
+
+        this.container.addChild(this.soilImage, "Middle", "Middle");
         this.soilColour = this.soilColourConverter.soilToColour(soil);
-        this.tileX = x;
-        this.tileY = y;
 
         this.isHovering = false;
         this.placementState = "n/a";
         this.updateDisplay();
     }
 
-    setPlacementState(state: TilePlacementState) {
-        this.placementState = state;
+    setSoil(soil: Soil) {
+        this.soilColour = this.soilColourConverter.soilToColour(soil);
         this.updateDisplay();
     }
+
+    setState(placementState: TilePlacementState, viabilityState: TileViabilityState) {
+        this.placementState = placementState;
+        this.viabilityState = viabilityState;
+        this.updateDisplay();
+    }
+    
 
     setIsHovering(isHovering: boolean) {
         this.isHovering = isHovering;
@@ -53,22 +81,21 @@ export class TileWidget extends ClickableWidget {
         } else {
             switch(this.placementState) {
                 case "allowed":
-                    tintColour = COLOURS.GREEN;
+                    tintColour = COLOURS.TURQUOISE;
                     break;
                 case "blocked":
-                    tintColour = COLOURS.RED;
+                    tintColour = COLOURS.PINK_100;
                     break;
             }
         }
         
         const finalColour = Phaser.Display.Color.ObjectToColor(
-            Phaser.Display.Color.Interpolate.ColorWithColor(this.soilColour, tintColour, 100, 50)
+            Phaser.Display.Color.Interpolate.ColorWithColor(this.soilColour, tintColour, 100, 80)
         );
-        this.image.setTint(finalColour.color);
-    }
+        this.soilImage.setTint(finalColour.color);
 
-    setSoil(soil: Soil) {
-        this.soilColour = this.soilColourConverter.soilToColour(soil);
-        this.updateDisplay();
+        this.allowedSprite.setVisible(this.placementState === "allowed");
+        this.blockedSprite.setVisible(this.placementState === "blocked");
+        this.viableSprite.setVisible(this.viabilityState === "viable");
     }
 }
