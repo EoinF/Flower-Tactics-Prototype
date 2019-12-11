@@ -1,5 +1,5 @@
-import { withLatestFrom, map, filter, flatMap } from 'rxjs/operators';
-import { combineLatest, merge } from 'rxjs';
+import { withLatestFrom, map, filter, flatMap, tap, shareReplay, mergeScan, startWith, first } from 'rxjs/operators';
+import { combineLatest, merge, of, zip } from 'rxjs';
 import { GuiController } from './controllers/GuiController';
 import { GameStateManager } from './controllers/GameStateManager';
 import { SeedController } from './controllers/SeedController';
@@ -60,7 +60,9 @@ export function setupConnectors(
         )
     );
 
-    combineLatest(selectedFlowerIndex$, flowerTypesArray$)
+    
+    combineLatest(selectedFlowerIndex$, flowerTypesArray$.pipe(first()), (selectedIndex) => selectedIndex)
+        .pipe(withLatestFrom(flowerTypesArray$))
         .subscribe(([selectedIndex, flowerTypesArray]) => {
         if (selectedIndex < 0) {
             flowerSelectionController.selectFlowerByIndex(selectedIndex + flowerTypesArray.length);

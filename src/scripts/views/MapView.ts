@@ -141,7 +141,7 @@ export class MapView {
 
 				const x = tile.index % gameState.numTilesX;
 				const y = Math.floor(tile.index / gameState.numTilesX);
-				const isPlaceable = (gameState.getMountainAtTile(tile) == null 
+				const isPlaceable = (gameState.getMountainAtTile(tile) == null
 					&& gameState.getFlowerAtTile(tile) == null)
 					&& gameState.getTilesAdjacent(x, y).some(
 						adjacentTile => gameState.getFlowerAtTile(adjacentTile) != null
