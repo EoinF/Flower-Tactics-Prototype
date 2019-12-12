@@ -27,5 +27,6 @@ export class Tutorial1 extends TutorialBase {
             "You've been given one starting flower in the bottom left tile of the map",
             "This flower takes 2 turns to be fully grown. Click the 'end turn' button twice"
         ]);
+        callbacks.focusTile(gameState.getTileAt(gameState.flowers[0].x, gameState.flowers[0].y)!);
     }
 }
