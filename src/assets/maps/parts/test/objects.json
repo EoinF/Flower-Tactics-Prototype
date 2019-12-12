@@ -103,72 +103,63 @@
             "x": 1,
             "y": 1,
             "type": "1",
-            "growth": 1,
-            "mode": "Grow"
+            "growth": 1
         },
         {
             "index": 1,
             "x": 14,
             "y": 14,
             "type": "1",
-            "growth": 1,
-            "mode": "Grow"
+            "growth": 1
         },
         {
             "index": 2,
             "x": 15,
             "y": 14,
             "type": "1",
-            "growth": 1,
-            "mode": "Grow"
+            "growth": 1
         },
         {
             "index": 3,
             "x": 15,
             "y": 15,
             "type": "1",
-            "growth": 3,
-            "mode": "Grow"
+            "growth": 3
         },
         {
             "index": 4,
             "x": 14,
             "y": 15,
             "type": "1",
-            "growth": 1,
-            "mode": "Grow"
+            "growth": 1
         },
         {
             "index": 5,
             "x": 25,
             "y": 25,
             "type": "1",
-            "growth": 2,
-            "mode": "Produce"
+            "growth": 2
         },
         {
             "index": 6,
             "x": 26,
             "y": 25,
             "type": "1",
-            "growth": 1,
-            "mode": "Produce"
+            "growth": 1
         },
         {
             "index": 7,
             "x": 26,
             "y": 26,
             "type": "1",
-            "growth": 1,
-            "mode": "Produce"
+            "growth": 1
         },
         {
             "index": 8,
             "x": 25,
             "y": 26,
             "type": "1",
-            "growth": 1,
-            "mode": "Produce"
+            "growth": 1
         }
     ]
 }

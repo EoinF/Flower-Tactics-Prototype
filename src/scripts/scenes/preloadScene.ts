@@ -1,8 +1,11 @@
 import { SoilColourConverter } from "../SoilColourConverter";
 import { MapLoader, ObjectData } from "../MapLoader";
-import { gameStateManager } from "../game";
-import objectData from '../../assets/maps/objects.json';
+import { gameStateManager, guiController } from "../game";
 import { MapGenerator } from "../MapGenerator";
+import { MapSaver } from "../MapSaver";
+import { GameStateData } from "../objects/GameState";
+import { Tutorial1 } from "../tutorial/Tutorial1";
+import { TutorialRunner } from "../tutorial/TutorialRunner";
 
 export default class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -16,7 +19,6 @@ export default class PreloadScene extends Phaser.Scene {
     this.load.image('river', 'assets/img/river.png');
     this.load.image('seed', 'assets/img/seed.png');
     this.load.image('seed2', 'assets/img/seed2.png');
-    this.load.image('map1-soil', 'assets/maps/soil.bmp');
 
     this.load.image('tile-allowed', 'assets/img/tile-allowed.png');
     this.load.image('tile-blocked', 'assets/img/tile-blocked.png');
@@ -43,12 +45,30 @@ export default class PreloadScene extends Phaser.Scene {
   create() {
     const soilColourConverter = new SoilColourConverter();
     const mapLoader = new MapLoader(soilColourConverter);
+    const mapSaver = new MapSaver();
 
-    const imageData = this.getMapImageData();
     const mapGenerator = new MapGenerator(1);
 
+    this.load.on('complete', () => {
+      console.log("complete");
+      const imageData = this.getMapImageData();
+      const objectData = this.cache.json.get('object-data') as ObjectData;
+      const initialState = mapLoader.loadMap(imageData, objectData);
+
+      mapSaver.saveMap(initialState);
+      this.onReady(initialState);
+    }, this)
+
+    const mapName = "tutorial1";
+
+    this.load.image('map1-soil', `assets/maps/parts/${mapName}/soil.bmp`);
+    this.load.json('object-data', `assets/maps/parts/${mapName}/objects.json`);
+    this.load.start();
+  }
+
+  onReady(initialState: GameStateData) {
     // gameStateManager.setState(mapGenerator.generateNewMap({numTilesX: 100, numTilesY: 100}));
-    gameStateManager.setState(mapLoader.loadMap(imageData, objectData as ObjectData));
+    gameStateManager.setState(initialState);
 
     this.scene.start('MainScene')
     this.scene.start('UIScene')

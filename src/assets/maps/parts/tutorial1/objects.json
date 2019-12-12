@@ -1,0 +1,59 @@
+{
+    "seedStatus": {
+        "1": {
+            "type": "1",
+            "quantity": 0,
+            "progress": 0
+        }
+    },
+    "flowerTypes": {
+        "1": {
+            "type": "1",
+            "name": "Daisy",
+            "turnsUntilGrown": 2,
+            "soilConsumptionRate": 0,
+            "seedProductionRate": 35,
+            "nitrogenRequirements": {
+                "min": 1800, "max": 2300
+            },
+            "phosphorousRequirements": {
+                "min": 2000, "max": 2500
+            },
+            "potassiumRequirements": {
+                "min": 1100, "max": 1500
+            }
+        }
+    },
+    "rivers": [],
+    "mountains": [
+        {
+            "x": 2,
+            "y": 1
+        },
+        {
+            "x": 3,
+            "y": 1
+        },
+        {
+            "x": 2,
+            "y": 2
+        },
+        {
+            "x": 3,
+            "y": 2
+        },
+        {
+            "x": 3,
+            "y": 3
+        }
+    ],
+    "flowers": [
+        {
+            "index": 0,
+            "x": 0,
+            "y": 6,
+            "type": "1",
+            "growth": 0
+        }
+    ]
+}
