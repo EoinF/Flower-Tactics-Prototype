@@ -27,7 +27,7 @@ export class ProgressBar implements BaseUIObject {
 
     constructor(scene: Phaser.Scene, x: number, y: number, value: number, maxValue: number) {
         this.maxValue = maxValue;
-        this.progressLabel = new TextLabel(scene, 4, 0, `${maxValue}/${maxValue}`, COLOURS.BLACK, true, 8)
+        this.progressLabel = new TextLabel(scene, 4, 0, `${maxValue}/${maxValue}`, COLOURS.BLACK, {isBold: true, fontSize: 8})
             .setDepthOffset(1);
         this.container = new UIContainer(scene, x, y, this.progressLabel.width, this.progressLabel.height)
             .setBackground(COLOURS.LIGHT_GRAY)

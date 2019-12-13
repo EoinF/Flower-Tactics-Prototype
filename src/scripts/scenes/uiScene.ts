@@ -1,7 +1,11 @@
-import { GuiView } from "../views/GuiView";
-import { guiController, gameStateManager, selectedObjectController, seedController, flowerSelectionController, mapController } from "../game";
-import { TutorialRunner } from "../tutorial/TutorialRunner";
-import { Tutorial1 } from "../tutorial/Tutorial1";
+import { guiController, gameStateManager, selectedObjectController, seedController, flowerSelectionController } from "../game";
+import { SelectedTileView } from "../views/SelectedTileView/SelectedTileView";
+import { SelectedFlowerTypeView } from "../views/SelectedFlowerTypeView";
+import { AlertMessageView } from "../views/AlertMessageView";
+import { COLOURS } from "../constants";
+import { TextButton } from "../widgets/generic/TextButton";
+import { FlowerSelectionView } from "../views/FlowerSelectionView";
+import { SeedContainerView } from "../views/SeedContainerView";
 
 export default class UIScene extends Phaser.Scene {
     constructor() {
@@ -9,9 +13,28 @@ export default class UIScene extends Phaser.Scene {
     }
     
   create() {
-    const guiView = new GuiView(this, gameStateManager, guiController, selectedObjectController, flowerSelectionController, seedController);
-    new TutorialRunner(guiController, mapController, gameStateManager)
-      .runTutorial(new Tutorial1());
+    const selectedTileView = new SelectedTileView(this, gameStateManager, selectedObjectController);
+	new SelectedFlowerTypeView(this, gameStateManager, selectedObjectController);
+	new AlertMessageView(this, guiController);
+
+	const { height } = this.game.canvas;
+	const offsetY = height - selectedTileView.y;
+	const seedView = new SeedContainerView(this, gameStateManager, seedController, flowerSelectionController, offsetY);
+	const flowerSelectionView = new FlowerSelectionView(this, gameStateManager, seedController, flowerSelectionController, offsetY + seedView.height, seedView.width);
+
+	const endTurnButton = new TextButton(this, 10, 10, 98, 24, "End Turn", COLOURS.BLACK,
+		COLOURS.WHITE, COLOURS.LIGHT_GRAY, "Bottom", "Right"
+	)
+		.setBorder(1, COLOURS.PURPLE_500)
+		.onClick(() => guiController.endTurn());
+	
+	guiController.messagePromptObservable().subscribe(messagePrompt => {
+		if (messagePrompt == null) {
+			this.scene.resume();
+		} else {
+			this.scene.pause();
+		}
+	});
   }
 }
   

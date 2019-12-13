@@ -32,8 +32,8 @@ export abstract class NumberDisplayBase implements BaseUIObject {
         this.originX = this.originY = 0;
         this.visible = true;
 
-        this.startLabel = new TextLabel(scene, 0, 0, labels.startLabelText, COLOURS.BLACK, true, 10);
-        this.endLabel = new TextLabel(scene, 0, 0, labels.endLabelText, COLOURS.BLACK, true, 10);
+        this.startLabel = new TextLabel(scene, 0, 0, labels.startLabelText, COLOURS.BLACK, { isBold: true, fontSize: 10});
+        this.endLabel = new TextLabel(scene, 0, 0, labels.endLabelText, COLOURS.BLACK, {isBold: true, fontSize: 10});
 
         this.backgroundImage = new RectangleSprite(scene, 2 + this.startLabel.width, 0,
             width - this.startLabel.width - this.endLabel.width - 4, height, 0.75)

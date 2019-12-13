@@ -4,8 +4,6 @@ import { gameStateManager, guiController } from "../game";
 import { MapGenerator } from "../MapGenerator";
 import { MapSaver } from "../MapSaver";
 import { GameStateData } from "../objects/GameState";
-import { Tutorial1 } from "../tutorial/Tutorial1";
-import { TutorialRunner } from "../tutorial/TutorialRunner";
 
 export default class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -50,7 +48,6 @@ export default class PreloadScene extends Phaser.Scene {
     const mapGenerator = new MapGenerator(1);
 
     this.load.on('complete', () => {
-      console.log("complete");
       const imageData = this.getMapImageData();
       const objectData = this.cache.json.get('object-data') as ObjectData;
       const initialState = mapLoader.loadMap(imageData, objectData);
@@ -72,6 +69,7 @@ export default class PreloadScene extends Phaser.Scene {
 
     this.scene.start('MainScene')
     this.scene.start('UIScene')
+    this.scene.start('OverlayScene')
 
     /**
      * This is how you would dynamically import the mainScene class (with code splitting),

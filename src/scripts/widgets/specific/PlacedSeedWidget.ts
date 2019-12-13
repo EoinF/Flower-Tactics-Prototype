@@ -15,7 +15,7 @@ export class PlacedSeedWidget extends ImageButton {
     ) {
         super(scene, x, y, "seed2", width, height, COLOURS.TRANSPARENT, COLOURS.TRANSPARENT);
         this.amount = seedAmount;
-        this.amountText = new TextLabel(scene, 4, 4, seedAmount.toString(), COLOURS.WHITE, false, 14, 2)
+        this.amountText = new TextLabel(scene, 4, 4, seedAmount.toString(), COLOURS.WHITE, { fontSize: 14, strokeThickness: 2 })
              .setOrigin(1, 0);
         
         this.container.addChild(this.amountText, "Bottom", "Right");

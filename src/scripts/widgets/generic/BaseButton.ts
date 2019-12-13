@@ -42,6 +42,7 @@ export class BaseButton extends ClickableWidget {
     setBackground(colourUp: Phaser.Display.Color, colourDown: Phaser.Display.Color) {
         this.colourUp = colourUp;
         this.colourDown = colourDown;
+        this.container.setBackground(this.colourUp);
         return this;
     }
 

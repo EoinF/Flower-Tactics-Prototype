@@ -1,6 +1,14 @@
 import { BaseUIObject } from "./BaseUIObject";
 import { COLOURS } from "../../constants";
 
+interface TextLabelConfig {
+    isBold: boolean;
+    maxWidth: number | null;
+    fontSize: number;
+    strokeThickness: number;
+    strokeColour: Phaser.Display.Color;
+}
+
 export class TextLabel implements BaseUIObject {
     private scene: Phaser.Scene;
     private textObject: Phaser.GameObjects.Text;
@@ -16,11 +24,21 @@ export class TextLabel implements BaseUIObject {
     visible: boolean;
 
     constructor(scene: Phaser.Scene,
-        x: number, y: number, text: string, 
-        colour: Phaser.Display.Color = COLOURS.BLACK, isBold: boolean = false, 
-        fontSize: number = 16,
-        strokeThickness: number = 0,
-        strokeColour: Phaser.Display.Color = COLOURS.BLACK
+        x: number, y: number, text: string,
+        colour: Phaser.Display.Color = COLOURS.BLACK, 
+        {
+            isBold = false,
+            maxWidth = null,
+            fontSize = 16,
+            strokeThickness = 0,
+            strokeColour = COLOURS.BLACK
+        }: Partial<TextLabelConfig> = {
+            isBold: false,
+            maxWidth: null,
+            fontSize: 16,
+            strokeThickness: 0,
+            strokeColour: COLOURS.BLACK
+        }
     ) {
         this.scene = scene;
         this.textObject = this.scene.add.text(x, y, text, {
@@ -28,7 +46,9 @@ export class TextLabel implements BaseUIObject {
             fontStyle: isBold ? 'bold' : '',
             fontSize: `${fontSize}px`,
             strokeThickness,
-            stroke: strokeColour
+            stroke: strokeColour,
+            lineSpacing: 4,
+            wordWrap: maxWidth != null ? { width: maxWidth, useAdvancedWrap: true } : {}
         }).setColor(colour.rgba);
         this.x = x;
         this.y = y;

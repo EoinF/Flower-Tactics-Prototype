@@ -40,12 +40,12 @@ export class SelectedFlowerTypeView {
         const displayIndent = 10;
 
         const popupContent = new FlexUIContainer(scene, 0, 0, this.popup.width, "grow");
-        this.popupText = new TextLabel(scene, 8, 8, "...", COLOURS.BLACK, true);
+        this.popupText = new TextLabel(scene, 8, 8, "...", COLOURS.BLACK, {isBold: true});
 
         // Labels
-        const nitrogenLabel = new TextLabel(scene, 4, 0, "Nitrogen: ", COLOURS.BLACK, false, 12);
-        const phosphorousLabel = new TextLabel(scene, 4, 0, "Phosphorous: ", COLOURS.BLACK, false, 12);
-        const potassiumLabel = new TextLabel(scene, 4, 0, "Potassium: ", COLOURS.BLACK, false, 12);
+        const nitrogenLabel = new TextLabel(scene, 4, 0, "Nitrogen: ", COLOURS.BLACK, {fontSize: 12});
+        const phosphorousLabel = new TextLabel(scene, 4, 0, "Phosphorous: ", COLOURS.BLACK, { fontSize: 12 });
+        const potassiumLabel = new TextLabel(scene, 4, 0, "Potassium: ", COLOURS.BLACK, {fontSize:12});
 
         const labelColumnWidth = Math.max(nitrogenLabel.width, phosphorousLabel.width, potassiumLabel.width);
 

@@ -2,6 +2,7 @@ import 'phaser'
 import MainScene from './scenes/mainScene'
 import PreloadScene from './scenes/preloadScene'
 import UIScene from './scenes/uiScene'
+import OverlayScene from './scenes/overlayScene'
 import { GameStateManager } from './controllers/GameStateManager'
 import { GuiController } from './controllers/GuiController'
 import { SelectedObjectController } from './controllers/SelectedObjectController'
@@ -24,7 +25,7 @@ const config: GameConfig = {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT
   },
-  scene: [PreloadScene, MainScene, UIScene]
+  scene: [PreloadScene, MainScene, UIScene, OverlayScene]
   // physics: {
   //   default: 'arcade',
   //   arcade: {

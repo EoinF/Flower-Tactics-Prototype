@@ -2,14 +2,15 @@ import { GuiController } from "../controllers/GuiController";
 import { GameStateManager } from "../controllers/GameStateManager";
 import { first, withLatestFrom, skip } from "rxjs/operators";
 import { TutorialBase } from "./TutorialBase";
-import { Subject, combineLatest, Subscription } from "rxjs";
+import { Subject, combineLatest } from "rxjs";
 import { Tile } from "../objects/Tile";
 import { MapController } from "../controllers/MapController";
-
+import { MessagePrompt } from "../views/MessageQueueView";
 
 export interface TutorialRunnerCallbacks {
-    showTips: (title: string, messages: string[]) => void;
+    showTips: (messages: MessagePrompt[]) => void;
     focusTile: (tile: Tile) => void;
+    victory: () => void;
 }
 
 export class TutorialRunner {
@@ -25,8 +26,9 @@ export class TutorialRunner {
         this.gameStateManager = gameStateManager;
 
         const callbacks = {
-            showTips: (title: string, messages: string[]) => this.showTips(title, messages),
-            focusTile: (tile: Tile) => this.focusTile(tile)
+            showTips: (messages: MessagePrompt[]) => this.showTips(messages),
+            focusTile: (tile: Tile) => this.focusTile(tile),
+            victory: () => this.victory()
         } as TutorialRunnerCallbacks;
 
         combineLatest(
@@ -45,8 +47,8 @@ export class TutorialRunner {
             .subscribe(([state, tutorial]) => tutorial.stateChange(state, callbacks));
     }
 
-    private showTips(title: string, messages: string[]) {
-        this.guiController.createAlertMessage(messages[0]);
+    private showTips(messages: MessagePrompt[]) {
+        this.guiController.createMessagePromptQueue(messages);
     }
 
     private focusTile(tile: Tile) {
@@ -57,6 +59,15 @@ export class TutorialRunner {
                 const mapY = 48 * Math.floor(tile.index / nextState.numTilesX);
                 mapCamera.setScroll(mapX - mapCamera.width / 2, mapY - mapCamera.height / 2);
             });
+    }
+
+    private victory() {
+        this.guiController.createMessagePromptQueue([{
+                title: "Victory",
+                content: "Tutorial complete!",
+                position: {x: 500, y: 300}
+            }]
+        );
     }
 
     runTutorial(tutorial: TutorialBase) {

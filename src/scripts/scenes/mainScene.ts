@@ -1,6 +1,6 @@
 import { SoilColourConverter } from "../SoilColourConverter";
 import { MapView } from "../views/MapView";
-import { gameStateManager, selectedObjectController, seedController, mapController } from "../game";
+import { gameStateManager, selectedObjectController, seedController, mapController, guiController } from "../game";
 import { TileStatsView } from "../views/TileStatsView";
 
 export default class MainScene extends Phaser.Scene {
@@ -13,6 +13,14 @@ export default class MainScene extends Phaser.Scene {
     const mapView = new MapView(this, gameStateManager, soilColourConverter, selectedObjectController, seedController, mapController);
     const tileStatsView = new TileStatsView(this, selectedObjectController);
     mapController.setCamera(this.cameras.main);
+
+		guiController.messagePromptObservable().subscribe(messagePrompt => {
+			if (messagePrompt == null) {
+				this.scene.resume();
+			} else {
+				this.scene.pause();
+			}
+		});
   }
 
   update() {

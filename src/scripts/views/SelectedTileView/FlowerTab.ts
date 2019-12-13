@@ -11,7 +11,7 @@ export class FlowerTab implements SelectedTileTab {
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         this.mainContainer = new FlexUIContainer(scene, x, y);
-        this.titleText = new TextLabel(scene, 8, 8, "...", COLOURS.BLACK, true);
+        this.titleText = new TextLabel(scene, 8, 8, "...", COLOURS.BLACK, {isBold: true});
         this.mainContainer
             .addChild(this.titleText)
             .setDepth(4)
