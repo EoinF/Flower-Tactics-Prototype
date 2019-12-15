@@ -10,9 +10,6 @@ export default class OverlayScene extends Phaser.Scene {
     
     create() {
         new MessageQueueView(this, guiController);
-        
-        new TutorialRunner(guiController, mapController, gameStateManager)
-            .runTutorial(new Tutorial1());
 
 		guiController.messagePromptObservable().subscribe(messagePrompt => {
 			if (messagePrompt == null) {
