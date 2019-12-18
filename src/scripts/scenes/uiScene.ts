@@ -6,6 +6,7 @@ import { COLOURS } from "../constants";
 import { TextButton } from "../widgets/generic/TextButton";
 import { FlowerSelectionView } from "../views/FlowerSelectionView";
 import { SeedContainerView } from "../views/SeedContainerView";
+import { combineLatest } from "rxjs";
 
 export default class UIScene extends Phaser.Scene {
     constructor() {
@@ -28,12 +29,13 @@ export default class UIScene extends Phaser.Scene {
 		.setBorder(1, COLOURS.PURPLE_500)
 		.onClick(() => guiController.endTurn());
 	
-	guiController.messagePromptObservable().subscribe(messagePrompt => {
-		if (messagePrompt == null) {
-			this.scene.resume();
-		} else {
-			this.scene.pause();
-		}
+	combineLatest(guiController.messagePromptObservable(), guiController.screenStateObservable())
+		.subscribe(([messagePrompt, screenState]) => {
+			if (messagePrompt != null || screenState != "In Game") {
+				this.scene.pause();
+			} else {
+				this.scene.resume();
+			}
 	});
   }
 }

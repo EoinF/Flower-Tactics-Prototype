@@ -7,15 +7,19 @@ interface MessagePromptQueue {
     index: number;
 }
 
+type ScreenState = "In Game" | "Evolve" | "Paused";
+
 export class GuiController {
     private endTurn$: Subject<void>;
     private onClickInfoButton$: Subject<void>;
+    private screenState$: Subject<ScreenState>;
     private alertMessage$: Subject<string>;
     private messagePromptQueue$: BehaviorSubject<MessagePromptQueue>
 
     constructor() {
         this.endTurn$ = new ReplaySubject(1);
         this.onClickInfoButton$ = new ReplaySubject(1);
+        this.screenState$ = new Subject();
         this.alertMessage$ = new Subject();
         this.messagePromptQueue$ = new BehaviorSubject({
             messagePrompts: [] as MessagePrompt[],
@@ -25,6 +29,10 @@ export class GuiController {
 
     clickInfoButton() {
         this.onClickInfoButton$.next();
+    }
+
+    setScreenState(screenState: ScreenState) {
+        this.screenState$.next(screenState);
     }
 
     endTurn() {
@@ -49,6 +57,10 @@ export class GuiController {
 
     onClickInfoButtonObservable(): Observable<void> {
         return this.onClickInfoButton$;
+    }
+
+    screenStateObservable(): Observable<ScreenState> {
+        return this.screenState$;
     }
 
     endTurnObservable(): Observable<void> {

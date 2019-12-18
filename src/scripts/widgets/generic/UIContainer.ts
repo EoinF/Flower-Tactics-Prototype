@@ -1,8 +1,8 @@
 import { getAlignedCoordinates } from "../utils";
-import { BaseUIObject } from "./BaseUIObject";
+import { UIObject } from "./UIObject";
 import { VerticalAlignment, HorizontalAlignment } from "../../types";
 
-export class UIContainer implements BaseUIObject {
+export class UIContainer implements UIObject {
     private scene: Phaser.Scene;
     public backgroundImage: Phaser.GameObjects.Rectangle;
     originalX: number;
@@ -21,7 +21,7 @@ export class UIContainer implements BaseUIObject {
     protected isInteractive: boolean;
     visible: boolean;
 
-    children: Array<BaseUIObject | UIContainer>;
+    children: Array<UIObject | UIContainer>;
 
     constructor(scene: Phaser.Scene,
         x: number, y: number,
@@ -78,13 +78,13 @@ export class UIContainer implements BaseUIObject {
         return this;
     }
 
-    removeChild(childToDelete: BaseUIObject): BaseUIObject {
+    removeChild(childToDelete: UIObject): UIObject {
         const index = this.children.findIndex(child => childToDelete === child);
         this.children.splice(index, 1);
         return childToDelete;
     }
 
-    addChild(child: BaseUIObject,
+    addChild(child: UIObject,
         verticalAlignment: VerticalAlignment = "Top",
         horizontalAlignment: HorizontalAlignment = "Left"
     ) {

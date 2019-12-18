@@ -9,6 +9,11 @@
             "type": "2",
             "quantity": 3,
             "progress": 7
+        },
+        "3": {
+            "type": "3",
+            "quantity": 999,
+            "progress": 7
         }
     },
     "flowerTypes": {
@@ -34,6 +39,22 @@
             "turnsUntilGrown": 5,
             "soilConsumptionRate": 60,
             "seedProductionRate": 34,
+            "nitrogenRequirements": {
+                "min": 200, "max": 2500
+            },
+            "phosphorousRequirements": {
+                "min": 100, "max": 2900
+            },
+            "potassiumRequirements": {
+                "min": 1400, "max": 1500
+            }
+        },
+        "3": {
+            "type": "3",
+            "name": "Daffodil",
+            "turnsUntilGrown": 1,
+            "soilConsumptionRate": 2,
+            "seedProductionRate": 150,
             "nitrogenRequirements": {
                 "min": 200, "max": 2500
             },

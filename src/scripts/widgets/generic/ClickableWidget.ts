@@ -1,6 +1,6 @@
 import { UIContainer } from "./UIContainer";
 import { Subject } from "rxjs";
-import { BaseUIObject } from "./BaseUIObject";
+import { UIObject, BaseUIObject } from "./UIObject";
 import { distinctUntilChanged, pairwise, filter, map } from "rxjs/operators";
 import { VerticalAlignment, HorizontalAlignment } from "../../types";
 
@@ -10,20 +10,7 @@ interface PointerState {
     pointer: { x: number, y: number }
 }
 
-export class ClickableWidget implements BaseUIObject {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-
-    originX: number;
-    originY: number;
-
-    alpha: number;
-    borderThickness: number;
-    borderColour: Phaser.Display.Color;
-    visible: boolean;
-
+export class ClickableWidget extends BaseUIObject {
     protected container: UIContainer;
 
     protected pointerState$: Subject<PointerState>;
@@ -33,12 +20,10 @@ export class ClickableWidget implements BaseUIObject {
         width: number, height: number,
         verticalAlignment: VerticalAlignment = "Top",
         horizontalAlignment: HorizontalAlignment = "Left") {
-        
-        this.container = new UIContainer(scene, x, y, width, height, verticalAlignment, horizontalAlignment);
+        super(scene, x, y, width, height, verticalAlignment, horizontalAlignment);
         this.container.setInteractive();
 
         this.pointerState$ = new Subject<PointerState>();
-        this.visible = true;
         
         scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
             this.pointerState$.next({

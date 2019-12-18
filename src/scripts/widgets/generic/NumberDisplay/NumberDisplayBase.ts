@@ -1,10 +1,10 @@
-import { BaseUIObject } from "../BaseUIObject";
+import { UIObject } from "../UIObject";
 import { TextLabel } from "../TextLabel";
 import { UIContainer } from "../UIContainer";
 import { RectangleSprite } from "../RectangleSprite";
 import { COLOURS } from "../../../constants";
 
-export abstract class NumberDisplayBase implements BaseUIObject {
+export abstract class NumberDisplayBase implements UIObject {
     protected mainContainer: UIContainer;
     protected backgroundImage: Phaser.GameObjects.Sprite;
     private startLabel: TextLabel;
@@ -48,23 +48,23 @@ export abstract class NumberDisplayBase implements BaseUIObject {
         this.mainContainer.addChild(this.endLabel, "Middle", "Right");
     }
 
-    setAlpha (alpha: number) : BaseUIObject {
+    setAlpha (alpha: number) : UIObject {
         this.alpha = alpha;
         this.mainContainer.setAlpha(alpha);
         return this;
     }
-    setPosition(x: number, y: number): BaseUIObject {
+    setPosition(x: number, y: number): UIObject {
         this.x = this.originX = x;
         this.y = this.originY = y;
         this.mainContainer.setPosition(x, y);
         return this;
     }
-    setVisible (isVisible: boolean) : BaseUIObject {
+    setVisible (isVisible: boolean) : UIObject {
         this.visible = isVisible;
         this.mainContainer.setVisible(isVisible);
         return this;
     }
-    setDepth (depth: number) : BaseUIObject {
+    setDepth (depth: number) : UIObject {
         this.mainContainer.setDepth(depth);
         return this;
     }
@@ -74,12 +74,12 @@ export abstract class NumberDisplayBase implements BaseUIObject {
     getData (key: string): any {
         this.mainContainer.getData(key)
     }
-    setData (key: string, value: any) : BaseUIObject {
+    setData (key: string, value: any) : UIObject {
         this.mainContainer.setData(key, value);
         return this;
     }
 
-    removeInteractive () : BaseUIObject {
+    removeInteractive () : UIObject {
         this.mainContainer.setInteractive();
         return this;
     }

@@ -13,14 +13,18 @@ export interface MessagePrompt {
 
 export class MessageQueueView {
     constructor(scene: Phaser.Scene, guiController: GuiController) {
-        const mainContainer = new UIContainer(scene, 0, 0, 300, 200, "Middle", "Middle")
+        const mainContainer = new UIContainer(scene, 0, 0, scene.game.canvas.width, scene.game.canvas.height)
+            .setBackground(COLOURS.withAlpha(COLOURS.GRAY, 0.7));
+        const popupContainer = new UIContainer(scene, 0, 0, 300, 200)
             .setBackground(COLOURS.PURPLE_200)
             .setBorder(1, COLOURS.BLACK)
             .setVisible(false);
 
+        mainContainer.addChild(popupContainer, "Middle", "Middle");
+
         const titleLabel = new TextLabel(scene, 16, 16, "Title here", COLOURS.BLACK, {isBold: true, fontSize: 20});
         const contentLabel = new TextLabel(scene, 16, titleLabel.height + 32, "Content goes here...", COLOURS.BLACK, {
-            maxWidth: mainContainer.width - 32
+            maxWidth: popupContainer.width - 32
         });
         const nextButton = new TextButton(scene, 16, 16, 72, 28, "Next", COLOURS.WHITE)
             .setBackground(COLOURS.BLUE_100, COLOURS.BLUE_700)
@@ -35,11 +39,10 @@ export class MessageQueueView {
                 guiController.nextMessagePrompt();
             });
 
-        mainContainer.addChild(titleLabel, "Top");
-        mainContainer.addChild(contentLabel);
-        mainContainer.addChild(nextButton, "Bottom", "Right");
-        mainContainer.addChild(doneButton, "Bottom", "Right");
-
+        popupContainer.addChild(titleLabel, "Top");
+        popupContainer.addChild(contentLabel);
+        popupContainer.addChild(nextButton, "Bottom", "Right");
+        popupContainer.addChild(doneButton, "Bottom", "Right");
 
         guiController.messagePromptObservable()
             .pipe(
@@ -51,7 +54,7 @@ export class MessageQueueView {
                 } else {
                     mainContainer.setVisible(true);
                     if (messagePrompt.position != null) {
-                        mainContainer.setPosition(messagePrompt.position.x, messagePrompt.position.y);
+                        popupContainer.setPosition(messagePrompt.position.x, messagePrompt.position.y);
                     }
                     titleLabel.setText(messagePrompt.title);
                     contentLabel.setText(messagePrompt.content);

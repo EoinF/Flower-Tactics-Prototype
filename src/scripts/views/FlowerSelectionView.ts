@@ -28,8 +28,6 @@ export class FlowerSelectionView {
         this.scene = scene;
 
         this.flowerSelector = new FlexUIContainer(scene, 8, offsetY + 8, width, "auto", "Bottom")
-            .setBackground(COLOURS.withAlpha(COLOURS.GRAY, 0.1))
-            .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.3))
             .setInteractive()
             .setDepth(3);
         
@@ -69,14 +67,14 @@ export class FlowerSelectionView {
             ).subscribe((isHighlighted) => {
             if (isHighlighted) {
                 this.flowerSelector
-                    .setBackground(COLOURS.withAlpha(COLOURS.PURPLE_100, 0.9))
-                    .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.8))
-                    .setAlpha(1);
+                    .setBackground(COLOURS.PURPLE_100)
+                    .setBorder(1, COLOURS.BLACK)
+                    .setAlpha(0.9);
             } else {
                 this.flowerSelector
-                    .setBackground(COLOURS.withAlpha(COLOURS.GRAY, 0.1))
-                    .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.3))
-                    .setAlpha(0.5);
+                    .setBackground(COLOURS.PURPLE_300)
+                    .setBorder(1, COLOURS.BLACK)
+                    .setAlpha(0.7);
             }
         })
     }

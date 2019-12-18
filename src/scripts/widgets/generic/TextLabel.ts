@@ -1,4 +1,4 @@
-import { BaseUIObject } from "./BaseUIObject";
+import { UIObject } from "./UIObject";
 import { COLOURS } from "../../constants";
 
 interface TextLabelConfig {
@@ -9,7 +9,7 @@ interface TextLabelConfig {
     strokeColour: Phaser.Display.Color;
 }
 
-export class TextLabel implements BaseUIObject {
+export class TextLabel implements UIObject {
     private scene: Phaser.Scene;
     private textObject: Phaser.GameObjects.Text;
     private depthOffset: number;

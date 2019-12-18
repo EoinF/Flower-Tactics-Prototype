@@ -1,5 +1,5 @@
 import { UIContainer } from "./UIContainer";
-import { BaseUIObject } from "./BaseUIObject";
+import { UIObject } from "./UIObject";
 import { getAlignedCoordinates } from "../utils";
 import { VerticalAlignment, HorizontalAlignment } from "../../types";
 
@@ -23,7 +23,7 @@ export class FlexUIContainer extends UIContainer {
     }
 
     
-    addChild(child: BaseUIObject,
+    addChild(child: UIObject,
         verticalAlignment: VerticalAlignment = "Top",
         horizontalAlignment: HorizontalAlignment = "Left"
     ) {

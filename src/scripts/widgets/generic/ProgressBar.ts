@@ -1,10 +1,10 @@
-import { BaseUIObject } from "./BaseUIObject";
+import { UIObject } from "./UIObject";
 import { TextLabel } from "./TextLabel";
 import { UIContainer } from "./UIContainer";
 import { RectangleSprite } from "./RectangleSprite";
 import { COLOURS } from "../../constants";
 
-export class ProgressBar implements BaseUIObject {
+export class ProgressBar implements UIObject {
     private value: number;
     private maxValue: number;
 

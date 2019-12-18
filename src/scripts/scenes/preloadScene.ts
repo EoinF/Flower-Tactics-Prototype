@@ -73,9 +73,10 @@ export default class PreloadScene extends Phaser.Scene {
 		// gameStateManager.setState(mapGenerator.generateNewMap({numTilesX: 100, numTilesY: 100}));
 		gameStateManager.setState(initialState);
 
-		this.scene.start('MainScene')
-		this.scene.start('UIScene')
-		this.scene.start('OverlayScene')
+		this.scene.start('MainScene');
+		this.scene.start('UIScene');
+		this.scene.start('EvolveSeedScene');
+		this.scene.start('OverlayScene');
 
 		/**
 		 * This is how you would dynamically import the mainScene class (with code splitting),

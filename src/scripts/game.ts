@@ -3,6 +3,7 @@ import MainScene from './scenes/mainScene'
 import PreloadScene from './scenes/preloadScene'
 import UIScene from './scenes/uiScene'
 import OverlayScene from './scenes/overlayScene'
+import EvolveSeedScene from './scenes/evolveSeedScene'
 import { GameStateManager } from './controllers/GameStateManager'
 import { GuiController } from './controllers/GuiController'
 import { SelectedObjectController } from './controllers/SelectedObjectController'
@@ -10,6 +11,7 @@ import { SeedController } from './controllers/SeedController'
 import { MapController } from './controllers/MapController'
 import { setupConnectors } from './connectors'
 import { FlowerSelectionController } from './controllers/FlowerSelectionController'
+import { EvolveSeedController } from './controllers/EvolveSeedController'
 
 const DEFAULT_WIDTH = 1280
 const DEFAULT_HEIGHT = 720
@@ -25,7 +27,7 @@ const config: GameConfig = {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT
   },
-  scene: [PreloadScene, MainScene, UIScene, OverlayScene]
+  scene: [PreloadScene, MainScene, UIScene, OverlayScene, EvolveSeedScene]
   // physics: {
   //   default: 'arcade',
   //   arcade: {
@@ -45,4 +47,5 @@ export const guiController = new GuiController();
 export const mapController = new MapController();
 export const seedController = new SeedController();
 export const flowerSelectionController = new FlowerSelectionController();
+export const evolveSeedController = new EvolveSeedController();
 setupConnectors(guiController, gameStateManager, seedController, mapController, flowerSelectionController);

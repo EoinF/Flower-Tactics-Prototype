@@ -10,8 +10,9 @@ import { FlowerType } from "../objects/FlowerType";
 import { ImageButton } from "../widgets/generic/ImageButton";
 import { ProgressBar } from "../widgets/generic/ProgressBar";
 import { COLOURS } from "../constants";
+import { TextButton } from "../widgets/generic/TextButton";
 
-const SEEDS_PER_ROW = 32;
+const SEEDS_PER_ROW = 24;
 const MAX_ROWS = 2;
 
 export class SeedContainerView {
@@ -22,6 +23,7 @@ export class SeedContainerView {
     mainContainer: UIContainer;
     seedContainer: UIContainer;
     infoButton: ImageButton;
+    evolveButton: TextButton;
     heldSeed: Phaser.GameObjects.Sprite | null;
 
     constructor(
@@ -33,23 +35,28 @@ export class SeedContainerView {
     ) {
         this.gameStateManager = gameStateManager;
         this.scene = scene;
+        
+        const seedProgressBar = new ProgressBar(scene, 4, 6, 0, 100);
 
-        this.mainContainer = new UIContainer(scene, 8, offsetY + 4, 16 + SEEDS_PER_ROW * 8, 24 * MAX_ROWS, "Bottom")
+        this.mainContainer = new UIContainer(scene, 8, offsetY + 4, seedProgressBar.width + 64 + SEEDS_PER_ROW * 8, 24 * MAX_ROWS, "Bottom")
             .setDepth(3)
             .setInteractive();
 
-        this.seedContainer = new UIContainer(scene, 0, 0, 16 + SEEDS_PER_ROW * 8, 24 * MAX_ROWS)
-            .setBackground(COLOURS.withAlpha(COLOURS.GRAY, 0.1))
-            .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.3))
+        this.seedContainer = new UIContainer(scene, 0, 0, seedProgressBar.width + 64 + SEEDS_PER_ROW * 8, 24 * MAX_ROWS)
             .setInteractive();
         
+            
         this.infoButton = new ImageButton(scene, 4, 4, 'button-info', "auto", "auto", COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW, COLOURS.RED, COLOURS.RED)
             .setBorder(1, COLOURS.BLACK)
             .onClick(() => {
                 guiController.clickInfoButton();
             });
-            
-        const seedProgressBar = new ProgressBar(scene, 4, this.infoButton.height + 8, 0, 100);
+        this.evolveButton = new TextButton(scene, 8 + this.infoButton.width, 4, 24, 24, "+", COLOURS.RED, COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW)
+            .setBorder(1, COLOURS.BLACK)
+            .onClick(() => {
+                guiController.setScreenState("Evolve");
+            });
+        
 
         this.mainContainer.addChild(this.seedContainer);
         this.mainContainer.addChild(
@@ -57,8 +64,12 @@ export class SeedContainerView {
             "Top", "Right"
         );
         this.mainContainer.addChild(
-            seedProgressBar,
+            this.evolveButton,
             "Top", "Right"
+        );
+        this.mainContainer.addChild(
+            seedProgressBar,
+            "Bottom", "Right"
         );
 
         this.width = this.mainContainer.width;
@@ -99,14 +110,14 @@ export class SeedContainerView {
             .subscribe((isHighlighted) => {
             if (isHighlighted) {
                 this.mainContainer
-                    .setBackground(COLOURS.withAlpha(COLOURS.PURPLE_100, 0.9))
-                    .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.8))
-                    .setAlpha(1);
+                    .setBackground(COLOURS.PURPLE_100)
+                    .setBorder(1, COLOURS.BLACK)
+                    .setAlpha(0.9);
             } else {
                 this.mainContainer
-                    .setBackground(COLOURS.withAlpha(COLOURS.GRAY, 0.1))
-                    .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.3))
-                    .setAlpha(0.3);
+                    .setBackground(COLOURS.PURPLE_300)
+                    .setBorder(1, COLOURS.BLACK)
+                    .setAlpha(0.7);
             }
         })
 

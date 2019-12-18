@@ -19,13 +19,6 @@ export class BaseButton extends ClickableWidget {
         super(scene, x, y, width, height, verticalAlignment, horizontalAlignment);
 
         this.container.setBackground(colourUp);
-        
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
-        this.originX = 0;
-        this.originY = 0;
         this.colourUp = colourUp;
         this.colourDown = colourDown;
         this.borderThickness = 0;
