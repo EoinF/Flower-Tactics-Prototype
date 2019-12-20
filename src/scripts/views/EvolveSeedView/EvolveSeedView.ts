@@ -3,7 +3,6 @@ import { GuiController } from "../../controllers/GuiController";
 import { GameStateManager } from "../../controllers/GameStateManager";
 import { COLOURS } from "../../constants";
 import { TextButton } from "../../widgets/generic/TextButton";
-import { combineLatest } from "rxjs";
 import { EvolveSeedController } from "../../controllers/EvolveSeedController";
 import { SeedInventoryView } from "./SeedInventoryView";
 import { SeedStatsView } from "./SeedStatsView";
@@ -12,8 +11,7 @@ import { SelectedObjectController } from "../../controllers/SelectedObjectContro
 export class EvolveSeedView {
     constructor(scene: Phaser.Scene, 
         guiController: GuiController, gameStateManager: GameStateManager, 
-        evolveSeedController: EvolveSeedController, 
-        selectedObjectController: SelectedObjectController
+        evolveSeedController: EvolveSeedController
     ) {
         const canvas = scene.game.canvas;
 
@@ -24,7 +22,7 @@ export class EvolveSeedView {
         const seedInventoryView = new SeedInventoryView(scene, 16, 16, (canvas.width * 0.6) - 24, canvas.height - 32, gameStateManager, evolveSeedController);
 
         // Top right panel
-        const seedStatsView = new SeedStatsView(scene, 16, 16, (canvas.width * 0.4) - 16, (canvas.height * 0.5) - 20, gameStateManager, selectedObjectController);
+        const seedStatsView = new SeedStatsView(scene, 16, 16, (canvas.width * 0.4) - 16, (canvas.height * 0.5) - 20, gameStateManager, evolveSeedController);
 
         // Bottom right panel
         const evolveContainer = new UIContainer(scene, 16, 16, (canvas.width * 0.4) - 16, (canvas.height * 0.5) - 20)

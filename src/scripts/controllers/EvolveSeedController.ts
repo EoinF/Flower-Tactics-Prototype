@@ -5,9 +5,14 @@ export type StagedSeeds = StringMap<number>;
 
 export class EvolveSeedController {
     private stagedSeeds$: BehaviorSubject<StagedSeeds>;
+    private selectedFlowerType$: Subject<string>;
     
     constructor() {
         this.stagedSeeds$ = new BehaviorSubject({});
+        this.selectedFlowerType$ = new Subject();
+    }
+    setSelectedFlowerType(type: string) {
+        this.selectedFlowerType$.next(type);
     }
 
     stageSeedForEvolution(type: string) {
@@ -23,4 +28,9 @@ export class EvolveSeedController {
     stagedSeedsObservable(): Observable<StagedSeeds> {
         return this.stagedSeeds$;
     }
+
+    selectedFlowerTypeObservable(): Observable<string> {
+        return this.selectedFlowerType$;
+    }
+    
 }

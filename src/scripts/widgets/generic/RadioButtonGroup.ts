@@ -4,6 +4,8 @@ import { COLOURS } from "../../constants";
 
 export class RadioButtonGroup {
     selectedButtonIndex: number;
+    isActive: boolean;
+
     private buttons: Array<BaseButton>;
     private callbacks: Array<(button: BaseButton, index: number) => void>;
     private selectedColourUp: Phaser.Display.Color;
@@ -32,6 +34,7 @@ export class RadioButtonGroup {
         this.selectedBorderThickness = selectedBorderThickness;
 
         this.callbacks = [];
+        this.isActive = true;
         if (buttons.length > 0) {
             this.setButtons(buttons);
         } else {
@@ -49,6 +52,11 @@ export class RadioButtonGroup {
             }
             button.setBorder(this.savedBorderThickness, this.savedBorderColour);
         }
+    }
+
+    setIsActive(isActive: boolean) {
+        this.isActive = isActive;
+        return this;
     }
 
     setSelected(indexOrButton: number | BaseButton) {
@@ -88,9 +96,11 @@ export class RadioButtonGroup {
         
         buttons.forEach((button, index) => {
             button.onClick(() => {
-                this.restoreButtonColours();
-                this._setSelected(index);
-                this.callbacks.forEach(f => f(button, index));
+                if (this.isActive) {
+                    this.restoreButtonColours();
+                    this._setSelected(index);
+                    this.callbacks.forEach(f => f(button, index));
+                }
             });
         });
     }

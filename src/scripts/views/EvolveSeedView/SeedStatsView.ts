@@ -1,17 +1,16 @@
 import { withLatestFrom, map, filter } from "rxjs/operators";
-import { SelectedObjectController } from "../../controllers/SelectedObjectController";
 import { GameStateManager } from "../../controllers/GameStateManager";
 import { BaseUIObject } from "../../widgets/generic/UIObject";
 import { COLOURS } from "../../constants";
 import { TextLabel } from "../../widgets/generic/TextLabel";
-import { SelectedFlowerTypeView } from "../SelectedFlowerTypeView";
 import { FlexUIContainer } from "../../widgets/generic/FlexUIContainer";
+import { EvolveSeedController } from "../../controllers/EvolveSeedController";
 
 export class SeedStatsView extends BaseUIObject {
     titleLabel: TextLabel;
     
     constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number,
-        gameStateManager: GameStateManager, selectedObjectController: SelectedObjectController
+        gameStateManager: GameStateManager, evolveSeedController: EvolveSeedController
     ) {
         super(scene, x, y, width, height);
         this.container.setBackground(COLOURS.PURPLE_200)
@@ -34,7 +33,7 @@ export class SeedStatsView extends BaseUIObject {
         labelContainer.addChild(seedProductionRateLabel);
                 
 
-        selectedObjectController.selectedFlowerTypeObservable().pipe(
+        evolveSeedController.selectedFlowerTypeObservable().pipe(
             filter(type => type != null),
             map(type => type!),
             withLatestFrom(gameStateManager.nextStateObservable()),

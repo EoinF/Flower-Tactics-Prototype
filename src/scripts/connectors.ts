@@ -5,7 +5,7 @@ import { GameStateManager } from './controllers/GameStateManager';
 import { SeedController } from './controllers/SeedController';
 import { MapController } from './controllers/MapController';
 import { FlowerSelectionController } from './controllers/FlowerSelectionController';
-import { selectedObjectController } from './game';
+import { selectedObjectController, evolveSeedController } from './game';
 
 interface TileLocation {
     tileX: number,
@@ -38,28 +38,25 @@ export function setupConnectors(
     const isMouseOverSeedContainer$ = seedController.mouseOverSeedContainerObservable();
     const pickedUpSeed$ = seedController.pickUpSeedObservable();
     const selectedFlowerIndex$ = flowerSelectionController.selectedFlowerIndexObservable();
-    const selectedFlowerType$ = flowerSelectionController.selectedFlowerTypeObservable();
+    const flowerSelection_selectedFlowerType$ = flowerSelectionController.selectedFlowerTypeObservable();
     const isMouseOverFlowerSelection$ = seedController.mouseOverFlowerSelectionObservable();
     const onClickInfoButton$ = guiController.onClickInfoButtonObservable();
+    const evolveSeed_selectedFlowerType$ = evolveSeedController.selectedFlowerTypeObservable();
 
     const flowerTypeOnClickingInfoButton$ = onClickInfoButton$.pipe(
-        flatMap(() => selectedFlowerType$),
+        flatMap(() => flowerSelection_selectedFlowerType$),
         filter(selectedFlowerType => selectedFlowerType != null)
     );
 
-    merge(flowerTypeOnClickingInfoButton$, selectedFlowerType$).pipe(
+    merge(flowerTypeOnClickingInfoButton$, flowerSelection_selectedFlowerType$, evolveSeed_selectedFlowerType$).pipe(
         filter((flowerType) => flowerType != null)
     ).subscribe((flowerType) => {
-        selectedObjectController.setSelectedFlowerType(flowerType.type);
+        selectedObjectController.setSelectedFlowerType(flowerType);
     })
 
     const flowerTypesArray$ = gameState$.pipe(
-        map(
-            state => Object.keys(state.flowerTypes)
-                .map(key => state.flowerTypes[key])
-        )
+        map(state => Object.keys(state.flowerTypes))
     );
-
     
     combineLatest(selectedFlowerIndex$, flowerTypesArray$.pipe(first()), (selectedIndex) => selectedIndex)
         .pipe(withLatestFrom(flowerTypesArray$))

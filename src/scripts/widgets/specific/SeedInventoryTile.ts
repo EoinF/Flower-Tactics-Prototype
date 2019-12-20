@@ -32,9 +32,14 @@ export class SeedInventoryTile extends BaseButton {
         this.addSeedCallbacks = [];
     }
 
-    setAmount(amount: number) {
-        this.seedAmountLabel.setText(" x " + amount.toString());
-        this.addSeedButton.setVisible(amount > 0);
+    setAmount(amount: number, amountStaged: number, isAnyStaged: boolean) {
+        const amountStagedText = (amountStaged > 0) ? `(${amountStaged})` : '';
+        const text = ` x ${amount}${amountStagedText}`;
+        this.seedAmountLabel.setText(text);
+
+        const isStaged = amountStaged > 0;
+        
+        this.addSeedButton.setVisible(amount > 0 && (isStaged || !isAnyStaged));
         return this;
     }
 

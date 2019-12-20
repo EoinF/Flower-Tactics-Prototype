@@ -137,12 +137,12 @@ export class SeedContainerView {
         combineLatest(gameStateManager.nextStateObservable(), gameStateManager.nextDeltaObservable(), flowerSelectionController.selectedFlowerTypeObservable())
             .subscribe(([nextState, nextDelta, selectedFlowerType]) => {
                 this.seedContainer.clear();
-                this.addSeedGUI(nextState, nextDelta, selectedFlowerType);
+                this.addSeedGUI(nextState, nextDelta, nextState.flowerTypes[selectedFlowerType]);
             });
 
         combineLatest(gameStateManager.nextStateObservable(), flowerSelectionController.selectedFlowerTypeObservable())
-            .subscribe(([nextDelta, selectedFlowerType]) => {
-                seedProgressBar.setValue(nextDelta.seedStatus[selectedFlowerType.type].progress);
+            .subscribe(([nextState, selectedFlowerType]) => {
+                seedProgressBar.setValue(nextState.seedStatus[selectedFlowerType].progress);
             })
     }
 

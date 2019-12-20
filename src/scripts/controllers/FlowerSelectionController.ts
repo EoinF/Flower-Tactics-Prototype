@@ -3,7 +3,7 @@ import { FlowerType } from "../objects/FlowerType";
 import { publishReplay, publish, shareReplay, startWith } from "rxjs/operators";
 
 export class FlowerSelectionController {
-    private selectedFlowerType$: Subject<FlowerType>;
+    private selectedFlowerType$: Subject<string>;
     private selectedFlowerIndex$: BehaviorSubject<number>;
 
     constructor() {
@@ -11,7 +11,7 @@ export class FlowerSelectionController {
         this.selectedFlowerIndex$ = new BehaviorSubject(0);
     }
 
-    selectFlower(type: FlowerType) {
+    selectFlower(type: string) {
         this.selectedFlowerType$.next(type);
     }
     selectNextFlower() {
@@ -32,7 +32,7 @@ export class FlowerSelectionController {
         );
     }
 
-    selectedFlowerTypeObservable(): Observable<FlowerType> {
+    selectedFlowerTypeObservable(): Observable<string> {
         return this.selectedFlowerType$;
     }
 }

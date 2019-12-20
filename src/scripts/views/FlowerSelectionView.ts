@@ -2,7 +2,7 @@ import { GameStateManager, GameStateDelta } from "../controllers/GameStateManage
 import { UIContainer } from "../widgets/generic/UIContainer";
 import { SeedController } from "../controllers/SeedController";
 import { combineLatest } from "rxjs";
-import { map, distinctUntilChanged } from "rxjs/operators";
+import { map, distinctUntilChanged, withLatestFrom } from "rxjs/operators";
 import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
 import { ImageButton } from "../widgets/generic/ImageButton";
 import { TextLabel } from "../widgets/generic/TextLabel";
@@ -48,8 +48,10 @@ export class FlowerSelectionView {
             flowerSelectionController.selectNextFlower();
         });
 
-        flowerSelectionController.selectedFlowerTypeObservable().subscribe(flowerType => {
-            this.flowerText.setText(flowerType.name);
+        flowerSelectionController.selectedFlowerTypeObservable().pipe(
+            withLatestFrom(gameStateManager.nextStateObservable())
+        ).subscribe(([flowerType, gameState]) => {
+            this.flowerText.setText(gameState.flowerTypes[flowerType].name);
         })
 
         scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
