@@ -23,7 +23,6 @@ export class SelectedTileView {
 
     private popup: UIContainer;
 
-    private tabGroup: RadioButtonGroup;
     private npkTabButton: ImageButton;
     private flowerTabButton: ImageButton;
 
@@ -49,8 +48,8 @@ export class SelectedTileView {
             .setBackground(COLOURS.PURPLE_200, COLOURS.PURPLE_400, COLOURS.WHITE, COLOURS.PURPLE_500)
             .setBorder(1, COLOURS.GRAY);
 
-        this.tabGroup = new RadioButtonGroup([this.npkTabButton, this.flowerTabButton])
-            .onChange((index: number) => {
+        const tabGroup = new RadioButtonGroup([this.npkTabButton, this.flowerTabButton])
+            .onChange((_, index) => {
                 SelectedObjectController.setActiveTabIndex(index);
             });
         

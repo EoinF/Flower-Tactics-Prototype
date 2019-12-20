@@ -1,9 +1,10 @@
-import { BaseUIObject } from "../../widgets/generic/UIObject";
+import { BaseUIObject } from "../generic/UIObject";
 import { COLOURS } from "../../constants";
-import { TextLabel } from "../../widgets/generic/TextLabel";
-import { TextButton } from "../../widgets/generic/TextButton";
+import { TextLabel } from "../generic/TextLabel";
+import { TextButton } from "../generic/TextButton";
+import { BaseButton } from "../generic/BaseButton";
 
-export class SeedInventoryTile extends BaseUIObject {
+export class SeedInventoryTile extends BaseButton {
     private seedAmountLabel: TextLabel;
     private addSeedButton: TextButton;
     private addSeedCallbacks: (() => void)[];
@@ -12,8 +13,8 @@ export class SeedInventoryTile extends BaseUIObject {
         width: number, height: number, 
         name: string, amount: number
     ) {
-        super(scene, x, y, width, height);
-        this.container.setBorder(1, COLOURS.GRAY);
+        super(scene, x, y, width, height, COLOURS.PURPLE_300, COLOURS.PURPLE_400);
+        this.setBorder(1, COLOURS.GRAY);
         const seedName = new TextLabel(scene, 4, 4, name);
         const seedImage = scene.add.image(4, 4, 'seed2');
         this.seedAmountLabel = new TextLabel(scene, seedImage.width + 4, 4, ` x ${amount}`)
@@ -29,11 +30,6 @@ export class SeedInventoryTile extends BaseUIObject {
         this.container.addChild(this.seedAmountLabel, "Bottom");
 
         this.addSeedCallbacks = [];
-    }
-
-    setBackground(colour: Phaser.Display.Color) {
-        this.container.setBackground(colour);
-        return this;
     }
 
     setAmount(amount: number) {

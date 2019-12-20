@@ -4,11 +4,14 @@ import { TextLabel } from "../../widgets/generic/TextLabel";
 import { GameState } from "../../objects/GameState";
 import { GameStateDelta, GameStateManager } from "../../controllers/GameStateManager";
 import { BaseUIObject } from "../../widgets/generic/UIObject";
-import { SeedInventoryTile } from "./SeedInventoryTile";
+import { SeedInventoryTile } from "../../widgets/specific/SeedInventoryTile";
 import { combineLatest } from "rxjs";
 import { EvolveSeedController, StagedSeeds } from "../../controllers/EvolveSeedController";
 import { filter, pairwise, map, startWith, tap, first, mergeMapTo } from "rxjs/operators";
 import { StringMap } from "../../types";
+import { RadioButtonGroup } from "../../widgets/generic/RadioButtonGroup";
+import { BaseButton } from "../../widgets/generic/BaseButton";
+import { selectedObjectController } from "../../game";
 
 interface SeedInventoryItem {
     type: string;
@@ -24,6 +27,7 @@ export class SeedInventoryView extends BaseUIObject {
     private seedSelectionGrid: UIContainer;
     private scene: Phaser.Scene;
     private inventoryMap: StringMap<SeedInventoryTile>;
+    private radioGroup: RadioButtonGroup;
 
     constructor(scene: Phaser.Scene, x: number, y: number,
         width: number, height: number,
@@ -48,6 +52,11 @@ export class SeedInventoryView extends BaseUIObject {
             gameStateManager.nextDeltaObservable(),
             evolveSeedController.stagedSeedsObservable()
         );
+
+        this.radioGroup = new RadioButtonGroup([], COLOURS.LIGHT_YELLOW, COLOURS.RED, COLOURS.GRAY, 1)
+            .onChange((button, index) => {
+                selectedObjectController.setSelectedFlowerType(button.getData("type"));
+            });
 
         const numFlowerTypes$ = seedState$
             .pipe(
@@ -74,6 +83,12 @@ export class SeedInventoryView extends BaseUIObject {
                 this.inventoryMap[item.type].setAmount(item.amount);
             })
         });
+
+        selectedObjectController.selectedFlowerTypeObservable().subscribe((type) => {
+            if (type != null) {
+                this.radioGroup.setSelected(this.inventoryMap[type])
+            }
+        })
     }
 
     createGrid(seedInventoryItems: SeedInventoryItem[], evolveSeedController: EvolveSeedController) {
@@ -84,13 +99,15 @@ export class SeedInventoryView extends BaseUIObject {
             const cell = new SeedInventoryTile(this.scene, x, y, this.cellWidth, this.cellHeight,
                 item.name, item.amount);
             
-            cell.setBackground(index % 2 == 0 ? COLOURS.PURPLE_300 : COLOURS.LIGHT_GRAY)
+            cell.setBackground(COLOURS.PURPLE_300, COLOURS.PURPLE_400)
                 .onAddSeed(() => {
                     evolveSeedController.stageSeedForEvolution(item.type);
-                });
+                })
+                .setData("type", item.type);
             this.seedSelectionGrid.addChild(cell);
             this.inventoryMap[item.type] = cell;
         });
+        this.radioGroup.setButtons(this.seedSelectionGrid.children as Array<BaseButton>);
     }
 
     simplifySeedStates(state: GameState, delta: GameStateDelta, stagedSeeds: StagedSeeds) {

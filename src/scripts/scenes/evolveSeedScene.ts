@@ -1,4 +1,4 @@
-import { guiController, gameStateManager, evolveSeedController } from "../game";
+import { guiController, gameStateManager, evolveSeedController, selectedObjectController } from "../game";
 import { combineLatest } from "rxjs";
 import { EvolveSeedView } from "../views/EvolveSeedView/EvolveSeedView";
 
@@ -9,7 +9,7 @@ export default class EvolveSeedScene extends Phaser.Scene {
     
     create() {
         this.scene.setVisible(false);
-        new EvolveSeedView(this, guiController, gameStateManager, evolveSeedController);
+        new EvolveSeedView(this, guiController, gameStateManager, evolveSeedController, selectedObjectController);
         
         combineLatest(guiController.messagePromptObservable(), guiController.screenStateObservable())
             .subscribe(([messagePrompt, screenState]) => {
