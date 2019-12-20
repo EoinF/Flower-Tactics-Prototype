@@ -113,6 +113,9 @@ export class SeedInventoryView extends BaseUIObject {
                 .onAddSeed(() => {
                     evolveSeedController.stageSeedForEvolution(item.type);
                 })
+                .onRemoveSeed(() => {
+                    evolveSeedController.unstageSeedForEvolution(item.type);
+                })
                 .setData("type", item.type);
             this.seedSelectionGrid.addChild(cell);
             this.inventoryMap[item.type] = cell;

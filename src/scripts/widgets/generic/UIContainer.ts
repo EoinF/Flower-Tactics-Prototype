@@ -98,7 +98,9 @@ export class UIContainer implements UIObject {
         child.setPosition(ax + this.x, ay + this.y);
         child.setAlpha(this.alpha);
         child.setDepth(this.depth + 1);
-        child.setVisible(this.visible && child.visible);
+        if (!this.visible) {
+            child.setVisible(false);
+        }
         return this;
     }
     

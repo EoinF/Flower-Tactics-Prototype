@@ -25,6 +25,22 @@ export class EvolveSeedController {
         });
     }
 
+    unstageSeedForEvolution(type: string) {
+        const stagedSeeds = this.stagedSeeds$.value;
+        
+        const newAmount = stagedSeeds[type] - 1;
+        if (newAmount > 0) {
+            this.stagedSeeds$.next({
+                ...stagedSeeds,
+                [type]: newAmount
+            })
+        } else {
+            const newStagedSeeds = JSON.parse(JSON.stringify(stagedSeeds));
+            delete newStagedSeeds[type];
+            this.stagedSeeds$.next(newStagedSeeds);
+        }
+    }
+
     stagedSeedsObservable(): Observable<StagedSeeds> {
         return this.stagedSeeds$;
     }

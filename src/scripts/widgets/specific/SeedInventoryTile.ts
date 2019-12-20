@@ -8,6 +8,8 @@ export class SeedInventoryTile extends BaseButton {
     private seedAmountLabel: TextLabel;
     private addSeedButton: TextButton;
     private addSeedCallbacks: (() => void)[];
+     removeSeedButton: TextButton;
+    private removeSeedCallbacks: (() => void)[];
 
     constructor(scene: Phaser.Scene, x: number, y: number, 
         width: number, height: number, 
@@ -22,14 +24,22 @@ export class SeedInventoryTile extends BaseButton {
         this.addSeedButton = new TextButton(scene, 4, 4, 24, 24, ">")
             .setBorder(1, COLOURS.GRAY)
             .onClick(() => this.addSeedCallbacks.forEach(callback => callback()))
-            .setVisible(amount > 0)
+            .setVisible(amount > 0);
+            
+        this.removeSeedButton = new TextButton(scene, 8 + this.addSeedButton.width, 4, 24, 24, "<")
+            .setBorder(1, COLOURS.GRAY)
+            .onClick(() => this.removeSeedCallbacks.forEach(callback => callback()))
+            .setVisible(false);
+
         this.container.addChild(this.addSeedButton, "Bottom", "Right");
+        this.container.addChild(this.removeSeedButton, "Bottom", "Right");
         
         this.container.addChild(seedName);
         this.container.addChild(seedImage, "Bottom");
         this.container.addChild(this.seedAmountLabel, "Bottom");
 
         this.addSeedCallbacks = [];
+        this.removeSeedCallbacks = [];
     }
 
     setAmount(amount: number, amountStaged: number, isAnyStaged: boolean) {
@@ -38,13 +48,18 @@ export class SeedInventoryTile extends BaseButton {
         this.seedAmountLabel.setText(text);
 
         const isStaged = amountStaged > 0;
-        
+        this.removeSeedButton.setVisible(isStaged);
         this.addSeedButton.setVisible(amount > 0 && (isStaged || !isAnyStaged));
         return this;
     }
 
     onAddSeed(callback: () => void) {
         this.addSeedCallbacks.push(callback);
+        return this;
+    }
+
+    onRemoveSeed(callback: () => void) {
+        this.removeSeedCallbacks.push(callback);
         return this;
     }
 }
