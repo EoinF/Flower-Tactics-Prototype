@@ -156,6 +156,5 @@ export function setupConnectors(
         evolveSeedController.setEvolveStatus(result.outcomeType);
         
         Object.keys(stagedSeeds).forEach(key => gameStateManager.deleteSeeds(key, stagedSeeds[key]));
-        evolveSeedController.unstageAllSeeds();
     })
 }

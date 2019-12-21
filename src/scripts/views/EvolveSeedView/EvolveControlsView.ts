@@ -5,7 +5,8 @@ import { GameStateManager } from "../../controllers/GameStateManager";
 import { TextButton } from "../../widgets/generic/TextButton";
 import { GuiController } from "../../controllers/GuiController";
 import { TextLabel } from "../../widgets/generic/TextLabel";
-import { tap, delay, debounceTime } from "rxjs/operators";
+import { tap, debounceTime } from "rxjs/operators";
+import { combineLatest } from "rxjs";
 
 export class EvolveControlsView extends BaseUIObject {
     constructor(scene: Phaser.Scene, x: number, y: number,
@@ -56,5 +57,12 @@ export class EvolveControlsView extends BaseUIObject {
         ).subscribe(status => {
             evolveStatusLabel.setVisible(false);
         });
+
+        combineLatest(gameStateManager.nextStateObservable(), evolveSeedController.stagedSeedsObservable())
+            .subscribe(([gameState, stagedSeeds]) => {
+                if (Object.keys(stagedSeeds).some(key => gameState.seedStatus[key].quantity < stagedSeeds[key])) {
+                    evolveSeedController.unstageAllSeeds();
+                }
+            });
     }
 }
