@@ -8,6 +8,7 @@ import { FlowerType } from "../objects/FlowerType";
 import { NumberRangeDisplay } from "../widgets/generic/NumberDisplay/NumberRangeDisplay";
 import { FlexUIContainer } from "../widgets/generic/FlexUIContainer";
 import { POTASSIUM_VALUE_RANGE, NITROGEN_VALUE_RANGE, PHOSPHOROUS_VALUE_RANGE, COLOURS } from "../constants";
+import { FlowerStatsDisplay } from "../widgets/specific/FlowerStatsDisplay";
 
 export class SelectedFlowerTypeView {
     x: number;
@@ -17,9 +18,7 @@ export class SelectedFlowerTypeView {
 
     private popup: UIContainer;
     private popupText: TextLabel;
-    private nitrogenDisplay: NumberRangeDisplay;
-    private phosphorousDisplay: NumberRangeDisplay;
-    private potassiumDisplay: NumberRangeDisplay;
+    private flowerStatsDisplay: FlowerStatsDisplay;
 
     constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, SelectedObjectController: SelectedObjectController) {
 
@@ -35,54 +34,13 @@ export class SelectedFlowerTypeView {
         this.width = this.popup.width;
         this.height = this.popup.height;
 
-        const displayHeight = 16;
-        const displayWidth = 250;
-        const displayIndent = 10;
-
         const popupContent = new FlexUIContainer(scene, 0, 0, this.popup.width, "grow");
         this.popupText = new TextLabel(scene, 8, 8, "...", COLOURS.BLACK, {isBold: true});
 
-        // Labels
-        const nitrogenLabel = new TextLabel(scene, 4, 0, "Nitrogen: ", COLOURS.BLACK, {fontSize: 12});
-        const phosphorousLabel = new TextLabel(scene, 4, 0, "Phosphorous: ", COLOURS.BLACK, { fontSize: 12 });
-        const potassiumLabel = new TextLabel(scene, 4, 0, "Potassium: ", COLOURS.BLACK, {fontSize:12});
-
-        const labelColumnWidth = Math.max(nitrogenLabel.width, phosphorousLabel.width, potassiumLabel.width);
-
-        // Nitrogen section
-        this.nitrogenDisplay = new NumberRangeDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
-            COLOURS.WHITE, COLOURS.BLACK,
-            { startLabelText: "0%", endLabelText: "30%" },
-            NITROGEN_VALUE_RANGE
-        );
-        const nitrogenSection = new UIContainer(scene, displayIndent, 0, labelColumnWidth + displayWidth + 4, displayHeight);
-        nitrogenSection.addChild(nitrogenLabel, "Middle");
-        nitrogenSection.addChild(this.nitrogenDisplay, "Middle");
-
-        // Phosphorous section
-        this.phosphorousDisplay = new NumberRangeDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
-            COLOURS.GREEN, COLOURS.RED,
-            { startLabelText: "0%", endLabelText: "30%" },
-            PHOSPHOROUS_VALUE_RANGE
-        );
-        const phosphorousSection = new UIContainer(scene, displayIndent, 2, labelColumnWidth + displayWidth + 4, displayHeight);
-        phosphorousSection.addChild(phosphorousLabel, "Middle");
-        phosphorousSection.addChild(this.phosphorousDisplay, "Middle");
-
-        // Potassium section
-        this.potassiumDisplay = new NumberRangeDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
-            COLOURS.GRAY, COLOURS.BLUE,
-            { startLabelText: "0%", endLabelText: "30%" },
-            POTASSIUM_VALUE_RANGE
-        );
-        const potassiumSection = new UIContainer(scene, displayIndent, 0, labelColumnWidth + displayWidth + 4, displayHeight);
-        potassiumSection.addChild(potassiumLabel, "Middle");
-        potassiumSection.addChild(this.potassiumDisplay, "Middle");
+        this.flowerStatsDisplay = new FlowerStatsDisplay(scene, 10, 0, 250, 16);
 
         popupContent.addChild(this.popupText);
-        popupContent.addChild(nitrogenSection);
-        popupContent.addChild(phosphorousSection);
-        popupContent.addChild(potassiumSection);
+        popupContent.addChild(this.flowerStatsDisplay);
 
         this.popup.addChild(popupContent);
 
@@ -102,11 +60,8 @@ export class SelectedFlowerTypeView {
     }
 
     private updatePopupText(gameState: GameState, flowerTypeDetails: FlowerType) {
-        this.nitrogenDisplay.setValues(flowerTypeDetails.nitrogenRequirements);
-        this.phosphorousDisplay.setValues(flowerTypeDetails.phosphorousRequirements);
-        this.potassiumDisplay.setValues(flowerTypeDetails.potassiumRequirements);
+        this.flowerStatsDisplay.setValues(flowerTypeDetails);
         
         this.popupText.setText(flowerTypeDetails.name + "  -  Soil Requirements");
-        // this.popup.setText(flowerTypeDetails.name + "  -  Soil Requirements");
     }
 }

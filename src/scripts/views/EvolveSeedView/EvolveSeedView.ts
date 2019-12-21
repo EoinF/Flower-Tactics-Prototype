@@ -22,10 +22,10 @@ export class EvolveSeedView {
         const seedInventoryView = new SeedInventoryView(scene, 16, 16, (canvas.width * 0.6) - 24, canvas.height - 32, gameStateManager, evolveSeedController);
 
         // Top right panel
-        const seedStatsView = new SeedStatsView(scene, 16, 16, (canvas.width * 0.4) - 16, (canvas.height * 0.5) - 20, gameStateManager, evolveSeedController);
+        const seedStatsView = new SeedStatsView(scene, 16, 16, (canvas.width * 0.4) - 16, (canvas.height * 0.4) - 20, gameStateManager, evolveSeedController);
 
         // Bottom right panel
-        const evolveContainer = new UIContainer(scene, 16, 16, (canvas.width * 0.4) - 16, (canvas.height * 0.5) - 20)
+        const evolveContainer = new UIContainer(scene, 16, 16, (canvas.width * 0.4) - 16, (canvas.height * 0.6) - 20)
             .setBackground(COLOURS.PURPLE_200)
             .setBorder(1, COLOURS.BLACK)
         

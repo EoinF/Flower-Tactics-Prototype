@@ -5,6 +5,7 @@ import { COLOURS } from "../../constants";
 import { TextLabel } from "../../widgets/generic/TextLabel";
 import { FlexUIContainer } from "../../widgets/generic/FlexUIContainer";
 import { EvolveSeedController } from "../../controllers/EvolveSeedController";
+import { FlowerStatsDisplay } from "../../widgets/specific/FlowerStatsDisplay";
 
 export class SeedStatsView extends BaseUIObject {
     titleLabel: TextLabel;
@@ -19,19 +20,21 @@ export class SeedStatsView extends BaseUIObject {
         this.titleLabel = new TextLabel(scene, 0, 8, "Flower Title", COLOURS.BLACK, {isBold: true, fontSize: 18}),
         this.container.addChild(this.titleLabel, "Top", "Middle");
 
-        const labelContainer = new FlexUIContainer(scene, 8, this.titleLabel.height + 16, this.container.width / 2, "grow");
+        const growingContainer = new FlexUIContainer(scene, 16, this.titleLabel.height + 32, this.container.width / 2, "grow");
 
-        this.container.addChild(labelContainer, "Top", "Left");
+        this.container.addChild(growingContainer, "Top", "Left");
 
         const soilConsumptionLabel = new TextLabel(scene, 0, 4, "Soil Consumption: ");
-        labelContainer.addChild(soilConsumptionLabel);
+        growingContainer.addChild(soilConsumptionLabel);
 
         const turnsUntilGrownLabel = new TextLabel(scene, 0, 4, "Turns to grow: ");
-        labelContainer.addChild(turnsUntilGrownLabel);
+        growingContainer.addChild(turnsUntilGrownLabel);
 
         const seedProductionRateLabel = new TextLabel(scene, 0, 4, "Seed production: ");
-        labelContainer.addChild(seedProductionRateLabel);
+        growingContainer.addChild(seedProductionRateLabel);
                 
+        const flowerStatsDisplay = new FlowerStatsDisplay(scene, 8, 32, 350, 16);
+        growingContainer.addChild(flowerStatsDisplay);
 
         evolveSeedController.selectedFlowerTypeObservable().pipe(
             filter(type => type != null),
@@ -47,6 +50,7 @@ export class SeedStatsView extends BaseUIObject {
             soilConsumptionLabel.setText("Soil Consumption: " + soilConsumptionRate);
             turnsUntilGrownLabel.setText("Turns to grow: " + turnsUntilGrown);
             seedProductionRateLabel.setText("Seed production: " + seedProductionRate);
+            flowerStatsDisplay.setValues(flowerTypeStats);
         })
     }
 }
