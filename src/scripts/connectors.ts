@@ -1,4 +1,4 @@
-import { withLatestFrom, map, filter, flatMap, tap, shareReplay, mergeScan, startWith, first } from 'rxjs/operators';
+import { withLatestFrom, map, filter, flatMap, tap, shareReplay, mergeScan, startWith, first, mergeMapTo } from 'rxjs/operators';
 import { combineLatest, merge, of, zip } from 'rxjs';
 import { GuiController } from './controllers/GuiController';
 import { GameStateManager } from './controllers/GameStateManager';
@@ -6,6 +6,7 @@ import { SeedController } from './controllers/SeedController';
 import { MapController } from './controllers/MapController';
 import { FlowerSelectionController } from './controllers/FlowerSelectionController';
 import { selectedObjectController, evolveSeedController } from './game';
+import { calculateSeedEvolve } from './deltaCalculators/calculateSeedEvolve';
 
 interface TileLocation {
     tileX: number,
@@ -29,18 +30,25 @@ export function setupConnectors(
     mapController: MapController,
     flowerSelectionController: FlowerSelectionController
 ) {
+    const onClickInfoButton$ = guiController.onClickInfoButtonObservable();
+    const onClickEvolveButton$ = guiController.onClickEvolveButtonObservable();
     const endTurn$ = guiController.endTurnObservable();
+
     const dragSeed$ = seedController.dragSeedObservable();
     const dropSeed$ = seedController.dropSeedObservable();
+    const isMouseOverSeedContainer$ = seedController.mouseOverSeedContainerObservable();
+    const isMouseOverFlowerSelection$ = seedController.mouseOverFlowerSelectionObservable();
+    const pickedUpSeed$ = seedController.pickUpSeedObservable();
+
     const gameState$ = gameStateManager.nextStateObservable();
     const gameStateDelta$ = gameStateManager.nextDeltaObservable();
+
     const mapCamera$ = mapController.cameraObservable();
-    const isMouseOverSeedContainer$ = seedController.mouseOverSeedContainerObservable();
-    const pickedUpSeed$ = seedController.pickUpSeedObservable();
+
     const selectedFlowerIndex$ = flowerSelectionController.selectedFlowerIndexObservable();
     const flowerSelection_selectedFlowerType$ = flowerSelectionController.selectedFlowerTypeObservable();
-    const isMouseOverFlowerSelection$ = seedController.mouseOverFlowerSelectionObservable();
-    const onClickInfoButton$ = guiController.onClickInfoButtonObservable();
+
+    const stagedSeeds$ = evolveSeedController.stagedSeedsObservable();
     const evolveSeed_selectedFlowerType$ = evolveSeedController.selectedFlowerTypeObservable();
 
     const flowerTypeOnClickingInfoButton$ = onClickInfoButton$.pipe(
@@ -139,4 +147,15 @@ export function setupConnectors(
             }
             mapController.dragSeedOverTile(null);
         });
+
+    onClickEvolveButton$.pipe(
+        mergeMapTo(stagedSeeds$.pipe(first()))
+    ).subscribe(stagedSeeds => {
+        const result = calculateSeedEvolve(stagedSeeds);
+        
+        evolveSeedController.setEvolveStatus(result.outcomeType);
+        
+        Object.keys(stagedSeeds).forEach(key => gameStateManager.deleteSeeds(key, stagedSeeds[key]));
+        evolveSeedController.unstageAllSeeds();
+    })
 }

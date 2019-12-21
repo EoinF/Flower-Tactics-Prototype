@@ -2,11 +2,9 @@ import { UIContainer } from "../../widgets/generic/UIContainer";
 import { GuiController } from "../../controllers/GuiController";
 import { GameStateManager } from "../../controllers/GameStateManager";
 import { COLOURS } from "../../constants";
-import { TextButton } from "../../widgets/generic/TextButton";
 import { EvolveSeedController } from "../../controllers/EvolveSeedController";
 import { SeedInventoryView } from "./SeedInventoryView";
 import { SeedStatsView } from "./SeedStatsView";
-import { SelectedObjectController } from "../../controllers/SelectedObjectController";
 import { EvolveControlsView } from "./EvolveControlsView";
 
 export class EvolveSeedView {
@@ -20,15 +18,15 @@ export class EvolveSeedView {
             .setBackground(COLOURS.withAlpha(COLOURS.GRAY, 0.7));
 
         // Left hand panel
-        const seedInventoryView = new SeedInventoryView(scene, 16, 16, (canvas.width * 0.6) - 24, canvas.height - 32, 
+        const seedInventoryView = new SeedInventoryView(scene, 16, 16, (canvas.width * 0.6) - 24, canvas.height - 32,
             gameStateManager, evolveSeedController);
 
         // Top right panel
-        const seedStatsView = new SeedStatsView(scene, 16, 16, (canvas.width * 0.4) - 16, (canvas.height * 0.4) - 20, 
+        const seedStatsView = new SeedStatsView(scene, 16, 16, (canvas.width * 0.4) - 16, (canvas.height * 0.4) - 20,
             gameStateManager, evolveSeedController);
 
         // Bottom right panel
-        const evolveControlsView = new EvolveControlsView(scene, 16, 16, (canvas.width * 0.4) - 16, (canvas.height * 0.6) - 20, 
+        const evolveControlsView = new EvolveControlsView(scene, 16, 16, (canvas.width * 0.4) - 16, (canvas.height * 0.6) - 20,
             gameStateManager, evolveSeedController, guiController);
         
         mainContainer.addChild(seedInventoryView, "Top", "Left");

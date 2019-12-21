@@ -12,13 +12,15 @@ type ScreenState = "In Game" | "Evolve" | "Paused";
 export class GuiController {
     private endTurn$: Subject<void>;
     private onClickInfoButton$: Subject<void>;
+    private onClickEvolveButton$: Subject<void>;
     private screenState$: Subject<ScreenState>;
     private alertMessage$: Subject<string>;
-    private messagePromptQueue$: BehaviorSubject<MessagePromptQueue>
+    private messagePromptQueue$: BehaviorSubject<MessagePromptQueue>;
 
     constructor() {
         this.endTurn$ = new ReplaySubject(1);
         this.onClickInfoButton$ = new ReplaySubject(1);
+        this.onClickEvolveButton$ = new ReplaySubject(1);
         this.screenState$ = new Subject();
         this.alertMessage$ = new Subject();
         this.messagePromptQueue$ = new BehaviorSubject({
@@ -29,6 +31,10 @@ export class GuiController {
 
     clickInfoButton() {
         this.onClickInfoButton$.next();
+    }
+
+    clickEvolveButton() {
+        this.onClickEvolveButton$.next();
     }
 
     setScreenState(screenState: ScreenState) {
@@ -57,6 +63,9 @@ export class GuiController {
 
     onClickInfoButtonObservable(): Observable<void> {
         return this.onClickInfoButton$;
+    }
+    onClickEvolveButtonObservable(): Observable<void> {
+        return this.onClickEvolveButton$;
     }
 
     screenStateObservable(): Observable<ScreenState> {

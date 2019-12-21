@@ -1,15 +1,20 @@
 import { Subject, BehaviorSubject, Observable } from "rxjs";
 import { StringMap } from "../types";
+import { EvolutionOutcome } from "../deltaCalculators/calculateSeedEvolve";
 
 export type StagedSeeds = StringMap<number>;
+
+export type EvolveStatus = EvolutionOutcome | 'INSUFFICIENT_SEEDS';
 
 export class EvolveSeedController {
     private stagedSeeds$: BehaviorSubject<StagedSeeds>;
     private selectedFlowerType$: Subject<string>;
+    private evolveStatus$: Subject<EvolveStatus>;
     
     constructor() {
         this.stagedSeeds$ = new BehaviorSubject({});
         this.selectedFlowerType$ = new Subject();
+        this.evolveStatus$ = new Subject();
     }
     setSelectedFlowerType(type: string) {
         this.selectedFlowerType$.next(type);
@@ -41,12 +46,24 @@ export class EvolveSeedController {
         }
     }
 
+    unstageAllSeeds() {
+        this.stagedSeeds$.next({});
+    }
+
+    setEvolveStatus(evolveStatus: EvolveStatus) {
+        this.evolveStatus$.next(evolveStatus);
+    }
+
     stagedSeedsObservable(): Observable<StagedSeeds> {
         return this.stagedSeeds$;
     }
 
     selectedFlowerTypeObservable(): Observable<string> {
         return this.selectedFlowerType$;
+    }
+
+    evolveStatusObservable(): Observable<EvolveStatus> {
+        return this.evolveStatus$;
     }
     
 }

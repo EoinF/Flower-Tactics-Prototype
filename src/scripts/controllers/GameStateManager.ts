@@ -172,14 +172,19 @@ export class GameStateManager {
         this.nextDelta$.next(this.gameStateDelta);
     }
 
-    _addSeed(type: string, tileIndex: number) {
+    deleteSeeds(type: string, amount: number) {
+        this.gameState.seedStatus[type].quantity -= amount;
+        this.nextState$.next(this.gameState);
+    }
+
+    private _addSeed(type: string, tileIndex: number) {
         let existingAmount = 0;
         if (this.gameStateDelta.placedSeeds[type].has(tileIndex)) {
             existingAmount = this.gameStateDelta.placedSeeds[type].get(tileIndex)!;
         }
         this.gameStateDelta.placedSeeds[type].set(tileIndex, existingAmount + 1);
     }
-    _removeSeed(type: string, tileIndex: number) {
+    private _removeSeed(type: string, tileIndex: number) {
         this.gameStateDelta.placedSeeds[type].set(tileIndex, this.gameStateDelta.placedSeeds[type].get(tileIndex)! -1);
     }
 }
