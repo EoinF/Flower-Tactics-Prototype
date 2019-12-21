@@ -1,11 +1,11 @@
 import { BaseUIObject } from "../../widgets/generic/UIObject";
-import { COLOURS } from "../../constants";
+import { COLOURS, SEED_INTERVALS } from "../../constants";
 import { EvolveSeedController } from "../../controllers/EvolveSeedController";
 import { GameStateManager } from "../../controllers/GameStateManager";
 import { TextButton } from "../../widgets/generic/TextButton";
 import { GuiController } from "../../controllers/GuiController";
 import { TextLabel } from "../../widgets/generic/TextLabel";
-import { tap, debounceTime } from "rxjs/operators";
+import { tap, debounceTime, filter } from "rxjs/operators";
 import { combineLatest } from "rxjs";
 
 export class EvolveControlsView extends BaseUIObject {
@@ -59,10 +59,16 @@ export class EvolveControlsView extends BaseUIObject {
         });
 
         combineLatest(gameStateManager.nextStateObservable(), evolveSeedController.stagedSeedsObservable())
-            .subscribe(([gameState, stagedSeeds]) => {
-                if (Object.keys(stagedSeeds).some(key => gameState.seedStatus[key].quantity < stagedSeeds[key])) {
-                    evolveSeedController.unstageAllSeeds();
-                }
+            .pipe(
+                filter(([gameState, stagedSeeds]) => {
+                    return Object.keys(stagedSeeds).some(key => {
+                        const stagedSeedsIndex = stagedSeeds[key];
+                        return gameState.seedStatus[key].quantity < SEED_INTERVALS[stagedSeedsIndex]
+                    });
+                })
+            )
+            .subscribe(() => {
+                evolveSeedController.unstageAllSeeds();
             });
     }
 }

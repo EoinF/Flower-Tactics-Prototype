@@ -1,5 +1,5 @@
 import { BaseUIObject } from "../generic/UIObject";
-import { COLOURS } from "../../constants";
+import { COLOURS, SEED_INTERVALS } from "../../constants";
 import { TextLabel } from "../generic/TextLabel";
 import { TextButton } from "../generic/TextButton";
 import { BaseButton } from "../generic/BaseButton";
@@ -24,7 +24,7 @@ export class SeedInventoryTile extends BaseButton {
         this.addSeedButton = new TextButton(scene, 4, 4, 24, 24, ">")
             .setBorder(1, COLOURS.GRAY)
             .onClick(() => this.addSeedCallbacks.forEach(callback => callback()))
-            .setVisible(amount > 0);
+            .setVisible(amount >= SEED_INTERVALS[1]);
             
         this.removeSeedButton = new TextButton(scene, 8 + this.addSeedButton.width, 4, 24, 24, "<")
             .setBorder(1, COLOURS.GRAY)
@@ -42,14 +42,16 @@ export class SeedInventoryTile extends BaseButton {
         this.removeSeedCallbacks = [];
     }
 
-    setAmount(amount: number, amountStaged: number, isAnyStaged: boolean) {
+    setAmount(amount: number, amountStagedIndex: number, isAnyStaged: boolean) {
+        const amountStaged = SEED_INTERVALS[amountStagedIndex];
+        const requiredAmountForNext = SEED_INTERVALS[amountStagedIndex + 1] - amountStaged;
         const amountStagedText = (amountStaged > 0) ? `(${amountStaged})` : '';
         const text = ` x ${amount}${amountStagedText}`;
         this.seedAmountLabel.setText(text);
 
         const isStaged = amountStaged > 0;
         this.removeSeedButton.setVisible(isStaged);
-        this.addSeedButton.setVisible(amount > 0 && (isStaged || !isAnyStaged));
+        this.addSeedButton.setVisible(amount >= requiredAmountForNext && (isStaged || !isAnyStaged));
         return this;
     }
 

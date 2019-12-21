@@ -172,8 +172,10 @@ export class GameStateManager {
         this.nextDelta$.next(this.gameStateDelta);
     }
 
-    deleteSeeds(type: string, amount: number) {
-        this.gameState.seedStatus[type].quantity -= amount;
+    deleteSeeds(seeds: Array<{type: string, amount: number}>) {
+        seeds.forEach((seed) => {
+            this.gameState.seedStatus[seed.type].quantity -= seed.amount;
+        });
         this.nextState$.next(this.gameState);
     }
 

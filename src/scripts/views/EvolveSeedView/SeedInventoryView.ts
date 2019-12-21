@@ -1,5 +1,5 @@
 import { UIContainer } from "../../widgets/generic/UIContainer";
-import { COLOURS } from "../../constants";
+import { COLOURS, SEED_INTERVALS } from "../../constants";
 import { TextLabel } from "../../widgets/generic/TextLabel";
 import { GameState } from "../../objects/GameState";
 import { GameStateDelta, GameStateManager } from "../../controllers/GameStateManager";
@@ -15,7 +15,7 @@ import { BaseButton } from "../../widgets/generic/BaseButton";
 interface SeedInventoryItem {
     type: string;
     amount: number;
-    amountStaged: number;
+    amountStagedIndex: number;
     name: string;
 }
 
@@ -80,10 +80,10 @@ export class SeedInventoryView extends BaseUIObject {
             map((states) => this.simplifySeedStates(...states))
         ).subscribe(({seedInventoryItems, isAnyStaged}) => {
             seedInventoryItems.forEach(item => {
-                if (item.amountStaged > 0) {
+                if (item.amountStagedIndex > 0) {
                     evolveSeedController.setSelectedFlowerType(item.type);
                 }
-                this.inventoryMap[item.type].setAmount(item.amount, item.amountStaged, isAnyStaged);
+                this.inventoryMap[item.type].setAmount(item.amount, item.amountStagedIndex, isAnyStaged);
             })
         });
 
@@ -130,15 +130,15 @@ export class SeedInventoryView extends BaseUIObject {
             delta.placedSeeds[type].forEach((amount) => {
                 amountPlaced += amount
             });
-            const amountStaged = type in stagedSeeds ? stagedSeeds[type] : 0;
-            if (amountStaged > 0) {
+            const amountStagedIndex = type in stagedSeeds ? stagedSeeds[type] : 0;
+            if (amountStagedIndex > 0) {
                 isAnyStaged = true;
             }
 
-            const amount = state.seedStatus[type].quantity - amountPlaced - amountStaged;
+            const amount = state.seedStatus[type].quantity - amountPlaced - SEED_INTERVALS[amountStagedIndex];
             const name = state.flowerTypes[type].name;
             return {
-                amount, name, type, amountStaged
+                amount, name, type, amountStagedIndex
             }
         });
         return {

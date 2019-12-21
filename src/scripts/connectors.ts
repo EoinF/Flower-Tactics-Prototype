@@ -7,6 +7,7 @@ import { MapController } from './controllers/MapController';
 import { FlowerSelectionController } from './controllers/FlowerSelectionController';
 import { selectedObjectController, evolveSeedController } from './game';
 import { calculateSeedEvolve } from './deltaCalculators/calculateSeedEvolve';
+import { SEED_INTERVALS } from './constants';
 
 interface TileLocation {
     tileX: number,
@@ -155,6 +156,13 @@ export function setupConnectors(
         
         evolveSeedController.setEvolveStatus(result.outcomeType);
         
-        Object.keys(stagedSeeds).forEach(key => gameStateManager.deleteSeeds(key, stagedSeeds[key]));
+        const seedsToDelete = Object.keys(stagedSeeds).map(type => {
+            const stagedSeedIndex = stagedSeeds[type];
+            return {
+                type,
+                amount: SEED_INTERVALS[stagedSeedIndex]
+            }
+        });
+        gameStateManager.deleteSeeds(seedsToDelete);
     })
 }
