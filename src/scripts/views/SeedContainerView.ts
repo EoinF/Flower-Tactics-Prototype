@@ -153,11 +153,13 @@ export class SeedContainerView {
         ];
 
         let amountAlreadyPlaced = 0;
-        const valuesIterator = gameStateDelta.placedSeeds[selectedSeedStatus.type].values();
-        let value = valuesIterator.next();
-        while (!value.done) {
-            amountAlreadyPlaced += value.value;
-            value = valuesIterator.next();
+        if (selectedSeedStatus.type in gameStateDelta.placedSeeds) {
+            const valuesIterator = gameStateDelta.placedSeeds[selectedSeedStatus.type].values();
+            let value = valuesIterator.next();
+            while (!value.done) {
+                amountAlreadyPlaced += value.value;
+                value = valuesIterator.next();
+            }
         }
         for (let i = 0; i < selectedSeedStatus.quantity - amountAlreadyPlaced; i++) {
             this.addNewSeed(selectedSeedStatus.type);

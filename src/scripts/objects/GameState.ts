@@ -7,6 +7,7 @@ import { StringMap } from "../types";
 import { SeedStatusDelta } from "../controllers/GameStateManager";
 
 export interface GameStateData {
+    randomNumberGeneratorSeed: string;
     numTilesX: number;
     numTilesY: number;
     tiles: Tile[];
@@ -18,6 +19,8 @@ export interface GameStateData {
 }
 
 export class GameState implements GameStateData {
+    randomNumberGeneratorSeed: string;
+    private randomNumberGenerator: Phaser.Math.RandomDataGenerator;
     numTilesX: number;
     numTilesY: number;
     tiles: Tile[];
@@ -38,6 +41,8 @@ export class GameState implements GameStateData {
         this.tileToFlowerMap = new Map<Tile, Flower>();
         this.tileToRiverMap = new Map<Tile, River>();
         this.tileToMountainMap = new Map<Tile, Mountain>();
+        this.randomNumberGenerator = new Phaser.Math.RandomDataGenerator(data.randomNumberGeneratorSeed);
+        
 
         this.mapTilesToFlowers(data.flowers, this.tileToFlowerMap);
         this.mapTilesToRivers(data.rivers, this.tileToRiverMap);
@@ -127,5 +132,9 @@ export class GameState implements GameStateData {
 
     getFlowerType(flower: Flower) {
         return this.flowerTypes[flower.type];
+    }
+
+    getNextRandomNumber(min: number, max: number) {
+        return this.randomNumberGenerator.integerInRange(min, max);
     }
 }

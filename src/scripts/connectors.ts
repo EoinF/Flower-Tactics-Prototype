@@ -150,17 +150,23 @@ export function setupConnectors(
         });
 
     onClickEvolveButton$.pipe(
-        mergeMapTo(stagedSeeds$.pipe(first()))
-    ).subscribe(stagedSeed => {
+        mergeMapTo(stagedSeeds$.pipe(first())),
+        withLatestFrom(gameState$)
+    ).subscribe(([stagedSeed, gameState]) => {
         if (stagedSeed != null) {
-            const result = calculateSeedEvolve(stagedSeed);
+            const result = calculateSeedEvolve(stagedSeed, gameState);
             evolveSeedController.setEvolveStatus(result.outcomeType);
-            
+
             const seedsToDelete = [{
                 type: stagedSeed.type,
                 amount: SEED_INTERVALS[stagedSeed.stagedAmount]
             }];
-            gameStateManager.deleteSeeds(seedsToDelete);
+
+            if (result.outcomeType != 'FAILURE' && result.newFlower != null) {
+                gameStateManager.applyEvolveResult(seedsToDelete, result.newFlower);
+            } else {
+                gameStateManager.deleteSeeds(seedsToDelete);
+            }
         }
     })
 }

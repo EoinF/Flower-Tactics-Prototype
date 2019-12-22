@@ -15,6 +15,7 @@ export interface ObjectData {
     rivers: River[];
     flowerTypes: StringMap<FlowerType>;
     seedStatus: StringMap<SeedStatusDelta>;
+    randomNumberGeneratorSeed: string;
 }
 
 export class MapLoader {

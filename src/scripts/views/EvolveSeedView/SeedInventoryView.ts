@@ -127,9 +127,11 @@ export class SeedInventoryView extends BaseUIObject {
         let isAnyStaged = false;
         const seedInventoryItems = Object.keys(state.seedStatus).map(type => {
             let amountPlaced = 0;
-            delta.placedSeeds[type].forEach((amount) => {
-                amountPlaced += amount
-            });
+            if (type in delta.placedSeeds) {
+                delta.placedSeeds[type].forEach((amount) => {
+                    amountPlaced += amount
+                });
+            }
             let amountStagedIndex = 0;
             if (stagedSeed != null && type === stagedSeed.type) {
                 isAnyStaged = true;
