@@ -39,13 +39,8 @@ export class EvolveControlsView extends BaseUIObject {
         this.container.addChild(evolveButton, "Bottom", "Left");
         this.container.addChild(evolveStatusLabel, "Bottom");
 
-        evolveSeedController.stagedSeedsObservable().subscribe((stagedSeeds) => {
-            const amountStaged = Object.keys(stagedSeeds)
-                .map(key => stagedSeeds[key])
-                .reduce((previous, current) => {
-                    return previous + current;
-                }, 0);
-            evolveButton.setVisible(amountStaged > 0);
+        evolveSeedController.stagedSeedsObservable().subscribe((stagedSeed) => {
+            evolveButton.setVisible(stagedSeed != null);
         });
 
         evolveSeedController.evolveStatusObservable().pipe(
@@ -60,11 +55,9 @@ export class EvolveControlsView extends BaseUIObject {
 
         combineLatest(gameStateManager.nextStateObservable(), evolveSeedController.stagedSeedsObservable())
             .pipe(
-                filter(([gameState, stagedSeeds]) => {
-                    return Object.keys(stagedSeeds).some(key => {
-                        const stagedSeedsIndex = stagedSeeds[key];
-                        return gameState.seedStatus[key].quantity < SEED_INTERVALS[stagedSeedsIndex]
-                    });
+                filter(([gameState, stagedSeed]) => {
+                    return stagedSeed != null &&
+                        gameState.seedStatus[stagedSeed.type].quantity < SEED_INTERVALS[stagedSeed.stagedAmount]
                 })
             )
             .subscribe(() => {

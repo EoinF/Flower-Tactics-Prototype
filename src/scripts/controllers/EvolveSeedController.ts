@@ -2,60 +2,66 @@ import { Subject, BehaviorSubject, Observable } from "rxjs";
 import { StringMap } from "../types";
 import { EvolutionOutcome } from "../deltaCalculators/calculateSeedEvolve";
 
-export type StagedSeeds = StringMap<number>;
+export interface StagedSeed {
+    type: string;
+    stagedAmount: number;
+}
 
 export type EvolveStatus = EvolutionOutcome | 'INSUFFICIENT_SEEDS';
 
 export class EvolveSeedController {
-    private stagedSeeds$: BehaviorSubject<StagedSeeds>;
+    private stagedSeed$: BehaviorSubject<StagedSeed | null>;
     private selectedFlowerType$: Subject<string>;
     private evolveStatus$: Subject<EvolveStatus>;
     
     constructor() {
-        this.stagedSeeds$ = new BehaviorSubject({});
+        this.stagedSeed$ = new BehaviorSubject<StagedSeed | null>(null);
         this.selectedFlowerType$ = new Subject();
         this.evolveStatus$ = new Subject();
     }
+
     setSelectedFlowerType(type: string) {
         this.selectedFlowerType$.next(type);
     }
 
     stageSeedForEvolution(type: string) {
-        const stagedSeeds = this.stagedSeeds$.value;
-        const existingAmount = (type in stagedSeeds) ? stagedSeeds[type] : 0
-        
-        this.stagedSeeds$.next({
-            ...stagedSeeds,
-            [type]: existingAmount + 1
+        const stagedSeed = this.stagedSeed$.value;
+        let existingAmount = 0;
+        if (stagedSeed != null) {
+            existingAmount = stagedSeed.stagedAmount;
+        }
+        this.stagedSeed$.next({
+            type,
+            stagedAmount: existingAmount + 1
         });
     }
 
-    unstageSeedForEvolution(type: string) {
-        const stagedSeeds = this.stagedSeeds$.value;
+    unstageSeedForEvolution() {
+        const stagedSeed = this.stagedSeed$.value;
         
-        const newAmount = stagedSeeds[type] - 1;
-        if (newAmount > 0) {
-            this.stagedSeeds$.next({
-                ...stagedSeeds,
-                [type]: newAmount
-            })
-        } else {
-            const newStagedSeeds = JSON.parse(JSON.stringify(stagedSeeds));
-            delete newStagedSeeds[type];
-            this.stagedSeeds$.next(newStagedSeeds);
+        if (stagedSeed != null) {
+            const newAmount = stagedSeed.stagedAmount - 1;
+            if (newAmount > 0) {
+                this.stagedSeed$.next({
+                    type: stagedSeed.type,
+                    stagedAmount: newAmount
+                })
+            } else {
+                this.stagedSeed$.next(null);
+            }
         }
     }
 
     unstageAllSeeds() {
-        this.stagedSeeds$.next({});
+        this.stagedSeed$.next(null);
     }
 
     setEvolveStatus(evolveStatus: EvolveStatus) {
         this.evolveStatus$.next(evolveStatus);
     }
 
-    stagedSeedsObservable(): Observable<StagedSeeds> {
-        return this.stagedSeeds$;
+    stagedSeedsObservable(): Observable<StagedSeed | null> {
+        return this.stagedSeed$;
     }
 
     selectedFlowerTypeObservable(): Observable<string> {

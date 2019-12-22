@@ -151,18 +151,16 @@ export function setupConnectors(
 
     onClickEvolveButton$.pipe(
         mergeMapTo(stagedSeeds$.pipe(first()))
-    ).subscribe(stagedSeeds => {
-        const result = calculateSeedEvolve(stagedSeeds);
-        
-        evolveSeedController.setEvolveStatus(result.outcomeType);
-        
-        const seedsToDelete = Object.keys(stagedSeeds).map(type => {
-            const stagedSeedIndex = stagedSeeds[type];
-            return {
-                type,
-                amount: SEED_INTERVALS[stagedSeedIndex]
-            }
-        });
-        gameStateManager.deleteSeeds(seedsToDelete);
+    ).subscribe(stagedSeed => {
+        if (stagedSeed != null) {
+            const result = calculateSeedEvolve(stagedSeed);
+            evolveSeedController.setEvolveStatus(result.outcomeType);
+            
+            const seedsToDelete = [{
+                type: stagedSeed.type,
+                amount: SEED_INTERVALS[stagedSeed.stagedAmount]
+            }];
+            gameStateManager.deleteSeeds(seedsToDelete);
+        }
     })
 }

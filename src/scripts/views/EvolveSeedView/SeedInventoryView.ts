@@ -6,7 +6,7 @@ import { GameStateDelta, GameStateManager } from "../../controllers/GameStateMan
 import { BaseUIObject } from "../../widgets/generic/UIObject";
 import { SeedInventoryTile } from "../../widgets/specific/SeedInventoryTile";
 import { combineLatest } from "rxjs";
-import { EvolveSeedController, StagedSeeds } from "../../controllers/EvolveSeedController";
+import { EvolveSeedController, StagedSeed } from "../../controllers/EvolveSeedController";
 import { filter, pairwise, map, startWith, tap, first, mergeMapTo } from "rxjs/operators";
 import { StringMap } from "../../types";
 import { RadioButtonGroup } from "../../widgets/generic/RadioButtonGroup";
@@ -94,7 +94,7 @@ export class SeedInventoryView extends BaseUIObject {
         })
 
         evolveSeedController.stagedSeedsObservable().pipe(
-            map(stagedSeeds => Object.keys(stagedSeeds).length > 0)
+            map(stagedSeed => stagedSeed != null)
         ).subscribe((isAnyStaged) => {
             this.radioGroup.setIsActive(!isAnyStaged);
         });
@@ -114,7 +114,7 @@ export class SeedInventoryView extends BaseUIObject {
                     evolveSeedController.stageSeedForEvolution(item.type);
                 })
                 .onRemoveSeed(() => {
-                    evolveSeedController.unstageSeedForEvolution(item.type);
+                    evolveSeedController.unstageSeedForEvolution();
                 })
                 .setData("type", item.type);
             this.seedSelectionGrid.addChild(cell);
@@ -123,16 +123,17 @@ export class SeedInventoryView extends BaseUIObject {
         this.radioGroup.setButtons(this.seedSelectionGrid.children as Array<BaseButton>);
     }
 
-    simplifySeedStates(state: GameState, delta: GameStateDelta, stagedSeeds: StagedSeeds) {
+    simplifySeedStates(state: GameState, delta: GameStateDelta, stagedSeed: StagedSeed | null) {
         let isAnyStaged = false;
         const seedInventoryItems = Object.keys(state.seedStatus).map(type => {
             let amountPlaced = 0;
             delta.placedSeeds[type].forEach((amount) => {
                 amountPlaced += amount
             });
-            const amountStagedIndex = type in stagedSeeds ? stagedSeeds[type] : 0;
-            if (amountStagedIndex > 0) {
+            let amountStagedIndex = 0;
+            if (stagedSeed != null && type === stagedSeed.type) {
                 isAnyStaged = true;
+                amountStagedIndex = stagedSeed.stagedAmount;
             }
 
             const amount = state.seedStatus[type].quantity - amountPlaced - SEED_INTERVALS[amountStagedIndex];
