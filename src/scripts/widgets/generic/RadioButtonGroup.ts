@@ -70,7 +70,7 @@ export class RadioButtonGroup {
         this._setSelected(index);
     }
 
-    _setSelected(index: number) {
+    private _setSelected(index: number) {
         if (this.buttons.length > 0) {
             this.selectedButtonIndex = index;
             const button = this.buttons[index];

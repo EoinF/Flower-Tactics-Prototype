@@ -1,16 +1,16 @@
-import { Subject, BehaviorSubject, Observable, combineLatest, merge } from "rxjs";
-import { mergeAll, mapTo, startWith } from "rxjs/operators";
+import { Subject, Observable, merge, BehaviorSubject, ReplaySubject } from "rxjs";
+import { mapTo, startWith, shareReplay } from "rxjs/operators";
 import { MapLocation } from "./MapController";
 
 export class SelectedObjectController {
     private selectedTile$: Subject<MapLocation>;
     private selectedFlowerType$: Subject<string>;
-    private activeTab$: Subject<number>;
+    private activeTab$: ReplaySubject<number>;
 
     constructor() {
         this.selectedTile$ = new Subject<MapLocation>();
         this.selectedFlowerType$ = new Subject<string>();
-        this.activeTab$ = new BehaviorSubject(0);
+        this.activeTab$ = new ReplaySubject(1);
     }
 
     selectedTileObservable(): Observable<MapLocation | null> {
@@ -32,7 +32,9 @@ export class SelectedObjectController {
     }
 
     activeTabObservable(): Observable<number> {
-        return this.activeTab$;
+        return this.activeTab$.pipe(
+            startWith(0)
+        );
     }
 
     setSelectedTile(x: number, y: number) {

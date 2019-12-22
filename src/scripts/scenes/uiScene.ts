@@ -14,12 +14,12 @@ export default class UIScene extends Phaser.Scene {
     }
     
   create() {
-    //const selectedTileView = new SelectedTileView(this, gameStateManager, selectedObjectController);
+    const selectedTileView = new SelectedTileView(this, gameStateManager, selectedObjectController);
 	new SelectedFlowerTypeView(this, gameStateManager, selectedObjectController);
 	new AlertMessageView(this, guiController);
 
 	const { height } = this.game.canvas;
-	const offsetY = height - 600// - selectedTileView.y;
+	const offsetY = height - selectedTileView.y;
 	const seedView = new SeedContainerView(this, gameStateManager, seedController, flowerSelectionController, offsetY);
 	const flowerSelectionView = new FlowerSelectionView(this, gameStateManager, seedController, flowerSelectionController, offsetY + seedView.height, seedView.width);
 

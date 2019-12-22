@@ -26,10 +26,7 @@ export class FlowerSelectionController {
     }
 
     selectedFlowerIndexObservable(): Observable<number> {
-        return this.selectedFlowerIndex$.pipe(
-            startWith(0),
-            shareReplay(1),
-        );
+        return this.selectedFlowerIndex$;
     }
 
     selectedFlowerTypeObservable(): Observable<string> {

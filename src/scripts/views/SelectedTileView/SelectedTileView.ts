@@ -28,7 +28,7 @@ export class SelectedTileView {
 
     private tabs: SelectedTileTab[];
 
-    constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, SelectedObjectController: SelectedObjectController) {
+    constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, selectedObjectController: SelectedObjectController) {
         this.popup = new UIContainer(scene, 8, 8, 412, 96, "Bottom")
             .setVisible(false)
             .setInteractive()
@@ -40,7 +40,7 @@ export class SelectedTileView {
         this.y = this.popup.y;
         this.width = this.popup.width;
         this.height = this.popup.height;
-        
+
         this.npkTabButton = new ImageButton(scene, 2, 2, 'button-npk')
             .setBackground(COLOURS.PURPLE_200, COLOURS.PURPLE_400, COLOURS.WHITE, COLOURS.PURPLE_500)
             .setBorder(1, COLOURS.GRAY);
@@ -50,9 +50,10 @@ export class SelectedTileView {
 
         const tabGroup = new RadioButtonGroup([this.npkTabButton, this.flowerTabButton])
             .onChange((_, index) => {
-                SelectedObjectController.setActiveTabIndex(index);
-            });
-        
+                selectedObjectController.setActiveTabIndex(index);
+            })
+            .setSelected(0);
+
         const flowerTab = new FlowerTab(scene, this.x, this.y);
         const soilTab = new SoilTab(scene, this.x, this.y);
         this.tabs = [soilTab, flowerTab];
@@ -61,8 +62,8 @@ export class SelectedTileView {
         this.popup.addChild(this.flowerTabButton, "Top", "Right");
 
         combineLatest(gameStateManager.nextStateObservable(),
-            SelectedObjectController.selectedTileObservable(),
-            SelectedObjectController.activeTabObservable()
+            selectedObjectController.selectedTileObservable(),
+            selectedObjectController.activeTabObservable()
         ).subscribe(([newState, activeTile, activeTab]) => {
             this.tabs.forEach(tab => tab.hide());
             if (activeTile != null) {
