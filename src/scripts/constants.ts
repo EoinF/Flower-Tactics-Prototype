@@ -46,10 +46,11 @@ export const COLOURS = {
 
 export const SEED_INTERVALS =               [0, 5,  10, 20, 30, 50, 100,    200]; // Number of seeds
 
-export const SUCCESS_INTERVALS =            [0, 50, 70, 80, 85, 90, 95,     100]; // % chance
-export const SUCCESS_PLUS_INTERVALS =       [0, 0,  10, 20, 30, 40, 50,      80]; // % chance
-export const SUCCESS_PLUS_PLUS_INTERVALS =  [0, 0,   0,  0, 10, 30, 40,      60]; // % chance
+export const SUCCESS_INTERVALS =            [0, 50, 70, 80, 40, 0,  0,      0];  // % chance
+export const SUCCESS_PLUS_INTERVALS =       [0, 0,  10, 30, 65, 80, 30,     0];  // % chance
+export const SUCCESS_PLUS_2_INTERVALS =     [0, 0,   0,  0, 10, 50, 70,     90]; // % chance
+export const SUCCESS_PLUS_3_INTERVALS =     [0, 0,   0,  0, 0,  10, 30,     40]; // % chance
 
-export const SUCCESS_MAP = new Map(SEED_INTERVALS.map((seed, index) => [seed, SUCCESS_INTERVALS[index]]));
-export const SUCCESS_PLUS_MAP = new Map(SEED_INTERVALS.map((seed, index) => [seed, SUCCESS_PLUS_INTERVALS[index]]));
-export const SUCCESS_PLUS_PLUS_MAP = new Map(SEED_INTERVALS.map((seed, index) => [seed, SUCCESS_PLUS_PLUS_INTERVALS[index]]));
+// export const SUCCESS_PLUS_MAP = new Map(SEED_INTERVALS.map((seed, index) => [seed, SUCCESS_PLUS_INTERVALS[index]]));
+// export const SUCCESS_PLUS_2_MAP = new Map(SEED_INTERVALS.map((seed, index) => [seed, SUCCESS_PLUS_2_INTERVALS[index]]));
+// export const SUCCESS_PLUS_3_MAP = new Map(SEED_INTERVALS.map((seed, index) => [seed, SUCCESS_PLUS_3_INTERVALS[index]]));

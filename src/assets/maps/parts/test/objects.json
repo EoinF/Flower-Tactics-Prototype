@@ -1,4 +1,5 @@
 {
+    "randomNumberGeneratorSeed": "123",
     "seedStatus": {
         "1": {
             "type": "1",
