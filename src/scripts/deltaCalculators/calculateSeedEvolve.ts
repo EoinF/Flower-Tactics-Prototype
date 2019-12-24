@@ -3,7 +3,6 @@ import { SUCCESS_INTERVALS, SUCCESS_PLUS_INTERVALS, SUCCESS_PLUS_2_INTERVALS, SU
 import { FlowerType } from "../objects/FlowerType";
 import { GameState } from "../objects/GameState";
 import { NumberRange } from "../types";
-import { gameStateManager } from "../game";
 
 export type EvolutionOutcome = 'SUCCESS' | 'FAILURE' | 'SUCCESS+' | 'SUCCESS++' | 'SUCCESS+++';
 
@@ -20,7 +19,6 @@ export function calculateSeedEvolve(stagedSeed: StagedSeed, gameState: GameState
 
     newFlower.name += '+';
     newFlower.type = nextType;
-
     if (gameState.getNextRandomNumber(1, 100) <= SUCCESS_PLUS_3_INTERVALS[stagedSeed.stagedAmount]) {
         outcomeType = 'SUCCESS+++';
         applyImprovements(newFlower, gameState, 30);

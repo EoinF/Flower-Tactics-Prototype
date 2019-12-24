@@ -71,5 +71,4 @@ export class EvolveSeedController {
     evolveStatusObservable(): Observable<EvolveStatus> {
         return this.evolveStatus$;
     }
-    
 }

@@ -72,6 +72,15 @@ export class GameStateManager {
         return seedStatusDelta;
     }
 
+    private getCopiedState(): GameStateData {
+        const currentState = this.nextState$.value;
+        const nextRandomNumberSeed = currentState!.getRandomNumberSeed();
+        const copiedData = JSON.parse(JSON.stringify(currentState)) as GameStateData;
+        return {
+            ...copiedData, randomNumberGeneratorSeed: nextRandomNumberSeed
+        };
+    }
+
     private getBlankDelta(): GameStateDelta {
         return {
             flowerDelta: this.nextState$.value!.flowers.map(_ => ({growth: 0})),
@@ -94,7 +103,7 @@ export class GameStateManager {
     }
 
     nextState() {
-        const copiedData = JSON.parse(JSON.stringify(this.nextState$.value)) as GameStateData;
+        const copiedData = this.getCopiedState();
 
         const {
             tileSoilDelta,
@@ -182,9 +191,10 @@ export class GameStateManager {
 
     applyEvolveResult(seeds: Array<{type: string, amount: number}>, newFlower: FlowerType) {
         const updatedDelta = this.nextDelta$.value!;
-        const updatedState = JSON.parse(JSON.stringify(this.nextState$.value)) as GameStateData;
-        updatedState.flowerTypes[newFlower.type] = newFlower;
-        updatedState.seedStatus[newFlower.type] = {
+        
+        const copiedData = this.getCopiedState();
+        copiedData.flowerTypes[newFlower.type] = newFlower;
+        copiedData.seedStatus[newFlower.type] = {
             type: newFlower.type,
             quantity: 1,
             progress: 0
@@ -196,9 +206,9 @@ export class GameStateManager {
             progress: 0
         }
         seeds.forEach((seed) => {
-            updatedState.seedStatus[seed.type].quantity -= seed.amount;
+            copiedData.seedStatus[seed.type].quantity -= seed.amount;
         });
-        this.nextState$.next(new GameState(updatedState));
+        this.nextState$.next(new GameState(copiedData));
         this.nextDelta$.next(updatedDelta);
     }
 

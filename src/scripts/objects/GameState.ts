@@ -137,4 +137,8 @@ export class GameState implements GameStateData {
     getNextRandomNumber(min: number, max: number) {
         return this.randomNumberGenerator.integerInRange(min, max);
     }
+
+    getRandomNumberSeed() {
+        return this.randomNumberGenerator.state();
+    }
 }
