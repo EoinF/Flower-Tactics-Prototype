@@ -62,7 +62,9 @@ export class FlexUIContainer extends UIContainer {
         child.setPosition(ax + this.x + oldWidth, ay + this.y + oldHeight);
         child.setAlpha(this.alpha);
         child.setDepth(this.depth + 1);
-        child.setVisible(this.visible && child.visible);
+        if (!this.visible) {
+            child.setVisible(false);
+        }
         return this;
     }
 

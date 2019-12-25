@@ -20,7 +20,7 @@ export class EvolveChanceView implements UIObject {
 
     protected container: FlexUIContainer;
 
-    constructor(scene: Phaser.Scene, 
+    constructor(scene: Phaser.Scene,
         x: number, y: number,
         width: number, evolveSeedController: EvolveSeedController) {
         
@@ -54,13 +54,13 @@ export class EvolveChanceView implements UIObject {
                 if (SUCCESS_PLUS_INTERVALS[stagedAmount] > 0) {
                     labels[index].setText(`Success+ chance = ${SUCCESS_PLUS_INTERVALS[stagedAmount]}%`)
                         .setVisible(true)
-                        .setColor(COLOURS.YELLOW);
+                        .setColor(COLOURS.LIGHT_GREEN);
                     index++;
                 }
                 if (SUCCESS_PLUS_2_INTERVALS[stagedAmount] > 0) {
                     labels[index].setText(`Success++ chance = ${SUCCESS_PLUS_2_INTERVALS[stagedAmount]}%`)
                         .setVisible(true)
-                        .setColor(COLOURS.LIGHT_GREEN);
+                        .setColor(COLOURS.YELLOW);
                     index++;
                 }
                 if (SUCCESS_PLUS_3_INTERVALS[stagedAmount] > 0) {

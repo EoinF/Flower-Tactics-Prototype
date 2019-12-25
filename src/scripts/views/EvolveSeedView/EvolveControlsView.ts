@@ -5,9 +5,11 @@ import { GameStateManager } from "../../controllers/GameStateManager";
 import { TextButton } from "../../widgets/generic/TextButton";
 import { GuiController } from "../../controllers/GuiController";
 import { TextLabel } from "../../widgets/generic/TextLabel";
-import { tap, debounceTime, filter } from "rxjs/operators";
+import { tap, debounceTime, filter, withLatestFrom } from "rxjs/operators";
 import { combineLatest } from "rxjs";
 import { EvolveChanceView } from "./EvolveChanceView";
+import { FlexUIContainer } from "../../widgets/generic/FlexUIContainer";
+import { UIContainer } from "../../widgets/generic/UIContainer";
 
 export class EvolveControlsView extends BaseUIObject {
     constructor(scene: Phaser.Scene, x: number, y: number,
@@ -36,19 +38,39 @@ export class EvolveControlsView extends BaseUIObject {
         const evolveStatusLabel = new TextLabel(scene, 16 + evolveButton.width, 8, "", COLOURS.BLACK, {isBold: true, fontSize: 18})
             .setVisible(false);
 
-        const title = new TextLabel(scene, 0, 8, "Seed Evolution", COLOURS.BLACK, { isBold: true, fontSize: 18 });
+        const evolveDescriptionContainer = new FlexUIContainer(scene, 0, 8, this.container.width, "grow");
         
-        this.container.addChild(title, "Top", "Middle");
+        const title = new TextLabel(scene, 0, 8, "Seed Evolution", COLOURS.BLACK, { isBold: true, fontSize: 18 });
+        const numberOfSeedsLabel = new TextLabel(scene, 0, 0, "999 seeds");
+        const nameOfSeedsLabel = new TextLabel(scene, 16, 0, "-", COLOURS.BLACK, {isBold: true});
+        const stagedSeedsLabelsContainer = new FlexUIContainer(scene, 24, 8, "grow", nameOfSeedsLabel.height);
 
-        const evolveChanceView = new EvolveChanceView(scene, 16, title.height + 24, this.container.width - 32, evolveSeedController);
+        stagedSeedsLabelsContainer.addChild(numberOfSeedsLabel);
+        stagedSeedsLabelsContainer.addChild(nameOfSeedsLabel);
 
-        this.container.addChild(evolveChanceView);
+        const evolveChanceView = new EvolveChanceView(scene, 16, 16, this.container.width - 32, evolveSeedController);
+
+        evolveDescriptionContainer.addChild(title, "Top", "Middle");
+        evolveDescriptionContainer.addChild(stagedSeedsLabelsContainer);
+        evolveDescriptionContainer.addChild(evolveChanceView);
+
+        this.container.addChild(evolveDescriptionContainer);
         this.container.addChild(closeButton, "Bottom", "Right");
         this.container.addChild(evolveButton, "Bottom", "Left");
         this.container.addChild(evolveStatusLabel, "Bottom");
 
-        evolveSeedController.stagedSeedsObservable().subscribe((stagedSeed) => {
+        evolveSeedController.stagedSeedsObservable().pipe(
+            withLatestFrom(gameStateManager.nextStateObservable())
+        ).subscribe(([stagedSeed, gameState]) => {
             evolveButton.setVisible(stagedSeed != null);
+            let name = "-";
+            let amount = 0;
+            if (stagedSeed != null) {
+                amount = SEED_INTERVALS[stagedSeed.stagedAmount];
+                name = gameState.flowerTypes[stagedSeed.type].name;
+            }
+            numberOfSeedsLabel.setText(`${amount} seeds`);
+            nameOfSeedsLabel.setText(`${name}`);
         });
 
         evolveSeedController.evolveStatusObservable().pipe(
