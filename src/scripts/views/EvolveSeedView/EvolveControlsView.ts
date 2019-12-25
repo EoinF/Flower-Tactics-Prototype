@@ -7,6 +7,7 @@ import { GuiController } from "../../controllers/GuiController";
 import { TextLabel } from "../../widgets/generic/TextLabel";
 import { tap, debounceTime, filter } from "rxjs/operators";
 import { combineLatest } from "rxjs";
+import { EvolveChanceView } from "./EvolveChanceView";
 
 export class EvolveControlsView extends BaseUIObject {
     constructor(scene: Phaser.Scene, x: number, y: number,
@@ -35,6 +36,13 @@ export class EvolveControlsView extends BaseUIObject {
         const evolveStatusLabel = new TextLabel(scene, 16 + evolveButton.width, 8, "", COLOURS.BLACK, {isBold: true, fontSize: 18})
             .setVisible(false);
 
+        const title = new TextLabel(scene, 0, 8, "Seed Evolution", COLOURS.BLACK, { isBold: true, fontSize: 18 });
+        
+        this.container.addChild(title, "Top", "Middle");
+
+        const evolveChanceView = new EvolveChanceView(scene, 16, title.height + 24, this.container.width - 32, evolveSeedController);
+
+        this.container.addChild(evolveChanceView);
         this.container.addChild(closeButton, "Bottom", "Right");
         this.container.addChild(evolveButton, "Bottom", "Left");
         this.container.addChild(evolveStatusLabel, "Bottom");

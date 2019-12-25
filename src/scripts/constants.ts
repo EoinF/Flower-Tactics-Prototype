@@ -31,6 +31,7 @@ export const COLOURS = {
     TURQUOISE: new Phaser.Display.Color(75, 231, 163),
 
     GREEN: new Phaser.Display.Color(50, 200, 50),
+    LIGHT_GREEN: new Phaser.Display.Color(50, 255, 50),
     RED: new Phaser.Display.Color(255, 0, 0),
     LIGHT_RED: new Phaser.Display.Color(255, 50, 50),
 
@@ -48,8 +49,8 @@ export const SEED_INTERVALS =               [0, 5,  10, 20, 30, 50, 100,    200]
 
 export const SUCCESS_INTERVALS =            [0, 50, 70, 80, 40, 0,  0,      0];  // % chance
 export const SUCCESS_PLUS_INTERVALS =       [0, 0,  10, 30, 65, 80, 30,     0];  // % chance
-export const SUCCESS_PLUS_2_INTERVALS =     [0, 0,   0,  0, 10, 50, 70,     90]; // % chance
-export const SUCCESS_PLUS_3_INTERVALS =     [0, 0,   0,  0, 0,  10, 30,     40]; // % chance
+export const SUCCESS_PLUS_2_INTERVALS =     [0, 0,   0,  0, 10, 50, 70,     80]; // % chance
+export const SUCCESS_PLUS_3_INTERVALS =     [0, 0,   0,  0, 0,   0, 30,     60]; // % chance
 
 // export const SUCCESS_PLUS_MAP = new Map(SEED_INTERVALS.map((seed, index) => [seed, SUCCESS_PLUS_INTERVALS[index]]));
 // export const SUCCESS_PLUS_2_MAP = new Map(SEED_INTERVALS.map((seed, index) => [seed, SUCCESS_PLUS_2_INTERVALS[index]]));
