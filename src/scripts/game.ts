@@ -48,4 +48,12 @@ export const mapController = new MapController();
 export const seedController = new SeedController();
 export const flowerSelectionController = new FlowerSelectionController();
 export const evolveSeedController = new EvolveSeedController();
-setupConnectors(guiController, gameStateManager, seedController, mapController, flowerSelectionController);
+setupConnectors(
+  guiController,
+  gameStateManager,
+  seedController,
+  mapController,
+  flowerSelectionController,
+  selectedObjectController,
+  evolveSeedController
+);

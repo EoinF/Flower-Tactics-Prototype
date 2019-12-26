@@ -10,6 +10,8 @@ export default class EvolveSeedScene extends Phaser.Scene {
     create() {
         this.scene.setVisible(false);
         new EvolveSeedView(this, guiController, gameStateManager, evolveSeedController);
+
+        evolveSeedController.setFlowerNames((this.cache.text.get('flower-names') as string).split('\n'));
         
         combineLatest(guiController.messagePromptObservable(), guiController.screenStateObservable())
             .subscribe(([messagePrompt, screenState]) => {

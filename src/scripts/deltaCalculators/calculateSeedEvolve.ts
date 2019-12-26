@@ -11,13 +11,13 @@ export interface EvolutionResult {
     newFlower: FlowerType | null;
 }
 
-export function calculateSeedEvolve(stagedSeed: StagedSeed, gameState: GameState): EvolutionResult {
+export function calculateSeedEvolve(stagedSeed: StagedSeed, gameState: GameState, nextName: string): EvolutionResult {
     const newFlower = JSON.parse(JSON.stringify(gameState.flowerTypes[stagedSeed.type])) as FlowerType;
     const existingTypes = Object.keys(gameState.flowerTypes).map(type => parseInt(type));
     const nextType = (Math.max(...existingTypes) + 1).toString();
     let outcomeType: EvolutionOutcome = 'FAILURE';
 
-    newFlower.name += '+';
+    newFlower.name = nextName;
     newFlower.type = nextType;
     if (gameState.getNextRandomNumber(1, 100) <= SUCCESS_PLUS_3_INTERVALS[stagedSeed.stagedAmount]) {
         outcomeType = 'SUCCESS+++';

@@ -1,13 +1,14 @@
-import { withLatestFrom, map, filter, flatMap, tap, shareReplay, mergeScan, startWith, first, mergeMapTo } from 'rxjs/operators';
-import { combineLatest, merge, of, zip } from 'rxjs';
+import { withLatestFrom, map, filter, flatMap, first, mergeMapTo, takeWhile, take, repeatWhen, repeat, tap, mergeMap, switchMapTo, publish, share } from 'rxjs/operators';
+import { combineLatest, merge, Observable, zip, of } from 'rxjs';
 import { GuiController } from './controllers/GuiController';
 import { GameStateManager } from './controllers/GameStateManager';
 import { SeedController } from './controllers/SeedController';
 import { MapController } from './controllers/MapController';
 import { FlowerSelectionController } from './controllers/FlowerSelectionController';
-import { selectedObjectController, evolveSeedController } from './game';
 import { calculateSeedEvolve } from './deltaCalculators/calculateSeedEvolve';
 import { SEED_INTERVALS } from './constants';
+import { SelectedObjectController } from './controllers/SelectedObjectController';
+import { EvolveSeedController } from './controllers/EvolveSeedController';
 
 interface TileLocation {
     tileX: number,
@@ -29,7 +30,9 @@ export function setupConnectors(
     gameStateManager: GameStateManager, 
     seedController: SeedController, 
     mapController: MapController,
-    flowerSelectionController: FlowerSelectionController
+    flowerSelectionController: FlowerSelectionController,
+    selectedObjectController: SelectedObjectController, 
+    evolveSeedController: EvolveSeedController
 ) {
     const onClickInfoButton$ = guiController.onClickInfoButtonObservable();
     const onClickEvolveButton$ = guiController.onClickEvolveButtonObservable();
@@ -51,6 +54,7 @@ export function setupConnectors(
 
     const stagedSeeds$ = evolveSeedController.stagedSeedsObservable();
     const evolveSeed_selectedFlowerType$ = evolveSeedController.selectedFlowerTypeObservable();
+    const flowerNames$ = evolveSeedController.flowerNamesObservable();
 
     const flowerTypeOnClickingInfoButton$ = onClickInfoButton$.pipe(
         flatMap(() => flowerSelection_selectedFlowerType$),
@@ -150,11 +154,14 @@ export function setupConnectors(
         });
 
     onClickEvolveButton$.pipe(
-        mergeMapTo(stagedSeeds$.pipe(first())),
-        withLatestFrom(gameState$)
-    ).subscribe(([stagedSeed, gameState]) => {
+        withLatestFrom(gameState$, flowerNames$),
+        map(([_, gameState, flowerNames]) => {
+            return flowerNames[gameState.getNextRandomNumber(0, flowerNames.length - 1)];
+        }),
+        withLatestFrom(gameState$, stagedSeeds$)
+    ).subscribe(([newFlowerName, gameState, stagedSeed]) => {
         if (stagedSeed != null) {
-            const result = calculateSeedEvolve(stagedSeed, gameState);
+            const result = calculateSeedEvolve(stagedSeed, gameState, newFlowerName);
             evolveSeedController.setEvolveStatus(result.outcomeType);
 
             const seedsToDelete = [{

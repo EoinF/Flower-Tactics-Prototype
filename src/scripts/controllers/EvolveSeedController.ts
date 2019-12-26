@@ -13,11 +13,17 @@ export class EvolveSeedController {
     private stagedSeed$: BehaviorSubject<StagedSeed | null>;
     private selectedFlowerType$: Subject<string>;
     private evolveStatus$: Subject<EvolveStatus>;
+    private flowerNames$: Subject<string[]>;
     
     constructor() {
+        this.flowerNames$ = new Subject();
         this.stagedSeed$ = new BehaviorSubject<StagedSeed | null>(null);
         this.selectedFlowerType$ = new Subject();
         this.evolveStatus$ = new Subject();
+    }
+
+    setFlowerNames(names: string[]) {
+        this.flowerNames$.next(names);
     }
 
     setSelectedFlowerType(type: string) {
@@ -70,5 +76,9 @@ export class EvolveSeedController {
 
     evolveStatusObservable(): Observable<EvolveStatus> {
         return this.evolveStatus$;
+    }
+
+    flowerNamesObservable(): Observable<string[]> {
+        return this.flowerNames$;
     }
 }
