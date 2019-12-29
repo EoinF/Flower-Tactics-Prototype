@@ -72,38 +72,42 @@ function applyImprovements(newFlower: FlowerType, gameState: GameState, improvem
             }
         })
         let roll = gameState.getNextRandomNumber(0, improvementChancesArray.length - 1);
-        switch(improvementChancesArray[roll]) {
-            case 'growth':
-                newFlower.turnsUntilGrown--;
-                break;
-            case 'seed production':
-                newFlower.seedProductionRate++;
-                break;
-            case 'soil consumption':
-                newFlower.soilConsumptionRate--;
-                break;
-            case 'requirements':
-                roll = gameState.getNextRandomNumber(1, 3);
-                if (roll === 1) {
-                    newFlower.nitrogenRequirements = improveRequirements(newFlower.nitrogenRequirements, gameState);
-                } else if (roll === 2) {
-                    newFlower.potassiumRequirements = improveRequirements(newFlower.potassiumRequirements, gameState);
-                } else {
-                    newFlower.phosphorousRequirements = improveRequirements(newFlower.phosphorousRequirements, gameState);
-                }
-                break;
-        }
+        applyImprovementDelta(newFlower, improvementChancesArray[roll], gameState, 1);
         improvementPoints -= improvementCosts[improvementChancesArray[roll]];
     }
 }
 
-function improveRequirements(existingRequirements: NumberRange, gameState: GameState) {
-    const random = gameState.getNextRandomNumber(0, 2) - 1;
-    const variance = random === 0 ? -15 : +15
+function applyImprovementDelta(newFlower: FlowerType, improvementType: string, gameState: GameState, delta: number) {
+    switch(improvementType) {
+        case 'growth':
+            newFlower.turnsUntilGrown -= delta;
+            break;
+        case 'seed production':
+            newFlower.seedProductionRate += delta;
+            break;
+        case 'soil consumption':
+            newFlower.soilConsumptionRate -= delta;
+            break;
+        case 'requirements':
+            const roll = gameState.getNextRandomNumber(1, 3);
+            if (roll === 1) {
+                newFlower.nitrogenRequirements = improveRequirements(newFlower.nitrogenRequirements, gameState, delta);
+            } else if (roll === 2) {
+                newFlower.potassiumRequirements = improveRequirements(newFlower.potassiumRequirements, gameState, delta);
+            } else {
+                newFlower.phosphorousRequirements = improveRequirements(newFlower.phosphorousRequirements, gameState, delta);
+            }
+            break;
+    }
+}
+
+function improveRequirements(existingRequirements: NumberRange, gameState: GameState, delta: number) {
+    const random = gameState.getNextRandomNumber(0, 1);
+    const variance = random === 0 ? -20 : +20;
 
     const newRequirements = {
-        min: existingRequirements.min - (15 - variance),
-        max: existingRequirements.max + (15 + variance)
+        min: existingRequirements.min + (variance - 10) * delta,
+        max: existingRequirements.max + (10 + variance) * delta
     }
     return newRequirements;
 }
