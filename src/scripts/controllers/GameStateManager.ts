@@ -116,6 +116,7 @@ export class GameStateManager {
     }
 
     nextState() {
+        const gameState = this.nextState$.value!;
         const copiedData = this.getCopiedState();
 
         const {
@@ -124,12 +125,6 @@ export class GameStateManager {
             seedStatusDelta,
             placedSeeds
         } = this.nextDelta$.value!;
-
-        tileSoilDelta.forEach((soilDelta, index) => {
-            copiedData.tiles[index].soil.nitrogenContent += soilDelta.nitrogen;
-            copiedData.tiles[index].soil.phosphorousContent += soilDelta.phosphorous;
-            copiedData.tiles[index].soil.potassiumContent += soilDelta.potassium;
-        });
 
         let flowersToRemove: Flower[] = [];
         copiedData.flowers.forEach((copiedFlower) => {
@@ -143,10 +138,27 @@ export class GameStateManager {
                 } = copiedData.flowerTypes[copiedFlower.type];
                 const growthNeeded = turnsUntilGrown - copiedFlower.growth;
                 let survivalChance = tenacity - growthNeeded * 5;
-                if (this.nextState$.value!.getNextRandomNumber(0, 99) >= survivalChance) {
+                if (gameState.getNextRandomNumber(0, 99) >= survivalChance) {
                     flowersToRemove.push(copiedFlower);
                 }
             }
+        });
+        
+        flowersToRemove.forEach((flower) => {
+            const tile = gameState.getTileAt(flower.x, flower.y)!;
+            const {
+                soilConsumptionRate
+            } = gameState.flowerTypes[flower.type];
+            const returnedNutrients = soilConsumptionRate * flower.growth;
+            tileSoilDelta[tile.index].nitrogen += returnedNutrients;
+            tileSoilDelta[tile.index].phosphorous += returnedNutrients;
+            tileSoilDelta[tile.index].potassium += returnedNutrients;
+        });
+
+        tileSoilDelta.forEach((soilDelta, index) => {
+            copiedData.tiles[index].soil.nitrogenContent += soilDelta.nitrogen;
+            copiedData.tiles[index].soil.phosphorousContent += soilDelta.phosphorous;
+            copiedData.tiles[index].soil.potassiumContent += soilDelta.potassium;
         });
         
         Object.keys(placedSeeds).forEach(type => {
@@ -157,8 +169,7 @@ export class GameStateManager {
                         x: tileIndex % this.nextState$.value!.numTilesX,
                         y: Math.floor(tileIndex / this.nextState$.value!.numTilesX),
                         type,
-                        growth: 0,
-                        mode: 'Grow'
+                        growth: 0
                     })
                 }
             })

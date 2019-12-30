@@ -6,5 +6,4 @@ export interface Flower {
     y: number;
     type: string;
     growth: number;
-    mode: FlowerMode;
 };
