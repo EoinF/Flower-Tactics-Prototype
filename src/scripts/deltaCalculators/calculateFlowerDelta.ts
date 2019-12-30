@@ -4,6 +4,7 @@ import { StringMap } from "../types";
 import { FlowerType } from "../objects/FlowerType";
 import { SoilDelta, FlowerDelta, SeedStatusDelta, GameStateDelta } from "../controllers/GameStateManager";
 import { GameState } from "../objects/GameState";
+import { isRequirementsSatisfied } from "./helpers";
 
 export function calculateFlowerEffects(gameState: GameState, gameStateDelta: GameStateDelta) {
     gameState.tileToFlowerMap.forEach((flower, tile) => {
@@ -13,10 +14,11 @@ export function calculateFlowerEffects(gameState: GameState, gameStateDelta: Gam
         gameStateDelta.tileSoilDelta[tile.index].potassium += deltas.soilDelta.potassium;
 
         deltas.flowerDeltaMap.forEach((flowerDelta, flowerIndex) => {
-            const existingDelta = gameStateDelta.flowerDelta[flowerIndex];
-            gameStateDelta.flowerDelta[flowerIndex] = {
-                growth: existingDelta.growth + flowerDelta.growth
-            };
+            const existingDelta = gameStateDelta.flowerDelta.get(flowerIndex)!;
+            gameStateDelta.flowerDelta.set(flowerIndex, {
+                growth: existingDelta.growth + flowerDelta.growth,
+                isNourished: flowerDelta.isNourished
+            });
         });
 
         deltas.seedDelta.forEach((seedDelta, type) => {
@@ -34,28 +36,24 @@ export function getFlowerEffect(tile: Tile, flower: Flower, flowerTypes: StringM
     const {
         turnsUntilGrown,
         soilConsumptionRate,
-        seedProductionRate,
-        nitrogenRequirements,
-        phosphorousRequirements,
-        potassiumRequirements
+        seedProductionRate
     } = flowerTypes[flower.type];
     
     const flowerDeltaMap = new Map<number, FlowerDelta>();
     const seedDelta = new Map<string, SeedStatusDelta>();
     
-    if (nitrogenRequirements.min <= tile.soil.nitrogenContent && tile.soil.nitrogenContent <= nitrogenRequirements.max
-        && phosphorousRequirements.min <= tile.soil.phosphorousContent && tile.soil.phosphorousContent <= phosphorousRequirements.max
-        && potassiumRequirements.min <= tile.soil.potassiumContent && tile.soil.potassiumContent <= potassiumRequirements.max) {
-        
-        if (flower.growth < turnsUntilGrown) {
-            flowerDeltaMap.set(flower.index, { growth: 1 });
-        } else {
+    const isNourished = isRequirementsSatisfied(tile.soil, flowerTypes[flower.type])
+    if (isNourished) {
+        let growth = 1;
+        if (flower.growth >= turnsUntilGrown) {
+            growth = 0;
             seedDelta.set(flower.type, {
                 quantity: 0,
                 progress: seedProductionRate,
                 type: flower.type
             })
         }
+        flowerDeltaMap.set(flower.index, { growth, isNourished });
     }
 
     const totalDelta = soilConsumptionRate;

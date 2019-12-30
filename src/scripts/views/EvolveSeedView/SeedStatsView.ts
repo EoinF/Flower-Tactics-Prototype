@@ -32,6 +32,9 @@ export class SeedStatsView extends BaseUIObject {
 
         const seedProductionRateLabel = new TextLabel(scene, 0, 4, "Seed production: ");
         growingContainer.addChild(seedProductionRateLabel);
+        
+        const tenacityLabel = new TextLabel(scene, 0, 4, "Tenacity: ");
+        growingContainer.addChild(tenacityLabel);
                 
         const flowerStatsDisplay = new FlowerStatsDisplay(scene, 8, 32, 350, 16);
         growingContainer.addChild(flowerStatsDisplay);
@@ -43,13 +46,14 @@ export class SeedStatsView extends BaseUIObject {
             map(([type, gameState]) => gameState.flowerTypes[type])
         ).subscribe(flowerTypeStats => {
             const { 
-                soilConsumptionRate, turnsUntilGrown, seedProductionRate, name
+                soilConsumptionRate, turnsUntilGrown, seedProductionRate, name, tenacity
             } = flowerTypeStats;
 
             this.titleLabel.setText(name);
             soilConsumptionLabel.setText("Soil Consumption: " + soilConsumptionRate);
             turnsUntilGrownLabel.setText("Turns to grow: " + turnsUntilGrown);
             seedProductionRateLabel.setText("Seed production: " + seedProductionRate);
+            tenacityLabel.setText("Tenacity: " + tenacity + "%");
             flowerStatsDisplay.setValues(flowerTypeStats);
         })
     }

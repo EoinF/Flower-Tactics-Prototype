@@ -6,6 +6,7 @@ export interface FlowerType {
     turnsUntilGrown: number;
     soilConsumptionRate: number,
     seedProductionRate: number,
+    tenacity: number;
     
     nitrogenRequirements: NumberRange;
     phosphorousRequirements: NumberRange;

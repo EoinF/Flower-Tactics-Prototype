@@ -24,6 +24,7 @@
             "turnsUntilGrown": 5,
             "soilConsumptionRate": 10,
             "seedProductionRate": 10,
+            "tenacity": 50,
             "nitrogenRequirements": {
                 "min": 1000, "max": 1500
             },
@@ -40,6 +41,7 @@
             "turnsUntilGrown": 5,
             "soilConsumptionRate": 60,
             "seedProductionRate": 34,
+            "tenacity": 50,
             "nitrogenRequirements": {
                 "min": 200, "max": 2500
             },
@@ -56,6 +58,7 @@
             "turnsUntilGrown": 1,
             "soilConsumptionRate": 2,
             "seedProductionRate": 150,
+            "tenacity": 50,
             "nitrogenRequirements": {
                 "min": 200, "max": 2500
             },

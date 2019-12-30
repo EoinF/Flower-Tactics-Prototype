@@ -13,6 +13,7 @@
             "turnsUntilGrown": 2,
             "soilConsumptionRate": 0,
             "seedProductionRate": 35,
+            "tenacity": 0,
             "nitrogenRequirements": {
                 "min": 1800, "max": 2300
             },
