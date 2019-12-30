@@ -1,6 +1,7 @@
 import { Observable, Subject, ReplaySubject, BehaviorSubject } from 'rxjs';
 import { map, withLatestFrom, distinctUntilChanged, publishReplay, shareReplay, tap } from 'rxjs/operators';
 import { MessagePrompt } from '../views/MessageQueueView';
+import { MapLocation } from './MapController';
 
 interface MessagePromptQueue {
     messagePrompts: MessagePrompt[];
@@ -16,6 +17,7 @@ export class GuiController {
     private screenState$: Subject<ScreenState>;
     private alertMessage$: Subject<string>;
     private messagePromptQueue$: BehaviorSubject<MessagePromptQueue>;
+    private mousePosition$: Subject<MapLocation>;
 
     constructor() {
         this.endTurn$ = new ReplaySubject(1);
@@ -27,6 +29,7 @@ export class GuiController {
             messagePrompts: [] as MessagePrompt[],
             index: 0
         });
+        this.mousePosition$ = new Subject();
     }
 
     clickInfoButton() {
@@ -61,6 +64,10 @@ export class GuiController {
             index: this.messagePromptQueue$.value.index + 1});
     }
 
+    setMousePosition(x: number, y: number) {
+        this.mousePosition$.next({x, y});
+    }
+
     onClickInfoButtonObservable(): Observable<void> {
         return this.onClickInfoButton$;
     }
@@ -93,5 +100,9 @@ export class GuiController {
             .pipe(
                 map(({index, messagePrompts}) => index === messagePrompts.length - 1)
             )
+    }
+
+    mousePositionObservable(): Observable<MapLocation> {
+        return this.mousePosition$;
     }
 }

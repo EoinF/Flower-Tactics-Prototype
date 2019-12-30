@@ -31,7 +31,8 @@ export class MapGenerator {
             rivers: this.generateRivers(numTilesX, numTilesY),
             flowerTypes: {},
             seedStatus: {},
-            randomNumberGeneratorSeed: "0"
+            randomNumberGeneratorSeed: "0",
+            cloudLayoutSeed: null
         };
     }
     

@@ -83,7 +83,7 @@ export class SeedContainerView {
             }
 
             if (this.heldSeed != null) {
-                seedController.dragSeed(this.heldSeed.getData("pickedUpSeed").type, pointer.x, pointer.y);
+                seedController.dragSeed(pointer.x, pointer.y);
                 this.heldSeed.setPosition(pointer.x, pointer.y);
             }
         });
@@ -97,7 +97,7 @@ export class SeedContainerView {
                         this.addNewSeed(seedType);
                     }
                 });
-                seedController.dropSeed(seedType, pointer.x, pointer.y);
+                seedController.dropSeed(pointer.x, pointer.y);
                 subscription.unsubscribe();
                 this.heldSeed!.setVisible(false);
                 this.heldSeed!.destroy();

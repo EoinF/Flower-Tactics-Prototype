@@ -7,20 +7,16 @@ export interface MapLocation {
 }
 
 export class MapController {
-    dragSeedOverTile$: Subject<Tile | null>;
-    camera$: Subject<Phaser.Cameras.Scene2D.Camera>;
+    private mouseOverTile$: Subject<Tile | null>;
+    private camera$: Subject<Phaser.Cameras.Scene2D.Camera>;
 
     constructor() {
-        this.dragSeedOverTile$ = new ReplaySubject(1);
+        this.mouseOverTile$ = new Subject();
         this.camera$ = new ReplaySubject(1);
     }
 
-    dragSeedOverTile(tile: Tile | null) {
-        this.dragSeedOverTile$.next(tile);
-    }
-
-    dragSeedOverTileObservable(): Observable<Tile | null> {
-        return this.dragSeedOverTile$;
+    setMouseOverTile(tile: Tile | null) {
+        this.mouseOverTile$.next(tile);
     }
 
     setCamera(camera: Phaser.Cameras.Scene2D.Camera) {
@@ -29,5 +25,9 @@ export class MapController {
 
     cameraObservable(): Observable<Phaser.Cameras.Scene2D.Camera> {
         return this.camera$;
+    }
+
+    mouseOverTileObservable(): Observable<Tile | null> {
+        return this.mouseOverTile$;
     }
 }

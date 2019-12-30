@@ -3,11 +3,12 @@ import { GameStateManager } from "../controllers/GameStateManager";
 import { SelectedObjectController } from "../controllers/SelectedObjectController";
 import { SeedController } from "../controllers/SeedController";
 import { MapController } from "../controllers/MapController";
-import { startWith, pairwise, distinctUntilChanged, withLatestFrom, first, timeout } from "rxjs/operators";
+import { startWith, pairwise, distinctUntilChanged, withLatestFrom, first, timeout, flatMap, filter, map } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
 import { TileWidget } from "../widgets/specific/TileWidget";
 import { indexToMapCoordinates } from "../widgets/utils";
+import { combineLatest } from "rxjs";
 
 export class MapView {
     scene: Phaser.Scene;
@@ -164,8 +165,9 @@ export class MapView {
 				}
 			});
 
-		mapController.dragSeedOverTileObservable()
+		combineLatest(mapController.mouseOverTileObservable(), seedController.pickUpSeedObservable())
 			.pipe(
+				map(([tile, heldObject]) => heldObject === null ? null : tile),
 				distinctUntilChanged(),
 				startWith(null),
 				pairwise()

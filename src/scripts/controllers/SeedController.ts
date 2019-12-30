@@ -2,14 +2,13 @@ import { ReplaySubject, Observable, Subject } from "rxjs";
 import { distinctUntilChanged, startWith } from "rxjs/operators";
 
 interface DragSeed {
-    type: string,
     x: number,
     y: number
 }
 
 type SeedOrigin = 'SEED_ORIGIN_MAP' | 'SEED_ORIGIN_INVENTORY';
 
-type PickedUpSeed = {
+export interface HeldSeed {
     tileIndex: number | null;
     type: string;
     origin: SeedOrigin;
@@ -17,7 +16,7 @@ type PickedUpSeed = {
 
 export class SeedController {
     private resetPickedUpSeed$: Subject<void>;
-    private pickUpSeed$: Subject<PickedUpSeed>;
+    private pickUpSeed$: Subject<HeldSeed>;
     private dragSeed$: Subject<DragSeed | null>;
     private dropSeed$: Subject<DragSeed>;
 
@@ -41,15 +40,15 @@ export class SeedController {
         this.resetPickedUpSeed$.next();
     }
 
-    dragSeed(type: string, x: number, y: number) {
+    dragSeed(x: number, y: number) {
         this.dragSeed$.next({
-            type, x, y
+            x, y
         })
     }
 
-    dropSeed(type: string, x: number, y: number) {
+    dropSeed(x: number, y: number) {
         this.dropSeed$.next({
-            type, x, y
+            x, y
         });
         this.dragSeed$.next(null);
     }
@@ -62,7 +61,7 @@ export class SeedController {
         this.mouseOverSeedContainer$.next(isMouseOver);
     }
     
-    pickUpSeedObservable(): Observable<PickedUpSeed> {
+    pickUpSeedObservable(): Observable<HeldSeed> {
         return this.pickUpSeed$;
     }
 

@@ -6,6 +6,7 @@ import { calculateFlowerEffects } from "../deltaCalculators/calculateFlowerDelta
 import { FlowerType } from "../objects/FlowerType";
 import { map, filter } from "rxjs/operators";
 import { Flower } from "../objects/Flower";
+import { CLOUD_LAYOUT_SEED_MAX } from "../constants";
 
 export interface FlowerDelta {
     growth: number;
@@ -29,15 +30,14 @@ export interface GameStateDelta {
     flowerDelta: Map<number, FlowerDelta>;
     seedStatusDelta: StringMap<SeedStatusDelta>;
     placedSeeds: StringMap<Map<number, number>>;
+    placedCloudTileIndex: number | null;
 }
 
 export class GameStateManager {
-    private seed: number;
     private loadMap$: ReplaySubject<GameState>;
     private nextState$: BehaviorSubject<GameState | null>;
     private nextDelta$: BehaviorSubject<GameStateDelta | null>;
     constructor(seed: number) {
-        this.seed = seed;
         this.loadMap$ = new ReplaySubject(1);
         this.nextState$ = new BehaviorSubject<GameState | null>(null);
         this.nextDelta$ = new BehaviorSubject<GameStateDelta | null>(null);
@@ -49,6 +49,9 @@ export class GameStateManager {
             gameState = gameStateOrData;
         } else {
             gameState = new GameState(gameStateOrData);
+            if (gameStateOrData.cloudLayoutSeed == null) {
+                gameState.generateNextCloudLayout();
+            }
         }
         
         this.nextState$.next(gameState);
@@ -104,7 +107,8 @@ export class GameStateManager {
                 })
             ),
             seedStatusDelta: this.getBlankSeedStatusDelta(gameState),
-            placedSeeds: this.generatePlacedSeedsMap(gameState)
+            placedSeeds: this.generatePlacedSeedsMap(gameState),
+            placedCloudTileIndex: null
         };
     }
 
@@ -188,6 +192,7 @@ export class GameStateManager {
         );
 
         const newState = new GameState(copiedData);
+        newState.generateNextCloudLayout();
         this.nextState$.next(newState);
         this.nextDelta$.next(this.calculateDelta(newState));
     }

@@ -19,6 +19,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('river', 'assets/img/river.png');
 		this.load.image('seed', 'assets/img/seed.png');
 		this.load.image('seed2', 'assets/img/seed2.png');
+		this.load.image('cloud', 'assets/img/cloud.png');
 
 		this.load.image('tile-allowed', 'assets/img/tile-allowed.png');
 		this.load.image('tile-blocked', 'assets/img/tile-blocked.png');
@@ -27,6 +28,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('button-npk', 'assets/img/button-npk.png');
 		this.load.image('button-flower', 'assets/img/button-flower.png');
 		this.load.image('button-info', 'assets/img/button-info.png');
+		this.load.image('button-cloud', 'assets/img/button-cloud.png');
 
 		this.load.image('gui-arrow-left', 'assets/img/gui-arrow-left.png');
 		this.load.text('flower-names', 'assets/names.txt');

@@ -5,8 +5,10 @@ import { River } from "./River";
 import { FlowerType } from "./FlowerType";
 import { StringMap } from "../types";
 import { SeedStatusDelta } from "../controllers/GameStateManager";
+import { CLOUD_LAYOUT_SEED_MAX } from "../constants";
 
 export interface GameStateData {
+    cloudLayoutSeed: number | null;
     randomNumberGeneratorSeed: string;
     numTilesX: number;
     numTilesY: number;
@@ -19,6 +21,7 @@ export interface GameStateData {
 }
 
 export class GameState implements GameStateData {
+    cloudLayoutSeed: number;
     randomNumberGeneratorSeed: string;
     private randomNumberGenerator: Phaser.Math.RandomDataGenerator;
     numTilesX: number;
@@ -35,8 +38,12 @@ export class GameState implements GameStateData {
     seedStatus: StringMap<SeedStatusDelta>;
 
     constructor(data: GameStateData) {
-        Object.keys(data).forEach(key => {
-            this[key] = data[key];
+        const {
+            cloudLayoutSeed,
+            ...otherData
+        } = data;
+        Object.keys(otherData).forEach(key => {
+            this[key] = otherData[key];
         });
         this.tileToFlowerMap = new Map<Tile, Flower>();
         this.tileToRiverMap = new Map<Tile, River>();
@@ -140,5 +147,9 @@ export class GameState implements GameStateData {
 
     getRandomNumberSeed() {
         return this.randomNumberGenerator.state();
+    }
+
+    generateNextCloudLayout() {
+        this.cloudLayoutSeed = this.getNextRandomNumber(0, CLOUD_LAYOUT_SEED_MAX);
     }
 }

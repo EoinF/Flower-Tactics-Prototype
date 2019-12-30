@@ -12,6 +12,7 @@ import { MapController } from './controllers/MapController'
 import { setupConnectors } from './connectors'
 import { FlowerSelectionController } from './controllers/FlowerSelectionController'
 import { EvolveSeedController } from './controllers/EvolveSeedController'
+import { HeldObjectController } from './controllers/HeldObjectController'
 
 const DEFAULT_WIDTH = 1280
 const DEFAULT_HEIGHT = 720
@@ -48,6 +49,7 @@ export const mapController = new MapController();
 export const seedController = new SeedController();
 export const flowerSelectionController = new FlowerSelectionController();
 export const evolveSeedController = new EvolveSeedController();
+export const heldObjectController = new HeldObjectController();
 setupConnectors(
   guiController,
   gameStateManager,

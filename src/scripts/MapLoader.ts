@@ -16,6 +16,7 @@ export interface ObjectData {
     flowerTypes: StringMap<FlowerType>;
     seedStatus: StringMap<SeedStatusDelta>;
     randomNumberGeneratorSeed: string;
+    cloudLayoutSeed: number | null;
 }
 
 export class MapLoader {

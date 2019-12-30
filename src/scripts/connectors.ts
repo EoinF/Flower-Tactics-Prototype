@@ -56,6 +56,8 @@ export function setupConnectors(
     const evolveSeed_selectedFlowerType$ = evolveSeedController.selectedFlowerTypeObservable();
     const flowerNames$ = evolveSeedController.flowerNamesObservable();
 
+    const mousePosition$ = guiController.mousePositionObservable();
+
     const flowerTypeOnClickingInfoButton$ = onClickInfoButton$.pipe(
         flatMap(() => flowerSelection_selectedFlowerType$),
         filter(selectedFlowerType => selectedFlowerType != null)
@@ -96,7 +98,7 @@ export function setupConnectors(
                 const tile = gameState.getTileAt(tileXY.tileX, tileXY.tileY);
                 if (tile != null) {
                     const isOtherSeedTypeBlockingTile = Object.keys(gameStateDelta.placedSeeds)
-                        .filter(type => type != droppedSeed.type)
+                        .filter(type => type != pickedUpSeed.type)
                         .some(type => {
                             return gameStateDelta.placedSeeds[type].has(tile.index)
                                 && gameStateDelta.placedSeeds[type].get(tile.index)! > 0;
@@ -120,9 +122,9 @@ export function setupConnectors(
                         }
                         else {
                             if (pickedUpSeed.origin == 'SEED_ORIGIN_INVENTORY') {
-                                gameStateManager.placeSeed(droppedSeed.type, tile.index);
+                                gameStateManager.placeSeed(pickedUpSeed.type, tile.index);
                             } else { // SEED_ORIGIN_MAP
-                                gameStateManager.moveSeed(droppedSeed.type, pickedUpSeed.tileIndex!, tile.index);
+                                gameStateManager.moveSeed(pickedUpSeed.type, pickedUpSeed.tileIndex!, tile.index);
                             }
                             return;
                         }
@@ -137,20 +139,20 @@ export function setupConnectors(
             seedController.resetPickedUpSeed();
         });
 
-    combineLatest(dragSeed$, mapCamera$, isMouseOverSeedContainer$, isMouseOverFlowerSelection$)
+    combineLatest(mousePosition$, mapCamera$, isMouseOverSeedContainer$, isMouseOverFlowerSelection$)
         .pipe(
             withLatestFrom(gameState$),
-        ).subscribe(([[draggedSeed, camera, isMouseOverContainer, isMouseOverFlowerSelection], gameState]) => {
-            if (draggedSeed != null) {
-                const tileXY = guiPositionToTileLocation(camera, draggedSeed.x, draggedSeed.y);
+        ).subscribe(([[mousePosition, camera, isMouseOverContainer, isMouseOverFlowerSelection], gameState]) => {
+            if (mousePosition != null) {
+                const tileXY = guiPositionToTileLocation(camera, mousePosition.x, mousePosition.y);
                 const tile = gameState.getTileAt(tileXY.tileX, tileXY.tileY);
 
-                if (!isMouseOverContainer  && !isMouseOverFlowerSelection && tile != null) {
-                    mapController.dragSeedOverTile(tile);
+                if (!isMouseOverContainer && !isMouseOverFlowerSelection && tile != null) {
+                    mapController.setMouseOverTile(tile);
                     return;
                 }
             }
-            mapController.dragSeedOverTile(null);
+            mapController.setMouseOverTile(null);
         });
 
     onClickEvolveButton$.pipe(
