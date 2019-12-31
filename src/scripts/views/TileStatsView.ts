@@ -1,9 +1,7 @@
 import { SelectedObjectController } from "../controllers/SelectedObjectController";
-
-const POPUP_OFFSET = {
-    x: 32,
-    y: -32
-}
+import { indexToMapCoordinates } from "../widgets/utils";
+import { withLatestFrom } from "rxjs/operators";
+import { gameStateManager } from "../game";
 
 export class TileStatsView {
     private highlightImage: Phaser.GameObjects.Rectangle;
@@ -17,9 +15,12 @@ export class TileStatsView {
             .setDepth(1)
             .setVisible(false);
 
-        this.selectedObjectController.selectedTileObservable().subscribe((activeObject) => {
-            if (activeObject != null) {
-                this.onSetActiveTile(activeObject.x, activeObject.y);
+        this.selectedObjectController.selectedTileObservable().pipe(
+            withLatestFrom(gameStateManager.nextStateObservable())
+        ).subscribe(([tileIndex, gameState]) => {
+            if (tileIndex != null) {
+                const coords = indexToMapCoordinates(tileIndex, gameState.numTilesX);
+                this.onSetActiveTile(coords.x, coords.y);
             } else {
                 this.highlightImage.setVisible(false);
             }

@@ -17,6 +17,7 @@ export class TileWidget extends ClickableWidget {
     private placementState: TilePlacementState;
     readonly tileX: number;
     readonly tileY: number;
+    readonly tileIndex: number;
 
     private soilColour: Phaser.Display.Color;
 
@@ -28,6 +29,7 @@ export class TileWidget extends ClickableWidget {
 
         this.tileX = tileX;
         this.tileY = tileY;
+        this.tileIndex = tileIndex;
 
         this.soilColourConverter = soilColourConverter;
         this.soilImage =  scene.add.image(0, 0, "blank-tile");

@@ -9,6 +9,7 @@ import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
 import { TileWidget } from "../widgets/specific/TileWidget";
 import { indexToMapCoordinates } from "../widgets/utils";
 import { combineLatest } from "rxjs";
+import { heldObjectController, guiController, mapController } from "../game";
 
 export class MapView {
     scene: Phaser.Scene;
@@ -87,10 +88,7 @@ export class MapView {
 	) {
         this.tileButtons.forEach(button => {
             button.onClick(() => {
-                selectedObjectController.setSelectedTile(
-                    button.tileX,
-                    button.tileY
-                );
+				mapController.clickTile(button.tileIndex);
             });
         });
 
@@ -99,16 +97,7 @@ export class MapView {
 				const tile = newState.getTileAt(button.tileX, button.tileY)!;
 				button.setSoil(tile.soil);
 			});
-			if (newState.flowers.length != this.flowerSprites.length) {
-				this.setupFlowerSprites(newState);
-			} else {
-				this.flowerSprites.forEach(img => {
-					const flower = newState.getFlowerAt(img.getData("x"), img.getData("y"))!;
-					const flowerType = newState.getFlowerType(flower);
-					img.setScale(0.2 + 0.8 * flower.growth / flowerType.turnsUntilGrown)
-						.setDepth(5);
-				});
-			}
+			this.setupFlowerSprites(newState);
 		});
 		
 		gameStateManager.nextDeltaObservable()
@@ -129,43 +118,45 @@ export class MapView {
 					});
 			});
 		
-		seedController.pickUpSeedObservable().pipe(
+		heldObjectController.heldSeedObservable().pipe(
 			withLatestFrom(gameStateManager.nextStateObservable())
 		).subscribe(([pickedUpSeed, gameState]) => {
-			for (let i = 0; i < gameState.tiles.length; i++) {
-				const tile = gameState.tiles[i];
-				const {
-					nitrogenRequirements,
-					potassiumRequirements,
-					phosphorousRequirements
-				} = gameState.flowerTypes[pickedUpSeed.type]
+			if (pickedUpSeed != null) {
+				for (let i = 0; i < gameState.tiles.length; i++) {
+					const tile = gameState.tiles[i];
+					const {
+						nitrogenRequirements,
+						potassiumRequirements,
+						phosphorousRequirements
+					} = gameState.flowerTypes[pickedUpSeed.type]
 
-				const x = tile.index % gameState.numTilesX;
-				const y = Math.floor(tile.index / gameState.numTilesX);
-				const isPlaceable = (gameState.getMountainAtTile(tile) == null
-					&& gameState.getFlowerAtTile(tile) == null)
-					&& gameState.getTilesAdjacent(x, y).some(
-						adjacentTile => gameState.getFlowerAtTile(adjacentTile) != null
+					const x = tile.index % gameState.numTilesX;
+					const y = Math.floor(tile.index / gameState.numTilesX);
+					const isPlaceable = (gameState.getMountainAtTile(tile) == null
+						&& gameState.getFlowerAtTile(tile) == null)
+						&& gameState.getTilesAdjacent(x, y).some(
+							adjacentTile => gameState.getFlowerAtTile(adjacentTile) != null
+						);
+						
+					const isViable = (
+						nitrogenRequirements.min <= tile.soil.nitrogenContent && tile.soil.nitrogenContent <= nitrogenRequirements.max
+						&& phosphorousRequirements.min <= tile.soil.phosphorousContent && tile.soil.phosphorousContent <= phosphorousRequirements.max
+						&& potassiumRequirements.min <= tile.soil.potassiumContent && tile.soil.potassiumContent <= potassiumRequirements.max
 					);
-					
-				const isViable = (
-					nitrogenRequirements.min <= tile.soil.nitrogenContent && tile.soil.nitrogenContent <= nitrogenRequirements.max
-					&& phosphorousRequirements.min <= tile.soil.phosphorousContent && tile.soil.phosphorousContent <= phosphorousRequirements.max
-					&& potassiumRequirements.min <= tile.soil.potassiumContent && tile.soil.potassiumContent <= potassiumRequirements.max
-				);
 
-				this.tileButtons[tile.index].setState(isPlaceable ? "allowed": "blocked", isViable ? "viable" : "unviable");
-			};
+					this.tileButtons[tile.index].setState(isPlaceable ? "allowed": "blocked", isViable ? "viable" : "unviable");
+				};
+			}
 		});
 
-		seedController.dropSeedObservable()
+		heldObjectController.dropSeedObservable()
 			.subscribe(() => {
 				for (let i = 0; i < this.tileButtons.length; i++) {
 					this.tileButtons[i].setState("n/a", "n/a");
 				}
 			});
 
-		combineLatest(mapController.mouseOverTileObservable(), seedController.pickUpSeedObservable())
+		combineLatest(mapController.mouseOverTileObservable(), heldObjectController.heldSeedObservable())
 			.pipe(
 				map(([tile, heldObject]) => heldObject === null ? null : tile),
 				distinctUntilChanged(),
@@ -186,27 +177,21 @@ export class MapView {
 		const location = indexToMapCoordinates(tileIndex, newState.numTilesX);
 		const placedSeedWidget = new PlacedSeedWidget(this.scene, (location.x * 48) - 24, (location.y * 48) - 24, 48, 48, seedAmount);
 		placedSeedWidget.onClick(() => {
-			selectedObjectController.setSelectedTile(
-				location.x,
-				location.y
-			);
+			mapController.clickTile(tileIndex);
 		});
 		placedSeedWidget.onHold(() => {
-			seedController.pickUpSeed(seedType, tileIndex, 'SEED_ORIGIN_MAP');
-			const currentSeedAmount = placedSeedWidget.getAmount();
-			if (currentSeedAmount === 1) {
-				this.placedSeedSprites.delete(tileIndex);
-				placedSeedWidget.destroy();
-					
-				const subscription = seedController.resetPickedUpSeedObservable()
-					.pipe(first())
-					.subscribe(() => this.addNewSeed(tileIndex, seedType, 1, newState, seedController, selectedObjectController));
-				seedController.dropSeedObservable()
-					.pipe(first())
-					.subscribe(() => subscription.unsubscribe());
-			} else {
-				placedSeedWidget.setAmount(seedAmount - 1);
-			}
+			// heldObjectController.pickUpSeed({
+			// 	type: seedType, 
+			// 	tileIndex,
+			// 	origin: 'SEED_ORIGIN_MAP'
+			// });
+			// const currentSeedAmount = placedSeedWidget.getAmount();
+			// if (currentSeedAmount === 1) {
+			// 	this.placedSeedSprites.delete(tileIndex);
+			// 	placedSeedWidget.destroy();
+			// } else {
+			// 	placedSeedWidget.setAmount(seedAmount - 1);
+			// }
 		});
 		
 		this.placedSeedSprites.set(tileIndex, placedSeedWidget);

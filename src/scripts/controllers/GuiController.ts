@@ -14,6 +14,8 @@ export class GuiController {
     private endTurn$: Subject<void>;
     private onClickInfoButton$: Subject<void>;
     private onClickEvolveButton$: Subject<void>;
+    private onClickSeedPlacementButton$: Subject<void>;
+    private onClickCloudPlacementButton$: Subject<void>;
     private screenState$: Subject<ScreenState>;
     private alertMessage$: Subject<string>;
     private messagePromptQueue$: BehaviorSubject<MessagePromptQueue>;
@@ -21,8 +23,10 @@ export class GuiController {
 
     constructor() {
         this.endTurn$ = new ReplaySubject(1);
-        this.onClickInfoButton$ = new ReplaySubject(1);
-        this.onClickEvolveButton$ = new ReplaySubject(1);
+        this.onClickInfoButton$ = new Subject();
+        this.onClickEvolveButton$ = new Subject();
+        this.onClickSeedPlacementButton$ = new Subject();
+        this.onClickCloudPlacementButton$ = new Subject();
         this.screenState$ = new Subject();
         this.alertMessage$ = new Subject();
         this.messagePromptQueue$ = new BehaviorSubject({
@@ -38,6 +42,14 @@ export class GuiController {
 
     clickEvolveButton() {
         this.onClickEvolveButton$.next();
+    }
+
+    clickSeedPlacementButton() {
+        this.onClickSeedPlacementButton$.next();
+    }
+    
+    clickCloudPlacementButton() {
+        this.onClickCloudPlacementButton$.next();
     }
 
     setScreenState(screenState: ScreenState) {
@@ -73,6 +85,12 @@ export class GuiController {
     }
     onClickEvolveButtonObservable(): Observable<void> {
         return this.onClickEvolveButton$;
+    }
+    onClickSeedPlacementButtonObservable(): Observable<void> {
+        return this.onClickSeedPlacementButton$;
+    }
+    onClickCloudPlacementButtonObservable(): Observable<void> {
+        return this.onClickCloudPlacementButton$;
     }
 
     screenStateObservable(): Observable<ScreenState> {

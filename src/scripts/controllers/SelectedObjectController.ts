@@ -3,17 +3,17 @@ import { mapTo, startWith, shareReplay } from "rxjs/operators";
 import { MapLocation } from "./MapController";
 
 export class SelectedObjectController {
-    private selectedTile$: Subject<MapLocation>;
+    private selectedTile$: Subject<number>;
     private selectedFlowerType$: Subject<string>;
     private activeTab$: ReplaySubject<number>;
 
     constructor() {
-        this.selectedTile$ = new Subject<MapLocation>();
+        this.selectedTile$ = new Subject<number>();
         this.selectedFlowerType$ = new Subject<string>();
         this.activeTab$ = new ReplaySubject(1);
     }
 
-    selectedTileObservable(): Observable<MapLocation | null> {
+    selectedTileObservable(): Observable<number | null> {
         return merge(
             this.selectedTile$,
             this.selectedFlowerType$.pipe(mapTo(null))
@@ -37,8 +37,8 @@ export class SelectedObjectController {
         );
     }
 
-    setSelectedTile(x: number, y: number) {
-        this.selectedTile$.next({x, y});
+    setSelectedTile(tileIndex: number) {
+        this.selectedTile$.next(tileIndex);
     }
 
     setSelectedFlowerType(type: string) {

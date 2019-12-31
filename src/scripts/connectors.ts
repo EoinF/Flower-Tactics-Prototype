@@ -1,5 +1,5 @@
-import { withLatestFrom, map, filter, flatMap, first, mergeMapTo, takeWhile, take, repeatWhen, repeat, tap, mergeMap, switchMapTo, publish, share } from 'rxjs/operators';
-import { combineLatest, merge, Observable, zip, of } from 'rxjs';
+import { withLatestFrom, map, filter, flatMap, first } from 'rxjs/operators';
+import { combineLatest, merge } from 'rxjs';
 import { GuiController } from './controllers/GuiController';
 import { GameStateManager } from './controllers/GameStateManager';
 import { SeedController } from './controllers/SeedController';
@@ -9,6 +9,8 @@ import { calculateSeedEvolve } from './deltaCalculators/calculateSeedEvolve';
 import { SEED_INTERVALS } from './constants';
 import { SelectedObjectController } from './controllers/SelectedObjectController';
 import { EvolveSeedController } from './controllers/EvolveSeedController';
+import { HeldSeedData, HeldObjectController } from './controllers/HeldObjectController';
+import { indexToMapCoordinates } from './widgets/utils';
 
 interface TileLocation {
     tileX: number,
@@ -32,22 +34,24 @@ export function setupConnectors(
     mapController: MapController,
     flowerSelectionController: FlowerSelectionController,
     selectedObjectController: SelectedObjectController, 
-    evolveSeedController: EvolveSeedController
+    evolveSeedController: EvolveSeedController,
+    heldObjectController: HeldObjectController
 ) {
     const onClickInfoButton$ = guiController.onClickInfoButtonObservable();
     const onClickEvolveButton$ = guiController.onClickEvolveButtonObservable();
     const endTurn$ = guiController.endTurnObservable();
 
-    const dragSeed$ = seedController.dragSeedObservable();
-    const dropSeed$ = seedController.dropSeedObservable();
     const isMouseOverSeedContainer$ = seedController.mouseOverSeedContainerObservable();
     const isMouseOverFlowerSelection$ = seedController.mouseOverFlowerSelectionObservable();
-    const pickedUpSeed$ = seedController.pickUpSeedObservable();
+    const pickedUpSeed$ = heldObjectController.heldSeedObservable();
+    const dropSeed$ = heldObjectController.dropSeedObservable();
 
     const gameState$ = gameStateManager.nextStateObservable();
     const gameStateDelta$ = gameStateManager.nextDeltaObservable();
 
     const mapCamera$ = mapController.cameraObservable();
+    const mouseOverTile$ = mapController.mouseOverTileObservable();
+    const clickTile$ = mapController.clickTileObservable();
 
     const selectedFlowerIndex$ = flowerSelectionController.selectedFlowerIndexObservable();
     const flowerSelection_selectedFlowerType$ = flowerSelectionController.selectedFlowerTypeObservable();
@@ -89,21 +93,28 @@ export function setupConnectors(
         gameStateManager.nextState();
     });
 
-    dropSeed$
+    clickTile$
         .pipe(
-            withLatestFrom(combineLatest([isMouseOverSeedContainer$, isMouseOverFlowerSelection$, gameState$, gameStateDelta$, mapCamera$, pickedUpSeed$]))
-        ).subscribe(([droppedSeed, [isMouseOverSeedContainer, isMouseOverFlowerSelection, gameState, gameStateDelta, camera, pickedUpSeed]]) => {
+            withLatestFrom(
+                combineLatest([
+                    isMouseOverSeedContainer$, 
+                    isMouseOverFlowerSelection$,
+                    gameState$,
+                    gameStateDelta$,
+                    pickedUpSeed$
+                ])
+            )
+        ).subscribe(([clickedTile, [isMouseOverSeedContainer, isMouseOverFlowerSelection, gameState, gameStateDelta, heldSeed]]) => {
             if (!isMouseOverSeedContainer && !isMouseOverFlowerSelection) {
-                const tileXY = guiPositionToTileLocation(camera, droppedSeed.x, droppedSeed.y);
-                const tile = gameState.getTileAt(tileXY.tileX, tileXY.tileY);
-                if (tile != null) {
+                if (heldSeed != null) {
                     const isOtherSeedTypeBlockingTile = Object.keys(gameStateDelta.placedSeeds)
-                        .filter(type => type != pickedUpSeed.type)
+                        .filter(type => type != heldSeed.type)
                         .some(type => {
-                            return gameStateDelta.placedSeeds[type].has(tile.index)
-                                && gameStateDelta.placedSeeds[type].get(tile.index)! > 0;
+                            return gameStateDelta.placedSeeds[type].has(clickedTile)
+                                && gameStateDelta.placedSeeds[type].get(clickedTile)! > 0;
                         });
 
+                    const tile = gameState.tiles[clickedTile];
                     const isFlowerBlockingTile = (gameState.getFlowerAtTile(tile) != null);
                     const isMountainBlockingTile = (gameState.getMountainAtTile(tile) != null);
 
@@ -114,30 +125,28 @@ export function setupConnectors(
                     } else if (isMountainBlockingTile) {
                         guiController.createAlertMessage("A mountain is blocking seed placement.");
                     } else {
-                        const isFlowerAdjacent = gameState.getTilesAdjacent(tileXY.tileX, tileXY.tileY).some(
-                            adjacentTile => gameState.getFlowerAtTile(adjacentTile) != null
+                        const location = indexToMapCoordinates(clickedTile, gameState.numTilesX);
+                        const isFlowerAdjacent = gameState.getTilesAdjacent(location.x, location.y).some(
+                            adjacentTile => {
+                                return gameState.getFlowerAtTile(adjacentTile) != null
+                            }
                         );
                         if (!isFlowerAdjacent) {
                             guiController.createAlertMessage("You can only place seeds near your existing flowers.");
                         }
                         else {
-                            if (pickedUpSeed.origin == 'SEED_ORIGIN_INVENTORY') {
-                                gameStateManager.placeSeed(pickedUpSeed.type, tile.index);
+                            if (heldSeed.origin == 'SEED_ORIGIN_INVENTORY') {
+                                gameStateManager.placeSeed(heldSeed.type, clickedTile);
                             } else { // SEED_ORIGIN_MAP
-                                gameStateManager.moveSeed(pickedUpSeed.type, pickedUpSeed.tileIndex!, tile.index);
+                                gameStateManager.moveSeed(heldSeed.type, heldSeed.tileIndex!, clickedTile);
                             }
                             return;
                         }
                     }
                 }
-            } else if (pickedUpSeed.origin == 'SEED_ORIGIN_MAP') {
-                if (pickedUpSeed.tileIndex != null) {
-                    gameStateManager.removeSeed(pickedUpSeed.type, pickedUpSeed.tileIndex);
-                    return;
-                }
             }
-            seedController.resetPickedUpSeed();
         });
+
 
     combineLatest(mousePosition$, mapCamera$, isMouseOverSeedContainer$, isMouseOverFlowerSelection$)
         .pipe(

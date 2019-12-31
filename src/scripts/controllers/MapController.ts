@@ -7,12 +7,18 @@ export interface MapLocation {
 }
 
 export class MapController {
+    private clickTile$: Subject<number>;
     private mouseOverTile$: Subject<Tile | null>;
     private camera$: Subject<Phaser.Cameras.Scene2D.Camera>;
 
     constructor() {
         this.mouseOverTile$ = new Subject();
+        this.clickTile$ = new Subject();
         this.camera$ = new ReplaySubject(1);
+    }
+
+    clickTile(tileIndex: number) {
+        this.clickTile$.next(tileIndex);
     }
 
     setMouseOverTile(tile: Tile | null) {
@@ -29,5 +35,9 @@ export class MapController {
 
     mouseOverTileObservable(): Observable<Tile | null> {
         return this.mouseOverTile$;
+    }
+
+    clickTileObservable(): Observable<number> {
+        return this.clickTile$;
     }
 }

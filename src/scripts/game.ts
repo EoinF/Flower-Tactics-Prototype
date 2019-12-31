@@ -57,5 +57,6 @@ setupConnectors(
   mapController,
   flowerSelectionController,
   selectedObjectController,
-  evolveSeedController
+  evolveSeedController,
+  heldObjectController
 );

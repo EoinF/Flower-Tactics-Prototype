@@ -9,6 +9,10 @@ import { GameState } from "../../objects/GameState";
 import { FlowerTab } from "./FlowerTab";
 import { SoilTab } from "./SoilTab";
 import { COLOURS } from "../../constants";
+import { GuiController } from "../../controllers/GuiController";
+import { mapController, heldObjectController } from "../../game";
+import { MapController } from "../../controllers/MapController";
+import { withLatestFrom, filter } from "rxjs/operators";
 
 export interface SelectedTileTab {
     show: (gameState: GameState, tile: Tile) => void;
@@ -28,7 +32,7 @@ export class SelectedTileView {
 
     private tabs: SelectedTileTab[];
 
-    constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, selectedObjectController: SelectedObjectController) {
+    constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, selectedObjectController: SelectedObjectController, mapController: MapController) {
         this.popup = new UIContainer(scene, 8, 8, 412, 96, "Bottom")
             .setVisible(false)
             .setInteractive()
@@ -61,14 +65,23 @@ export class SelectedTileView {
         this.popup.addChild(this.npkTabButton, "Top", "Right");
         this.popup.addChild(this.flowerTabButton, "Top", "Right");
 
-        combineLatest(gameStateManager.nextStateObservable(),
+        mapController.clickTileObservable()
+        .pipe(
+            withLatestFrom(heldObjectController.heldObjectObservable()),
+            filter(([_, heldObject]) => heldObject == null)
+        ).subscribe(([tileIndex]) => {
+            selectedObjectController.setSelectedTile(tileIndex);
+        })
+
+        combineLatest(
+            gameStateManager.nextStateObservable(),
             selectedObjectController.selectedTileObservable(),
             selectedObjectController.activeTabObservable()
-        ).subscribe(([newState, activeTile, activeTab]) => {
+        ).subscribe(([newState, tileIndex, activeTab]) => {
             this.tabs.forEach(tab => tab.hide());
-            if (activeTile != null) {
+            if (tileIndex != null) {
                 this.popup.setVisible(true);
-                const tile = newState.getTileAt(activeTile.x, activeTile.y)!;
+                const tile = newState.tiles[tileIndex];
                 this.updatePopupText(newState, tile, activeTab);
             } else {
                 this.popup.setVisible(false);

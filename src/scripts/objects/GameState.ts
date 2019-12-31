@@ -6,6 +6,7 @@ import { FlowerType } from "./FlowerType";
 import { StringMap } from "../types";
 import { SeedStatusDelta } from "../controllers/GameStateManager";
 import { CLOUD_LAYOUT_SEED_MAX } from "../constants";
+import { indexToMapCoordinates } from "../widgets/utils";
 
 export interface GameStateData {
     cloudLayoutSeed: number | null;

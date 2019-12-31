@@ -9,6 +9,7 @@ import { SeedContainerView } from "../views/SeedContainerView";
 import { combineLatest } from "rxjs";
 import { ImageButton } from "../widgets/generic/ImageButton";
 import { HeldObjectView } from "../views/HeldObjectView";
+import { withLatestFrom } from "rxjs/operators";
 
 export default class UIScene extends Phaser.Scene {
     constructor() {
@@ -16,7 +17,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
   create() {
-    const selectedTileView = new SelectedTileView(this, gameStateManager, selectedObjectController);
+    const selectedTileView = new SelectedTileView(this, gameStateManager, selectedObjectController, mapController);
 	new SelectedFlowerTypeView(this, gameStateManager, selectedObjectController);
 	new AlertMessageView(this, guiController);
 
@@ -30,9 +31,20 @@ export default class UIScene extends Phaser.Scene {
 		COLOURS.PURPLE_100, COLOURS.LIGHT_GRAY, COLOURS.WHITE
 	)
 		.setBorder(1, COLOURS.BLACK)
-		.onClick(() => heldObjectController.setHeldObject('CLOUD'));
+		.onClick(() => guiController.clickCloudPlacementButton());
 
 	cloudPlacementButton.setPosition(10, flowerSelectionView.flowerSelector.y - cloudPlacementButton.height - 8);
+	
+	guiController.onClickCloudPlacementButtonObservable()
+		.pipe(
+			withLatestFrom(heldObjectController.heldCloudObservable())
+		).subscribe(([_, heldObject]) => {
+			if (heldObject != null) {
+				heldObjectController.dropObject();
+			} else {
+				heldObjectController.pickUpClouds()
+			}
+	});
 
 	const endTurnButton = new TextButton(this, 10, 10, 98, 24, "End Turn", COLOURS.BLACK,
 		COLOURS.WHITE, COLOURS.LIGHT_GRAY, "Bottom", "Right"
