@@ -1,8 +1,7 @@
-import { GameStateManager, GameStateDelta } from "../controllers/GameStateManager";
+import { GameStateManager } from "../controllers/GameStateManager";
 import { UIContainer } from "../widgets/generic/UIContainer";
 import { SeedController } from "../controllers/SeedController";
-import { combineLatest } from "rxjs";
-import { map, distinctUntilChanged, withLatestFrom } from "rxjs/operators";
+import { withLatestFrom } from "rxjs/operators";
 import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
 import { ImageButton } from "../widgets/generic/ImageButton";
 import { TextLabel } from "../widgets/generic/TextLabel";
@@ -17,17 +16,20 @@ export class FlowerSelectionView {
     flowerSelectRight: ImageButton;
     flowerText: TextLabel;
 
-    constructor(scene: Phaser.Scene, 
-        gameStateManager: GameStateManager, 
-        seedController: SeedController, 
-        flowerSelectionController: FlowerSelectionController, 
-        offsetY: number, 
+    constructor(scene: Phaser.Scene,
+        gameStateManager: GameStateManager,
+        seedController: SeedController,
+        flowerSelectionController: FlowerSelectionController,
+        x: number, y: number,
         width: number
     ) {
         this.gameStateManager = gameStateManager;
         this.scene = scene;
 
-        this.flowerSelector = new FlexUIContainer(scene, 8, offsetY + 8, width, "auto", "Bottom")
+        this.flowerSelector = new FlexUIContainer(scene, x, y, width, "auto", "Bottom", "Right")
+            .setBackground(COLOURS.PURPLE_100)
+            .setBorder(1, COLOURS.BLACK)
+            .setAlpha(0.9)
             .setInteractive()
             .setDepth(3);
         
@@ -61,23 +63,5 @@ export class FlowerSelectionView {
                 seedController.setMouseOverFlowerSelector(false);
             }
         });
-
-        combineLatest(seedController.mouseOverSeedContainerObservable(), seedController.mouseOverFlowerSelectionObservable())
-            .pipe(
-                map(([o1, o2]) => o1 || o2),
-                distinctUntilChanged()
-            ).subscribe((isHighlighted) => {
-            if (isHighlighted) {
-                this.flowerSelector
-                    .setBackground(COLOURS.PURPLE_100)
-                    .setBorder(1, COLOURS.BLACK)
-                    .setAlpha(0.9);
-            } else {
-                this.flowerSelector
-                    .setBackground(COLOURS.PURPLE_300)
-                    .setBorder(1, COLOURS.BLACK)
-                    .setAlpha(0.7);
-            }
-        })
     }
 }

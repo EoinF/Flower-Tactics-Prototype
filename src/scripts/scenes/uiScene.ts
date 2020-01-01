@@ -10,6 +10,7 @@ import { combineLatest } from "rxjs";
 import { ImageButton } from "../widgets/generic/ImageButton";
 import { HeldObjectView } from "../views/HeldObjectView";
 import { withLatestFrom } from "rxjs/operators";
+import { CloudUIView } from "../views/CloudUIView";
 
 export default class UIScene extends Phaser.Scene {
     constructor() {
@@ -17,40 +18,27 @@ export default class UIScene extends Phaser.Scene {
     }
     
   create() {
-    const selectedTileView = new SelectedTileView(this, gameStateManager, selectedObjectController, mapController);
-	new SelectedFlowerTypeView(this, gameStateManager, selectedObjectController);
-	new AlertMessageView(this, guiController);
-
-	const { height } = this.game.canvas;
-	const offsetY = height - selectedTileView.y;
-	const seedView = new SeedContainerView(this, gameStateManager, seedController, flowerSelectionController, offsetY);
-	const flowerSelectionView = new FlowerSelectionView(this, gameStateManager, seedController, flowerSelectionController, offsetY + seedView.height, seedView.width);
-	new HeldObjectView(this, heldObjectController, guiController, mapController);
-
-	const cloudPlacementButton = new ImageButton(this, 10, 0, 'button-cloud', "auto", "auto", COLOURS.PURPLE_200,
-		COLOURS.PURPLE_100, COLOURS.LIGHT_GRAY, COLOURS.WHITE
-	)
-		.setBorder(1, COLOURS.BLACK)
-		.onClick(() => guiController.clickCloudPlacementButton());
-
-	cloudPlacementButton.setPosition(10, flowerSelectionView.flowerSelector.y - cloudPlacementButton.height - 8);
+	const selectedTileView = new SelectedTileView(this, gameStateManager, selectedObjectController, mapController);
 	
-	guiController.onClickCloudPlacementButtonObservable()
-		.pipe(
-			withLatestFrom(heldObjectController.heldCloudObservable())
-		).subscribe(([_, heldObject]) => {
-			if (heldObject != null) {
-				heldObjectController.dropObject();
-			} else {
-				heldObjectController.pickUpClouds()
-			}
-	});
+	const flowerSelectionWidth = 300;
+	const endTurnButtonPadding = 10;
 
-	const endTurnButton = new TextButton(this, 10, 10, 98, 24, "End Turn", COLOURS.BLACK,
+	const endTurnButton = new TextButton(this, endTurnButtonPadding, 8, 98, 24, "End Turn", COLOURS.BLACK,
 		COLOURS.WHITE, COLOURS.LIGHT_GRAY, "Bottom", "Right"
 	)
 		.setBorder(1, COLOURS.PURPLE_500)
 		.onClick(() => guiController.endTurn());
+
+	const offsetX = endTurnButton.width + endTurnButtonPadding * 2
+
+	const seedView = new SeedContainerView(this, gameStateManager, seedController, flowerSelectionController, offsetX, 8, flowerSelectionWidth);
+	const flowerSelectionView = new FlowerSelectionView(this, gameStateManager, seedController, flowerSelectionController, offsetX, 12 + seedView.height, flowerSelectionWidth);
+	new CloudUIView(this, heldObjectController, guiController, offsetX, 16 + seedView.height + flowerSelectionView.flowerSelector.height);
+
+	new SelectedFlowerTypeView(this, gameStateManager, selectedObjectController);
+	new AlertMessageView(this, guiController);
+
+	new HeldObjectView(this, heldObjectController, guiController, mapController);
 	
 	combineLatest(guiController.messagePromptObservable(), guiController.screenStateObservable())
 		.subscribe(([messagePrompt, screenState]) => {

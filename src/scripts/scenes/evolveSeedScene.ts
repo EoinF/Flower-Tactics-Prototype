@@ -9,6 +9,7 @@ export default class EvolveSeedScene extends Phaser.Scene {
     
     create() {
         this.scene.setVisible(false);
+        this.scene.pause();
         new EvolveSeedView(this, guiController, gameStateManager, evolveSeedController);
 
         evolveSeedController.setFlowerNames((this.cache.text.get('flower-names') as string).split('\n'));
@@ -22,8 +23,10 @@ export default class EvolveSeedScene extends Phaser.Scene {
                 }
                 if (screenState === "Evolve") {
                     this.scene.setVisible(true);
+                    this.scene.resume();
                 } else {
                     this.scene.setVisible(false);
+                    this.scene.pause();
                 }
         });
     }

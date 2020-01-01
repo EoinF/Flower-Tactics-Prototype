@@ -25,11 +25,17 @@ export class ProgressBar implements UIObject {
     protected progressLabel: TextLabel;
     protected progressRectangle: RectangleSprite;
 
-    constructor(scene: Phaser.Scene, x: number, y: number, value: number, maxValue: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number,
+        value: number, maxValue: number,
+        width: number | "auto" = "auto", height: number | "auto" = "auto"
+    ) {
         this.maxValue = maxValue;
-        this.progressLabel = new TextLabel(scene, 4, 0, `${maxValue}/${maxValue}`, COLOURS.BLACK, {isBold: true, fontSize: 8})
+        this.progressLabel = new TextLabel(scene, 0, 0, `${maxValue}/${maxValue}`, COLOURS.BLACK, {isBold: true, fontSize: 12})
+            .setOrigin(0.5, 0)
             .setDepthOffset(1);
-        this.container = new UIContainer(scene, x, y, this.progressLabel.width, this.progressLabel.height)
+        this.container = new UIContainer(scene, x, y, 
+            width === "auto" ? this.progressLabel.width : width, 
+            height === "auto" ? this.progressLabel.height : height)
             .setBackground(COLOURS.LIGHT_GRAY)
             .setBorder(1, COLOURS.BLACK);
 
@@ -38,7 +44,7 @@ export class ProgressBar implements UIObject {
             alpha: 1
         }).setOrigin(0, 0.5);
         
-        this.container.addChild(this.progressLabel);
+        this.container.addChild(this.progressLabel, "Middle", "Middle");
         this.container.addChild(this.progressRectangle);
         this.setValue(value);
         this.setProgressColour(COLOURS.YELLOW, COLOURS.LIGHT_YELLOW);

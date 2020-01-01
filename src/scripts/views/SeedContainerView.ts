@@ -11,9 +11,8 @@ import { ImageButton } from "../widgets/generic/ImageButton";
 import { ProgressBar } from "../widgets/generic/ProgressBar";
 import { COLOURS } from "../constants";
 import { TextButton } from "../widgets/generic/TextButton";
-
-const SEEDS_PER_ROW = 24;
-const MAX_ROWS = 2;
+import { TextLabel } from "../widgets/generic/TextLabel";
+import { FlexUIContainer } from "../widgets/generic/FlexUIContainer";
 
 export class SeedContainerView {
     width: number;
@@ -21,7 +20,6 @@ export class SeedContainerView {
     scene: Phaser.Scene;
     gameStateManager: GameStateManager;
     mainContainer: UIContainer;
-    seedContainer: UIContainer;
     infoButton: ImageButton;
     evolveButton: TextButton;
 
@@ -29,73 +27,61 @@ export class SeedContainerView {
         scene: Phaser.Scene,
         gameStateManager: GameStateManager,
         seedController: SeedController,
-        flowerSelectionController: FlowerSelectionController, 
-        offsetY: number
+        flowerSelectionController: FlowerSelectionController,
+        x: number,
+        y: number,
+        width: number
     ) {
         this.gameStateManager = gameStateManager;
         this.scene = scene;
-        
-        const seedProgressBar = new ProgressBar(scene, 4, 6, 0, 100);
 
-        this.mainContainer = new UIContainer(scene, 8, offsetY + 4, seedProgressBar.width + 64 + SEEDS_PER_ROW * 8, 24 * MAX_ROWS, "Bottom")
+        this.mainContainer = new FlexUIContainer(scene, x, y, width, 32, "Bottom", "Right")
             .setDepth(3)
+            .setBackground(COLOURS.PURPLE_100)
+            .setBorder(1, COLOURS.BLACK)
+            .setAlpha(0.9)
             .setInteractive();
 
-        this.seedContainer = new UIContainer(scene, 0, 0, seedProgressBar.width + 64 + SEEDS_PER_ROW * 8, 24 * MAX_ROWS)
-            .setInteractive();
+        const seedSprite = new ImageButton(this.scene, 4, 0,
+            "seed2",
+            "auto", "auto",
+            COLOURS.TRANSPARENT, COLOURS.TRANSPARENT, COLOURS.WHITE, COLOURS.WHITE
+        ).onClick(() => {
+            guiController.clickSeedPlacementButton();
+        });
+
+        const seedAmountLabel = new TextLabel(this.scene, 8 + seedSprite.width, 0, 'x999');
+        const seedProgressBar = new ProgressBar(scene, 12 + seedSprite.width + seedAmountLabel.width, 0, 0, 100, "auto", 16);
+
+        this.mainContainer.addChild(seedSprite, "Middle");
+        this.mainContainer.addChild(seedAmountLabel, "Middle");
+        this.mainContainer.addChild(seedProgressBar, "Middle");
         
-        this.infoButton = new ImageButton(scene, 4, 4, 'button-info', "auto", "auto", COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW, COLOURS.RED, COLOURS.RED)
+        this.infoButton = new ImageButton(scene, 4, 0, 'button-info', "auto", "auto", COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW, COLOURS.RED, COLOURS.RED)
             .setBorder(1, COLOURS.BLACK)
             .onClick(() => {
                 guiController.clickInfoButton();
             });
 
-        this.evolveButton = new TextButton(scene, 8 + this.infoButton.width, 4, 24, 24, "+", COLOURS.RED, COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW)
+        this.evolveButton = new TextButton(scene, 8 + this.infoButton.width, 0, 24, 24, "+", COLOURS.RED, COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW)
             .setBorder(1, COLOURS.BLACK)
             .onClick(() => {
                 guiController.setScreenState("Evolve");
-            });        
+            });
 
-        this.mainContainer.addChild(this.seedContainer);
-        this.mainContainer.addChild(
-            this.infoButton,
-            "Top", "Right"
-        );
-        this.mainContainer.addChild(
-            this.evolveButton,
-            "Top", "Right"
-        );
-        this.mainContainer.addChild(
-            seedProgressBar,
-            "Bottom", "Right"
-        );
+        this.mainContainer.addChild(this.infoButton, "Middle", "Right");
+        this.mainContainer.addChild(this.evolveButton, "Middle", "Right");
 
         this.width = this.mainContainer.width;
         this.height = this.mainContainer.height;
 
         scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-            if (this.seedContainer.hits(pointer.x, pointer.y)) {
+            if (this.mainContainer.hits(pointer.x, pointer.y)) {
                 seedController.setMouseOverSeedContainer(true);
             } else {
                 seedController.setMouseOverSeedContainer(false);
             }
         });
-
-        combineLatest(seedController.mouseOverSeedContainerObservable(), seedController.mouseOverFlowerSelectionObservable())
-            .pipe(map(([o1, o2]) => o1 || o2))
-            .subscribe((isHighlighted) => {
-            if (isHighlighted) {
-                this.mainContainer
-                    .setBackground(COLOURS.PURPLE_100)
-                    .setBorder(1, COLOURS.BLACK)
-                    .setAlpha(0.9);
-            } else {
-                this.mainContainer
-                    .setBackground(COLOURS.PURPLE_300)
-                    .setBorder(1, COLOURS.BLACK)
-                    .setAlpha(0.7);
-            }
-        })
 
         guiController.onClickSeedPlacementButtonObservable().pipe(
             withLatestFrom(heldObjectController.heldSeedObservable(), flowerSelectionController.selectedFlowerTypeObservable())
@@ -138,50 +124,23 @@ export class SeedContainerView {
 
         combineLatest(gameStateManager.nextStateObservable(), gameStateManager.nextDeltaObservable(), flowerSelectionController.selectedFlowerTypeObservable())
             .subscribe(([nextState, nextDelta, selectedFlowerType]) => {
-                this.seedContainer.clear();
-                this.addSeedGUI(nextState, nextDelta, nextState.flowerTypes[selectedFlowerType]);
+                const selectedSeedStatus = nextState.seedStatus[selectedFlowerType];
+                let amountAlreadyPlaced = 0;
+                if (selectedSeedStatus.type in nextDelta.placedSeeds) {
+                    const valuesIterator = nextDelta.placedSeeds[selectedSeedStatus.type].values();
+                    let value = valuesIterator.next();
+                    while (!value.done) {
+                        amountAlreadyPlaced += value.value;
+                        value = valuesIterator.next();
+                    }
+                }
+                const amount = selectedSeedStatus.quantity - amountAlreadyPlaced;
+                seedAmountLabel.setText(`x${amount}`);
             });
 
         combineLatest(gameStateManager.nextStateObservable(), flowerSelectionController.selectedFlowerTypeObservable())
             .subscribe(([nextState, selectedFlowerType]) => {
                 seedProgressBar.setValue(nextState.seedStatus[selectedFlowerType].progress);
             })
-    }
-
-    addSeedGUI(gameState: GameState, gameStateDelta: GameStateDelta, selectedFlowerType: FlowerType) {
-        const selectedSeedStatus = gameState.seedStatus[
-            Object.keys(gameState.seedStatus)
-                .find(type => selectedFlowerType.type === type)!
-        ];
-
-        let amountAlreadyPlaced = 0;
-        if (selectedSeedStatus.type in gameStateDelta.placedSeeds) {
-            const valuesIterator = gameStateDelta.placedSeeds[selectedSeedStatus.type].values();
-            let value = valuesIterator.next();
-            while (!value.done) {
-                amountAlreadyPlaced += value.value;
-                value = valuesIterator.next();
-            }
-        }
-        for (let i = 0; i < selectedSeedStatus.quantity - amountAlreadyPlaced; i++) {
-            this.addNewSeed(selectedSeedStatus.type);
-        }
-    }
-
-    addNewSeed(type: string) {
-        const x = (this.seedContainer.children.length) % SEEDS_PER_ROW;
-        const y = Math.floor((this.seedContainer.children.length) / SEEDS_PER_ROW);
-        
-        const seedSprite = new ImageButton(this.scene, (x * 8) + 4, this.seedContainer.height + ((y + 1) * -24) + 4,
-            "seed2", 
-            "auto", "auto",
-            COLOURS.TRANSPARENT, COLOURS.TRANSPARENT, COLOURS.WHITE, COLOURS.WHITE
-        );
-        
-        seedSprite.onClick(() => {
-            guiController.clickSeedPlacementButton();
-        });
-
-        this.seedContainer.addChild(seedSprite);
     }
 }

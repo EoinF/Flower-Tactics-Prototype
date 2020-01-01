@@ -65,8 +65,7 @@ export class SelectedTileView {
         this.popup.addChild(this.npkTabButton, "Top", "Right");
         this.popup.addChild(this.flowerTabButton, "Top", "Right");
 
-        mapController.clickTileObservable()
-        .pipe(
+        mapController.clickTileObservable().pipe(
             withLatestFrom(heldObjectController.heldObjectObservable()),
             filter(([_, heldObject]) => heldObject == null)
         ).subscribe(([tileIndex]) => {
