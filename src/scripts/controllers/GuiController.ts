@@ -1,5 +1,5 @@
 import { Observable, Subject, ReplaySubject, BehaviorSubject } from 'rxjs';
-import { map, withLatestFrom, distinctUntilChanged, publishReplay, shareReplay, tap } from 'rxjs/operators';
+import { map, distinctUntilChanged, startWith } from 'rxjs/operators';
 import { MessagePrompt } from '../views/MessageQueueView';
 import { MapLocation } from './MapController';
 
@@ -20,6 +20,8 @@ export class GuiController {
     private alertMessage$: Subject<string>;
     private messagePromptQueue$: BehaviorSubject<MessagePromptQueue>;
     private mousePosition$: Subject<MapLocation>;
+    private mouseOverSeedContainer$: Subject<boolean>;
+    private mouseOverFlowerSelection$: Subject<boolean>;
 
     constructor() {
         this.endTurn$ = new ReplaySubject(1);
@@ -34,6 +36,32 @@ export class GuiController {
             index: 0
         });
         this.mousePosition$ = new Subject();
+        this.mouseOverSeedContainer$ = new ReplaySubject(1);
+        this.mouseOverFlowerSelection$ = new ReplaySubject(1);
+    }
+
+    setMouseOverFlowerSelector(isMouseOver: boolean) {
+        this.mouseOverFlowerSelection$.next(isMouseOver);
+    }
+
+    setMouseOverSeedContainer(isMouseOver: boolean) {
+        this.mouseOverSeedContainer$.next(isMouseOver);
+    }
+
+    mouseOverSeedContainerObservable(): Observable<boolean> {
+        return this.mouseOverSeedContainer$
+            .pipe(
+                startWith(false),
+                distinctUntilChanged()
+            );
+    }
+
+    mouseOverFlowerSelectionObservable(): Observable<boolean> {
+        return this.mouseOverFlowerSelection$
+            .pipe(
+                startWith(false),
+                distinctUntilChanged()
+            );
     }
 
     clickInfoButton() {

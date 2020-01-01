@@ -1,7 +1,5 @@
 import { GameStateManager, GameStateDelta } from "../controllers/GameStateManager";
 import { UIContainer } from "../widgets/generic/UIContainer";
-import { SeedController } from "../controllers/SeedController";
-import { seedController, guiController, selectedObjectController, heldObjectController } from "../game";
 import { GameState } from "../objects/GameState";
 import { combineLatest } from "rxjs";
 import { first, map, withLatestFrom, flatMap, filter } from "rxjs/operators";
@@ -13,6 +11,8 @@ import { COLOURS } from "../constants";
 import { TextButton } from "../widgets/generic/TextButton";
 import { TextLabel } from "../widgets/generic/TextLabel";
 import { FlexUIContainer } from "../widgets/generic/FlexUIContainer";
+import { GuiController } from "../controllers/GuiController";
+import { HeldObjectController } from "../controllers/HeldObjectController";
 
 export class SeedContainerView {
     width: number;
@@ -26,7 +26,8 @@ export class SeedContainerView {
     constructor(
         scene: Phaser.Scene,
         gameStateManager: GameStateManager,
-        seedController: SeedController,
+        guiController: GuiController,
+        heldObjectController: HeldObjectController,
         flowerSelectionController: FlowerSelectionController,
         x: number,
         y: number,
@@ -77,9 +78,9 @@ export class SeedContainerView {
 
         scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
             if (this.mainContainer.hits(pointer.x, pointer.y)) {
-                seedController.setMouseOverSeedContainer(true);
+                guiController.setMouseOverSeedContainer(true);
             } else {
-                seedController.setMouseOverSeedContainer(false);
+                guiController.setMouseOverSeedContainer(false);
             }
         });
 

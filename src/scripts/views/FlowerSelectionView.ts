@@ -1,12 +1,12 @@
 import { GameStateManager } from "../controllers/GameStateManager";
 import { UIContainer } from "../widgets/generic/UIContainer";
-import { SeedController } from "../controllers/SeedController";
 import { withLatestFrom } from "rxjs/operators";
 import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
 import { ImageButton } from "../widgets/generic/ImageButton";
 import { TextLabel } from "../widgets/generic/TextLabel";
 import { FlexUIContainer } from "../widgets/generic/FlexUIContainer";
 import { COLOURS } from "../constants";
+import { GuiController } from "../controllers/GuiController";
 
 export class FlowerSelectionView {
     scene: Phaser.Scene;
@@ -18,7 +18,7 @@ export class FlowerSelectionView {
 
     constructor(scene: Phaser.Scene,
         gameStateManager: GameStateManager,
-        seedController: SeedController,
+        guiController: GuiController,
         flowerSelectionController: FlowerSelectionController,
         x: number, y: number,
         width: number
@@ -58,9 +58,9 @@ export class FlowerSelectionView {
 
         scene.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
             if (this.flowerSelector.hits(pointer.x, pointer.y)) {
-                seedController.setMouseOverFlowerSelector(true);
+                guiController.setMouseOverFlowerSelector(true);
             } else {
-                seedController.setMouseOverFlowerSelector(false);
+                guiController.setMouseOverFlowerSelector(false);
             }
         });
     }

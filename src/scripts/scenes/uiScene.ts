@@ -1,4 +1,4 @@
-import { guiController, gameStateManager, selectedObjectController, seedController, flowerSelectionController, heldObjectController, mapController } from "../game";
+import { guiController, gameStateManager, selectedObjectController, flowerSelectionController, heldObjectController, mapController } from "../game";
 import { SelectedTileView } from "../views/SelectedTileView/SelectedTileView";
 import { SelectedFlowerTypeView } from "../views/SelectedFlowerTypeView";
 import { AlertMessageView } from "../views/AlertMessageView";
@@ -7,9 +7,7 @@ import { TextButton } from "../widgets/generic/TextButton";
 import { FlowerSelectionView } from "../views/FlowerSelectionView";
 import { SeedContainerView } from "../views/SeedContainerView";
 import { combineLatest } from "rxjs";
-import { ImageButton } from "../widgets/generic/ImageButton";
 import { HeldObjectView } from "../views/HeldObjectView";
-import { withLatestFrom } from "rxjs/operators";
 import { CloudUIView } from "../views/CloudUIView";
 
 export default class UIScene extends Phaser.Scene {
@@ -31,8 +29,8 @@ export default class UIScene extends Phaser.Scene {
 
 	const offsetX = endTurnButton.width + endTurnButtonPadding * 2
 
-	const seedView = new SeedContainerView(this, gameStateManager, seedController, flowerSelectionController, offsetX, 8, flowerSelectionWidth);
-	const flowerSelectionView = new FlowerSelectionView(this, gameStateManager, seedController, flowerSelectionController, offsetX, 12 + seedView.height, flowerSelectionWidth);
+	const seedView = new SeedContainerView(this, gameStateManager, guiController, heldObjectController, flowerSelectionController, offsetX, 8, flowerSelectionWidth);
+	const flowerSelectionView = new FlowerSelectionView(this, gameStateManager, guiController, flowerSelectionController, offsetX, 12 + seedView.height, flowerSelectionWidth);
 	new CloudUIView(this, heldObjectController, guiController, offsetX, 16 + seedView.height + flowerSelectionView.flowerSelector.height);
 
 	new SelectedFlowerTypeView(this, gameStateManager, selectedObjectController);

@@ -7,7 +7,6 @@ import EvolveSeedScene from './scenes/evolveSeedScene'
 import { GameStateManager } from './controllers/GameStateManager'
 import { GuiController } from './controllers/GuiController'
 import { SelectedObjectController } from './controllers/SelectedObjectController'
-import { SeedController } from './controllers/SeedController'
 import { MapController } from './controllers/MapController'
 import { setupConnectors } from './connectors'
 import { FlowerSelectionController } from './controllers/FlowerSelectionController'
@@ -46,14 +45,12 @@ export const gameStateManager = new GameStateManager(0);
 export const selectedObjectController = new SelectedObjectController();
 export const guiController = new GuiController();
 export const mapController = new MapController();
-export const seedController = new SeedController();
 export const flowerSelectionController = new FlowerSelectionController();
 export const evolveSeedController = new EvolveSeedController();
 export const heldObjectController = new HeldObjectController();
 setupConnectors(
   guiController,
   gameStateManager,
-  seedController,
   mapController,
   flowerSelectionController,
   selectedObjectController,

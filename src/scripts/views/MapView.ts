@@ -1,15 +1,15 @@
 import { SoilColourConverter } from "../SoilColourConverter";
 import { GameStateManager } from "../controllers/GameStateManager";
 import { SelectedObjectController } from "../controllers/SelectedObjectController";
-import { SeedController } from "../controllers/SeedController";
 import { MapController } from "../controllers/MapController";
-import { startWith, pairwise, distinctUntilChanged, withLatestFrom, first, timeout, flatMap, filter, map } from "rxjs/operators";
+import { startWith, pairwise, distinctUntilChanged, withLatestFrom, map } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
 import { TileWidget } from "../widgets/specific/TileWidget";
 import { indexToMapCoordinates } from "../widgets/utils";
 import { combineLatest } from "rxjs";
-import { heldObjectController, guiController, mapController } from "../game";
+import { GuiController } from "../controllers/GuiController";
+import { HeldObjectController } from "../controllers/HeldObjectController";
 
 export class MapView {
     scene: Phaser.Scene;
@@ -25,8 +25,7 @@ export class MapView {
       scene: Phaser.Scene, 
       gameStateManager: GameStateManager, 
       soilColourConverter: SoilColourConverter,
-      selectedObjectController: SelectedObjectController,
-	  seedController: SeedController,
+	  heldObjectController: HeldObjectController,
 	  mapController: MapController
     ) {
 		this.scene = scene;
@@ -37,7 +36,7 @@ export class MapView {
 		this.riverSprites = [];
 		this.placedSeedSprites = new Map<number, PlacedSeedWidget>();
         this.setupSprites(scene, gameStateManager);
-        this.setupCallbacks(gameStateManager, selectedObjectController, seedController, mapController);
+        this.setupCallbacks(gameStateManager, mapController, heldObjectController);
     }
 
     setupSprites(scene: Phaser.Scene, gameStateManager: GameStateManager) {
@@ -83,8 +82,7 @@ export class MapView {
 	}
 
 	setupCallbacks(
-		gameStateManager: GameStateManager, selectedObjectController: SelectedObjectController, 
-		seedController: SeedController, mapController: MapController
+		gameStateManager: GameStateManager, mapController: MapController, heldObjectController: HeldObjectController
 	) {
         this.tileButtons.forEach(button => {
             button.onClick(() => {
@@ -112,7 +110,7 @@ export class MapView {
 						newStateDelta.placedSeeds[type]
 							.forEach((seedAmount, tileIndex) => {
 								if (seedAmount > 0) {
-									this.addNewSeed(tileIndex, type, seedAmount, newState, seedController, selectedObjectController);
+									this.addNewSeed(tileIndex, type, seedAmount, newState, mapController);
 								}
 							})
 					});
@@ -173,25 +171,11 @@ export class MapView {
 			});
 	}
 	
-	addNewSeed(tileIndex: number, seedType: string, seedAmount: number, newState: GameState, seedController: SeedController, selectedObjectController: SelectedObjectController) {
+	addNewSeed(tileIndex: number, seedType: string, seedAmount: number, newState: GameState, mapController: MapController) {
 		const location = indexToMapCoordinates(tileIndex, newState.numTilesX);
 		const placedSeedWidget = new PlacedSeedWidget(this.scene, (location.x * 48) - 24, (location.y * 48) - 24, 48, 48, seedAmount);
 		placedSeedWidget.onClick(() => {
 			mapController.clickTile(tileIndex);
-		});
-		placedSeedWidget.onHold(() => {
-			// heldObjectController.pickUpSeed({
-			// 	type: seedType, 
-			// 	tileIndex,
-			// 	origin: 'SEED_ORIGIN_MAP'
-			// });
-			// const currentSeedAmount = placedSeedWidget.getAmount();
-			// if (currentSeedAmount === 1) {
-			// 	this.placedSeedSprites.delete(tileIndex);
-			// 	placedSeedWidget.destroy();
-			// } else {
-			// 	placedSeedWidget.setAmount(seedAmount - 1);
-			// }
 		});
 		
 		this.placedSeedSprites.set(tileIndex, placedSeedWidget);

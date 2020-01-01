@@ -2,14 +2,13 @@ import { withLatestFrom, map, filter, flatMap, first } from 'rxjs/operators';
 import { combineLatest, merge } from 'rxjs';
 import { GuiController } from './controllers/GuiController';
 import { GameStateManager } from './controllers/GameStateManager';
-import { SeedController } from './controllers/SeedController';
 import { MapController } from './controllers/MapController';
 import { FlowerSelectionController } from './controllers/FlowerSelectionController';
 import { calculateSeedEvolve } from './deltaCalculators/calculateSeedEvolve';
 import { SEED_INTERVALS } from './constants';
 import { SelectedObjectController } from './controllers/SelectedObjectController';
 import { EvolveSeedController } from './controllers/EvolveSeedController';
-import { HeldSeedData, HeldObjectController } from './controllers/HeldObjectController';
+import { HeldObjectController } from './controllers/HeldObjectController';
 import { indexToMapCoordinates } from './widgets/utils';
 
 interface TileLocation {
@@ -29,28 +28,25 @@ function guiPositionToTileLocation(camera: Phaser.Cameras.Scene2D.Camera, x: num
 
 export function setupConnectors(
     guiController: GuiController,
-    gameStateManager: GameStateManager, 
-    seedController: SeedController, 
+    gameStateManager: GameStateManager,
     mapController: MapController,
     flowerSelectionController: FlowerSelectionController,
-    selectedObjectController: SelectedObjectController, 
+    selectedObjectController: SelectedObjectController,
     evolveSeedController: EvolveSeedController,
     heldObjectController: HeldObjectController
 ) {
     const onClickInfoButton$ = guiController.onClickInfoButtonObservable();
     const onClickEvolveButton$ = guiController.onClickEvolveButtonObservable();
     const endTurn$ = guiController.endTurnObservable();
+    const isMouseOverSeedContainer$ = guiController.mouseOverSeedContainerObservable();
+    const isMouseOverFlowerSelection$ = guiController.mouseOverFlowerSelectionObservable();
 
-    const isMouseOverSeedContainer$ = seedController.mouseOverSeedContainerObservable();
-    const isMouseOverFlowerSelection$ = seedController.mouseOverFlowerSelectionObservable();
     const pickedUpSeed$ = heldObjectController.heldSeedObservable();
-    const dropSeed$ = heldObjectController.dropSeedObservable();
 
     const gameState$ = gameStateManager.nextStateObservable();
     const gameStateDelta$ = gameStateManager.nextDeltaObservable();
 
     const mapCamera$ = mapController.cameraObservable();
-    const mouseOverTile$ = mapController.mouseOverTileObservable();
     const clickTile$ = mapController.clickTileObservable();
 
     const selectedFlowerIndex$ = flowerSelectionController.selectedFlowerIndexObservable();
