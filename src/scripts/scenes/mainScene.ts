@@ -11,8 +11,8 @@ export default class MainScene extends Phaser.Scene {
 
   create() {
     const soilColourConverter = new SoilColourConverter();
-    const mapView = new MapView(this, gameStateManager, soilColourConverter, heldObjectController, mapController);
-    const tileStatsView = new TileStatsView(this, selectedObjectController);
+    new MapView(this, gameStateManager, soilColourConverter, heldObjectController, mapController);
+    new TileStatsView(this, selectedObjectController);
     mapController.setCamera(this.cameras.main);
 
     combineLatest(guiController.messagePromptObservable(), guiController.screenStateObservable())

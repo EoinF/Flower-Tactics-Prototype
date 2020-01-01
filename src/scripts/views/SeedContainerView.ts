@@ -47,9 +47,7 @@ export class SeedContainerView {
             "seed2",
             "auto", "auto",
             COLOURS.TRANSPARENT, COLOURS.TRANSPARENT, COLOURS.WHITE, COLOURS.WHITE
-        ).onClick(() => {
-            guiController.clickSeedPlacementButton();
-        });
+        );
 
         const seedAmountLabel = new TextLabel(this.scene, 8 + seedSprite.width, 0, 'x999');
         const seedProgressBar = new ProgressBar(scene, 12 + seedSprite.width + seedAmountLabel.width, 0, 0, 100, "auto", 16);
@@ -64,14 +62,23 @@ export class SeedContainerView {
                 guiController.clickInfoButton();
             });
 
-        this.evolveButton = new TextButton(scene, 8 + this.infoButton.width, 0, 24, 24, "+", COLOURS.RED, COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW)
+        this.evolveButton = new TextButton(scene, 8 + this.infoButton.width, 0, 24, 24, "^", COLOURS.RED, COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW)
             .setBorder(1, COLOURS.BLACK)
             .onClick(() => {
                 guiController.setScreenState("Evolve");
             });
+        
+        const seedPlacementButton = new TextButton(scene, 12 + this.infoButton.width + this.evolveButton.width, 0,
+            24, 24, "+",
+            COLOURS.RED, COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW
+        ).setBorder(1, COLOURS.BLACK)
+            .onClick(() => {
+                guiController.clickSeedPlacementButton();
+            });
 
         this.mainContainer.addChild(this.infoButton, "Middle", "Right");
         this.mainContainer.addChild(this.evolveButton, "Middle", "Right");
+        this.mainContainer.addChild(seedPlacementButton, "Middle", "Right");
 
         this.width = this.mainContainer.width;
         this.height = this.mainContainer.height;
@@ -111,18 +118,6 @@ export class SeedContainerView {
                 }
             })
         
-
-        // heldObjectController.heldSeedObservable()
-        //     .subscribe(pickedUpSeed => {
-        //         if (pickedUpSeed != null) {
-        //             if (pickedUpSeed.origin == 'SEED_ORIGIN_INVENTORY') {
-        //                 this.seedContainer.children[this.seedContainer.children.length - 1]
-        //                     .destroy();
-        //                 this.seedContainer.children = this.seedContainer.children.filter((c, index) => index != this.seedContainer.children.length - 1);
-        //             }
-        //         }
-        //       });
-
         combineLatest(gameStateManager.nextStateObservable(), gameStateManager.nextDeltaObservable(), flowerSelectionController.selectedFlowerTypeObservable())
             .subscribe(([nextState, nextDelta, selectedFlowerType]) => {
                 const selectedSeedStatus = nextState.seedStatus[selectedFlowerType];

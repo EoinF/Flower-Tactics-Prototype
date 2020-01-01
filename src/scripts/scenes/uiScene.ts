@@ -16,7 +16,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
   create() {
-	const selectedTileView = new SelectedTileView(this, gameStateManager, selectedObjectController, mapController);
+	new SelectedTileView(this, gameStateManager, selectedObjectController, mapController);
 	
 	const flowerSelectionWidth = 300;
 	const endTurnButtonPadding = 10;
