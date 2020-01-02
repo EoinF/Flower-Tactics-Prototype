@@ -6,7 +6,7 @@ import { FlowerType } from "./FlowerType";
 import { StringMap } from "../types";
 import { SeedStatusDelta } from "../controllers/GameStateManager";
 import { CLOUD_LAYOUT_SEED_MAX } from "../constants";
-import { indexToMapCoordinates } from "../widgets/utils";
+import { CloudLayout } from "../controllers/HeldObjectController";
 
 export interface GameStateData {
     cloudLayoutSeed: number | null;
@@ -25,6 +25,7 @@ export class GameState implements GameStateData {
     cloudLayoutSeed: number;
     randomNumberGeneratorSeed: string;
     private randomNumberGenerator: Phaser.Math.RandomDataGenerator;
+    private cloudLayout: CloudLayout;
     numTilesX: number;
     numTilesY: number;
     tiles: Tile[];
@@ -151,6 +152,18 @@ export class GameState implements GameStateData {
     }
 
     generateNextCloudLayout() {
-        this.cloudLayoutSeed = this.getNextRandomNumber(0, CLOUD_LAYOUT_SEED_MAX);
+        this.cloudLayoutSeed = this.getNextRandomNumber(3, CLOUD_LAYOUT_SEED_MAX);
+        this.cloudLayout = [];
+
+        let current = this.cloudLayoutSeed;
+        for (let i = 0; i < 9; i++) {
+            console.log(current, current % 2);
+            this.cloudLayout.push(current % 2 == 1);
+            current = Math.floor(current / 2);
+        }
+    }
+    
+    getCloudLayout() {
+        return this.cloudLayout;
     }
 }

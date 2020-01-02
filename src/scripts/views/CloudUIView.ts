@@ -2,7 +2,9 @@ import { ImageButton } from "../widgets/generic/ImageButton";
 import { COLOURS } from "../constants";
 import { HeldObjectController } from "../controllers/HeldObjectController";
 import { GuiController } from "../controllers/GuiController";
-import { withLatestFrom } from "rxjs/operators";
+import { withLatestFrom, distinctUntilChanged } from "rxjs/operators";
+import { gameStateManager } from "../game";
+import { combineLatest } from "rxjs";
 
 export class CloudUIView {
     constructor(scene: Phaser.Scene, heldObjectController: HeldObjectController, guiController: GuiController, 
@@ -15,15 +17,17 @@ export class CloudUIView {
             .setBorder(1, COLOURS.BLACK)
             .onClick(() => guiController.clickCloudPlacementButton());
 
-        guiController.onClickCloudPlacementButtonObservable()
-            .pipe(
-                withLatestFrom(heldObjectController.heldCloudObservable())
-            ).subscribe(([_, heldObject]) => {
-                if (heldObject != null) {
-                    heldObjectController.dropObject();
-                } else {
-                    heldObjectController.pickUpClouds()
-                }
+        combineLatest(
+            guiController.onClickCloudPlacementButtonObservable(), 
+            gameStateManager.nextStateObservable().pipe(distinctUntilChanged())
+        ).pipe(
+            withLatestFrom(heldObjectController.heldCloudObservable())
+        ).subscribe(([[_, state], heldObject]) => {
+            if (heldObject != null) {
+                heldObjectController.dropObject();
+            } else {
+                heldObjectController.pickUpClouds(state.getCloudLayout())
+            }
         });
    } 
 }

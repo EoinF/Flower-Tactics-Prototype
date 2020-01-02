@@ -1,13 +1,13 @@
-import { HeldObjectController } from "../controllers/HeldObjectController";
+import { HeldObjectController, CloudLayout } from "../controllers/HeldObjectController";
 import { GuiController } from "../controllers/GuiController";
 import { withLatestFrom, filter, map } from "rxjs/operators";
 import { MapController } from "../controllers/MapController";
 import { gameStateManager } from "../game";
+import { HeldCloudsWidget } from "../widgets/specific/HeldCloudsWidget";
 
 export class HeldObjectView {
     constructor(scene: Phaser.Scene, heldObjectController: HeldObjectController, guiController: GuiController, mapController: MapController) {
-        const heldCloudsWidget = scene.add.image(0, 0, 'cloud')
-            .setVisible(false);
+        const heldCloudsWidget = new HeldCloudsWidget(scene, 0, 0);
         const heldSeedWidget = scene.add.sprite(0, 0, 'seed2')
             .setVisible(false);
 
@@ -25,6 +25,7 @@ export class HeldObjectView {
             if (heldObject != null) {
                 if (heldObject.type === 'CLOUD') {
                     heldCloudsWidget.setVisible(true);
+                    heldCloudsWidget.setCloudLayout(heldObject.data as CloudLayout);
                 } else if (heldObject.type === 'SEED') {
                     heldSeedWidget.setVisible(true);
                 }
