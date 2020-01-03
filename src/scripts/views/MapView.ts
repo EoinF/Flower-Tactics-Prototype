@@ -1,6 +1,5 @@
 import { SoilColourConverter } from "../SoilColourConverter";
 import { GameStateManager } from "../controllers/GameStateManager";
-import { SelectedObjectController } from "../controllers/SelectedObjectController";
 import { MapController } from "../controllers/MapController";
 import { startWith, pairwise, distinctUntilChanged, withLatestFrom, map } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
@@ -8,8 +7,9 @@ import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
 import { TileWidget } from "../widgets/specific/TileWidget";
 import { indexToMapCoordinates } from "../widgets/utils";
 import { combineLatest } from "rxjs";
-import { GuiController } from "../controllers/GuiController";
 import { HeldObjectController } from "../controllers/HeldObjectController";
+import { HeldCloudsWidget } from "../widgets/specific/HeldCloudsWidget";
+import { COLOURS } from "../constants";
 
 export class MapView {
     scene: Phaser.Scene;
@@ -20,6 +20,7 @@ export class MapView {
     mountainSprites: Phaser.GameObjects.Image[];
 	riverSprites: Phaser.GameObjects.Image[];
 	placedSeedSprites: Map<number, PlacedSeedWidget>;
+	placedCloudSprite: HeldCloudsWidget;
 
     constructor(
       scene: Phaser.Scene, 
@@ -35,6 +36,8 @@ export class MapView {
 		this.mountainSprites = [];
 		this.riverSprites = [];
 		this.placedSeedSprites = new Map<number, PlacedSeedWidget>();
+		this.placedCloudSprite = new HeldCloudsWidget(scene, 0, 0, COLOURS.withAlpha(COLOURS.WHITE, 0.1), COLOURS.TRANSPARENT)
+			.setDepth(5);
         this.setupSprites(scene, gameStateManager);
         this.setupCallbacks(gameStateManager, mapController, heldObjectController);
     }
@@ -58,6 +61,8 @@ export class MapView {
 			});
 			this.placedSeedSprites.forEach(s => s.destroy());
 			this.placedSeedSprites.clear();
+			
+			this.placedCloudSprite.setVisible(false);
 		});
     }
 
@@ -114,6 +119,13 @@ export class MapView {
 								}
 							})
 					});
+				if (newStateDelta.placedCloudTileIndex != null) {
+					const location = indexToMapCoordinates(newStateDelta.placedCloudTileIndex, newState.numTilesX);
+					this.placedCloudSprite.setPosition(location.x * 48, location.y * 48);
+					this.placedCloudSprite.setCloudLayout(newState.getCloudLayout());
+				} else {
+					this.placedCloudSprite.hideCloudLayout();
+				}
 			});
 		
 		heldObjectController.heldSeedObservable().pipe(

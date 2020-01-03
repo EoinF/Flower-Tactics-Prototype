@@ -31,6 +31,7 @@ export class HeldObjectView {
                 }
             }
         })
+
         mapController.mouseOverTileObservable()
             .pipe(
                 withLatestFrom(mapController.cameraObservable(), gameStateManager.nextStateObservable())
@@ -42,6 +43,10 @@ export class HeldObjectView {
 
                     heldCloudsWidget.setPosition(x, y);
                     heldSeedWidget.setPosition(x, y);
+                } else {
+                    const outsideOfView = -99999999;
+                    heldCloudsWidget.setPosition(outsideOfView, outsideOfView);
+                    heldSeedWidget.setPosition(outsideOfView, outsideOfView);
                 }
             });
     }

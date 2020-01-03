@@ -1,4 +1,4 @@
-import { withLatestFrom, map, filter, flatMap, first } from 'rxjs/operators';
+import { withLatestFrom, map, filter, flatMap, first, tap } from 'rxjs/operators';
 import { combineLatest, merge } from 'rxjs';
 import { GuiController } from './controllers/GuiController';
 import { GameStateManager } from './controllers/GameStateManager';
@@ -42,6 +42,7 @@ export function setupConnectors(
     const isMouseOverFlowerSelection$ = guiController.mouseOverFlowerSelectionObservable();
 
     const pickedUpSeed$ = heldObjectController.heldSeedObservable();
+    const heldClouds$ = heldObjectController.heldCloudObservable();
 
     const gameState$ = gameStateManager.nextStateObservable();
     const gameStateDelta$ = gameStateManager.nextDeltaObservable();
@@ -92,15 +93,13 @@ export function setupConnectors(
     clickTile$
         .pipe(
             withLatestFrom(
-                combineLatest([
-                    isMouseOverSeedContainer$, 
-                    isMouseOverFlowerSelection$,
-                    gameState$,
-                    gameStateDelta$,
-                    pickedUpSeed$
-                ])
+                isMouseOverSeedContainer$, 
+                isMouseOverFlowerSelection$,
+                gameState$,
+                gameStateDelta$,
+                pickedUpSeed$
             )
-        ).subscribe(([clickedTile, [isMouseOverSeedContainer, isMouseOverFlowerSelection, gameState, gameStateDelta, heldSeed]]) => {
+        ).subscribe(([clickedTile, isMouseOverSeedContainer, isMouseOverFlowerSelection, gameState, gameStateDelta, heldSeed]) => {
             if (!isMouseOverSeedContainer && !isMouseOverFlowerSelection) {
                 if (heldSeed != null) {
                     const isOtherSeedTypeBlockingTile = Object.keys(gameStateDelta.placedSeeds)
@@ -143,6 +142,15 @@ export function setupConnectors(
             }
         });
 
+    clickTile$
+        .pipe(
+            withLatestFrom(heldClouds$)
+        )
+        .subscribe(([tileIndex, heldCloud]) => {
+            if (heldCloud != null) {
+                gameStateManager.placeClouds(tileIndex);
+            }
+        });
 
     combineLatest(mousePosition$, mapCamera$, isMouseOverSeedContainer$, isMouseOverFlowerSelection$)
         .pipe(

@@ -4,12 +4,15 @@ import { COLOURS } from "../../constants";
 
 export class HeldCloudsWidget extends BaseUIObject {
 
-    constructor(scene: Phaser.Scene, x: number, y: number) {
+    constructor(scene: Phaser.Scene, x: number, y: number,
+        backgroundColour: Phaser.Display.Color = COLOURS.withAlpha(COLOURS.TURQUOISE, 0.2),
+        borderColour: Phaser.Display.Color = COLOURS.withAlpha(COLOURS.BLACK, 0.2)
+    ) {
         super(scene, x - 24, y - 24, 48 * 3, 48 * 3);
         
         this.container
-            .setBorder(1, COLOURS.withAlpha(COLOURS.BLACK, 0.2))
-            .setBackground(COLOURS.withAlpha(COLOURS.TURQUOISE, 0.2));
+            .setBorder(1, borderColour)
+            .setBackground(backgroundColour);
 
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 3; j++)
@@ -18,9 +21,14 @@ export class HeldCloudsWidget extends BaseUIObject {
     }
 
     setCloudLayout(cloudLayout: CloudLayout) {
+        this.setVisible(true);
         for (let i = 0; i < cloudLayout.length; i++) {
             this.container.children[i].setVisible(cloudLayout[i]);
         }
+    }
+
+    hideCloudLayout() {
+        this.setVisible(false);
     }
     
     setPosition (x: number, y: number) {

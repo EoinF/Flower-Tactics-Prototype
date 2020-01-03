@@ -228,6 +228,12 @@ export class GameStateManager {
         this.nextDelta$.next(delta);
     }
 
+    placeClouds(tileIndex: number) {
+        const delta = this.nextDelta$.value!;
+        delta.placedCloudTileIndex = tileIndex;
+        this.nextDelta$.next(delta);
+    }
+
     removeSeed(type: string, tileIndex: number) {
         const delta = this.nextDelta$.value!;
         delta.seedStatusDelta[type].quantity++;
