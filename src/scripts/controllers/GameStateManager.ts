@@ -168,8 +168,9 @@ export class GameStateManager {
         Object.keys(placedSeeds).forEach(type => {
             placedSeeds[type].forEach((seedAmount, tileIndex) => {
                 if (seedAmount > 0) {
+                    const newIndex = Math.max(...copiedData.flowers.map(flower => flower.index)) + 1;
                     copiedData.flowers.push({
-                        index: copiedData.flowers.length,
+                        index: newIndex,
                         x: tileIndex % this.nextState$.value!.numTilesX,
                         y: Math.floor(tileIndex / this.nextState$.value!.numTilesX),
                         type,

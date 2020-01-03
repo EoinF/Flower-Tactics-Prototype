@@ -5,8 +5,8 @@ import { COLOURS } from "../../constants";
 export class HeldCloudsWidget extends BaseUIObject {
 
     constructor(scene: Phaser.Scene, x: number, y: number,
-        backgroundColour: Phaser.Display.Color = COLOURS.withAlpha(COLOURS.TURQUOISE, 0.2),
-        borderColour: Phaser.Display.Color = COLOURS.withAlpha(COLOURS.BLACK, 0.2)
+        backgroundColour: Phaser.Display.Color = COLOURS.withAlpha(COLOURS.TURQUOISE, 0.4),
+        borderColour: Phaser.Display.Color = COLOURS.withAlpha(COLOURS.BLACK, 0.3)
     ) {
         super(scene, x - 24, y - 24, 48 * 3, 48 * 3);
         

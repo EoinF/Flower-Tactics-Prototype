@@ -1,7 +1,7 @@
 import { SoilColourConverter } from "../SoilColourConverter";
 import { GameStateManager } from "../controllers/GameStateManager";
 import { MapController } from "../controllers/MapController";
-import { startWith, pairwise, distinctUntilChanged, withLatestFrom, map } from "rxjs/operators";
+import { startWith, pairwise, distinctUntilChanged, withLatestFrom, map, filter } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
 import { TileWidget } from "../widgets/specific/TileWidget";
@@ -10,6 +10,7 @@ import { combineLatest } from "rxjs";
 import { HeldObjectController } from "../controllers/HeldObjectController";
 import { HeldCloudsWidget } from "../widgets/specific/HeldCloudsWidget";
 import { COLOURS } from "../constants";
+import { isRequirementsSatisfied } from "../deltaCalculators/helpers";
 
 export class MapView {
     scene: Phaser.Scene;
@@ -134,11 +135,6 @@ export class MapView {
 			if (pickedUpSeed != null) {
 				for (let i = 0; i < gameState.tiles.length; i++) {
 					const tile = gameState.tiles[i];
-					const {
-						nitrogenRequirements,
-						potassiumRequirements,
-						phosphorousRequirements
-					} = gameState.flowerTypes[pickedUpSeed.type]
 
 					const x = tile.index % gameState.numTilesX;
 					const y = Math.floor(tile.index / gameState.numTilesX);
@@ -148,18 +144,15 @@ export class MapView {
 							adjacentTile => gameState.getFlowerAtTile(adjacentTile) != null
 						);
 						
-					const isViable = (
-						nitrogenRequirements.min <= tile.soil.nitrogenContent && tile.soil.nitrogenContent <= nitrogenRequirements.max
-						&& phosphorousRequirements.min <= tile.soil.phosphorousContent && tile.soil.phosphorousContent <= phosphorousRequirements.max
-						&& potassiumRequirements.min <= tile.soil.potassiumContent && tile.soil.potassiumContent <= potassiumRequirements.max
-					);
+					const isViable = isRequirementsSatisfied(tile.soil, gameState.flowerTypes[pickedUpSeed.type]);
 
 					this.tileButtons[tile.index].setState(isPlaceable ? "allowed": "blocked", isViable ? "viable" : "unviable");
 				};
 			}
 		});
 
-		heldObjectController.dropSeedObservable()
+		heldObjectController.heldSeedObservable()
+			.pipe(filter(heldSeed => heldSeed == null))
 			.subscribe(() => {
 				for (let i = 0; i < this.tileButtons.length; i++) {
 					this.tileButtons[i].setState("n/a", "n/a");

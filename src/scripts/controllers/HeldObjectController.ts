@@ -62,20 +62,4 @@ export class HeldObjectController {
             startWith(null)
         );
     }
-
-    dropSeedObservable(): Observable<HeldSeedData> {
-        return this.dropObjectObservable().pipe(
-            filter(heldObject => heldObject.type === 'SEED'),
-            map(object => object.data as HeldSeedData)
-        );
-    }
-
-    dropObjectObservable() {
-        return this.heldObject$.pipe(
-            startWith(null),
-            pairwise(),
-            filter(([previous, current]) => previous != null && current == null),
-            map(([previous, current]) => previous!)
-        );
-    }
 }

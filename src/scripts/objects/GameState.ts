@@ -157,7 +157,6 @@ export class GameState implements GameStateData {
 
         let current = this.cloudLayoutSeed;
         for (let i = 0; i < 9; i++) {
-            console.log(current, current % 2);
             this.cloudLayout.push(current % 2 == 1);
             current = Math.floor(current / 2);
         }
