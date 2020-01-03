@@ -12,7 +12,11 @@ export default class EvolveSeedScene extends Phaser.Scene {
         this.scene.pause();
         new EvolveSeedView(this, guiController, gameStateManager, evolveSeedController);
 
-        evolveSeedController.setFlowerNames((this.cache.text.get('flower-names') as string).split('\n'));
+        evolveSeedController.setFlowerNames(
+            (this.cache.text.get('flower-names') as string)
+                .split('\n')
+                .map(name => name.replace('\n', ''))
+            );
         
         combineLatest(guiController.messagePromptObservable(), guiController.screenStateObservable())
             .subscribe(([messagePrompt, screenState]) => {
