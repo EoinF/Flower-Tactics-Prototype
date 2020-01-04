@@ -110,8 +110,15 @@ export function setupConnectors(
                         });
 
                     const tile = gameState.tiles[clickedTile];
+                    const location = indexToMapCoordinates(clickedTile, gameState.numTilesX);
                     const isFlowerBlockingTile = (gameState.getFlowerAtTile(tile) != null);
                     const isMountainBlockingTile = (gameState.getMountainAtTile(tile) != null);
+
+                    const isFlowerAdjacent = gameState.getTilesAdjacent(location.x, location.y).some(
+                        adjacentTile => {
+                            return gameState.getFlowerAtTile(adjacentTile) != null
+                        }
+                    );
 
                     if (isOtherSeedTypeBlockingTile) {
                         guiController.createAlertMessage("Another type of seed is already placed on this tile.");
@@ -119,24 +126,11 @@ export function setupConnectors(
                         guiController.createAlertMessage("A flower is blocking seed placement.");
                     } else if (isMountainBlockingTile) {
                         guiController.createAlertMessage("A mountain is blocking seed placement.");
-                    } else {
-                        const location = indexToMapCoordinates(clickedTile, gameState.numTilesX);
-                        const isFlowerAdjacent = gameState.getTilesAdjacent(location.x, location.y).some(
-                            adjacentTile => {
-                                return gameState.getFlowerAtTile(adjacentTile) != null
-                            }
-                        );
-                        if (!isFlowerAdjacent) {
-                            guiController.createAlertMessage("You can only place seeds near your existing flowers.");
-                        }
-                        else {
-                            if (heldSeed.origin == 'SEED_ORIGIN_INVENTORY') {
-                                gameStateManager.placeSeed(heldSeed.type, clickedTile);
-                            } else { // SEED_ORIGIN_MAP
-                                gameStateManager.moveSeed(heldSeed.type, heldSeed.tileIndex!, clickedTile);
-                            }
-                            return;
-                        }
+                    } else if (!isFlowerAdjacent) {
+                        guiController.createAlertMessage("You can only place seeds near your existing flowers.");
+                    }
+                    else {
+                        gameStateManager.placeSeed(heldSeed.type, clickedTile);
                     }
                 }
             }

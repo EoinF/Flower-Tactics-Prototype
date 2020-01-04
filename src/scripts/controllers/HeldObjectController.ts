@@ -1,19 +1,16 @@
 import { Subject, Observable } from "rxjs";
-import { filter, map, pairwise, startWith } from "rxjs/operators";
+import { map, startWith } from "rxjs/operators";
 
 interface HeldObject {
     type: 'SEED' | 'CLOUD',
     data: HeldSeedData | CloudLayout
 }
 
-type SeedOrigin = 'SEED_ORIGIN_MAP' | 'SEED_ORIGIN_INVENTORY';
-
 export type CloudLayout = Array<boolean>;
 
 export interface HeldSeedData {
     type: string;
     tileIndex: number | null;
-    origin: SeedOrigin;
 }
 
 export class HeldObjectController {

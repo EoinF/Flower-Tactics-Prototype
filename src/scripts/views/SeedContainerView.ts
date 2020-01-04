@@ -99,8 +99,7 @@ export class SeedContainerView {
             } else {
                 heldObjectController.pickUpSeed({
                     type: selectedFlowerType, 
-                    tileIndex: null,
-                    origin: 'SEED_ORIGIN_INVENTORY'
+                    tileIndex: null
                 });
             }
         })
