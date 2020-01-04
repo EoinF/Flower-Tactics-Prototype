@@ -11,10 +11,12 @@ export interface Soil {
 }
 
 export class Tile {
+    waterContent: number;
     index: number;
     soil: Soil;
 
-    constructor(index: number, soil: Soil = DEFAULT_SOIL) {
+    constructor(index: number, waterContent: number, soil: Soil = DEFAULT_SOIL) {
+        this.waterContent = waterContent;
         this.index = index;
         this.soil = {...soil};
     }

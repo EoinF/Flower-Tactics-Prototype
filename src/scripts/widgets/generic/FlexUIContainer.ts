@@ -67,5 +67,16 @@ export class FlexUIContainer extends UIContainer {
         }
         return this;
     }
+    
+    clear() {
+        super.clear();
 
+        if (this.widthFlexType !== "manual") {
+            this.width = 0;
+        }
+        if (this.heightFlexType !== "manual") {
+            this.height = 0;
+        }
+        return this;
+    }
 }

@@ -39,7 +39,7 @@ export class MapGenerator {
     private generateTiles(numTilesX: number, numTilesY: number): Tile[] {
         return new Array<Tile | undefined>(numTilesX * numTilesY)
             .fill(undefined)
-            .map((_, index) => new Tile(index))
+            .map((_, index) => new Tile(index, 3))
             .map((tile) => {
                 tile.soil = {
                     nitrogenContent: 0.09 * this.rnd.frac(),

@@ -8,20 +8,23 @@ import { Tile } from "../../objects/Tile";
 import { SelectedTileTab } from "./SelectedTileView";
 
 export class SoilTab implements SelectedTileTab {
+    private scene: Phaser.Scene;
     private mainContainer: UIContainer;
-    private titleText: TextLabel;
+    private firstRowContainer: UIContainer;
     
     private nitrogenDisplay: NumberPointDisplay;
     private phosphorousDisplay: NumberPointDisplay;
     private potassiumDisplay: NumberPointDisplay;
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
+        this.scene = scene;
         const displayHeight = 16;
         const displayWidth = 250;
         const displayIndent = 10;
 
-        this.titleText = new TextLabel(scene, 8, 8, "...", COLOURS.BLACK, {isBold: true});
-        this.mainContainer = new FlexUIContainer(scene, x, y, this.titleText.width, "grow")
+        this.firstRowContainer = new FlexUIContainer(scene, 8, 8, "grow", 18);
+
+        this.mainContainer = new FlexUIContainer(scene, x, y, "auto", "grow")
             .setVisible(false)
             .setDepth(4);
 
@@ -62,7 +65,7 @@ export class SoilTab implements SelectedTileTab {
         potassiumSection.addChild(potassiumLabel, "Middle");
         potassiumSection.addChild(this.potassiumDisplay, "Middle");
 
-        this.mainContainer.addChild(this.titleText);
+        this.mainContainer.addChild(this.firstRowContainer);
         this.mainContainer.addChild(nitrogenSection);
         this.mainContainer.addChild(phosphorousSection);
         this.mainContainer.addChild(potassiumSection);
@@ -87,7 +90,13 @@ export class SoilTab implements SelectedTileTab {
         this.phosphorousDisplay.setValue(phosphorousContent);
         this.potassiumDisplay.setValue(potassiumContent);
 
-        this.titleText.setText(titleText);
+        this.firstRowContainer.clear();
+        const titleTextLabel = new TextLabel(this.scene, 0, 0, titleText, COLOURS.BLACK, {isBold: true});
+        const waterSprite = this.scene.add.image(0, 0, "droplet").setScale(0.75);
+        const waterRemainingLabel = new TextLabel(this.scene, 0, 0, tile.waterContent.toString(), COLOURS.BLACK, { fontSize: 12 });
+        this.firstRowContainer.addChild(titleTextLabel);
+        this.firstRowContainer.addChild(waterSprite, "Middle");
+        this.firstRowContainer.addChild(waterRemainingLabel, "Middle");
     }
     
     hide() {

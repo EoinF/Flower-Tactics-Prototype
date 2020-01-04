@@ -40,7 +40,7 @@ export class MapLoader {
 
         const tiles = new Array<Tile | undefined>(numTilesX * numTilesY)
             .fill(undefined)
-            .map((_, index) => new Tile(index))
+            .map((_, index) => new Tile(index, 5))
             .map((tile, index) => {
                 const colour = RGBtoHSL(
                     imageData.data[(index * 4)],

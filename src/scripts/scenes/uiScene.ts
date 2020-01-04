@@ -27,7 +27,7 @@ export default class UIScene extends Phaser.Scene {
 		.setBorder(1, COLOURS.PURPLE_500)
 		.onClick(() => guiController.endTurn());
 
-	const offsetX = endTurnButton.width + endTurnButtonPadding * 2
+	const offsetX = endTurnButton.width + endTurnButtonPadding * 2;
 
 	const seedView = new SeedContainerView(this, gameStateManager, guiController, heldObjectController, flowerSelectionController, offsetX, 8, flowerSelectionWidth);
 	const flowerSelectionView = new FlowerSelectionView(this, gameStateManager, guiController, flowerSelectionController, offsetX, 12 + seedView.height, flowerSelectionWidth);

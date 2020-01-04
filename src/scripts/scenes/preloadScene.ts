@@ -31,6 +31,7 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('button-cloud', 'assets/img/button-cloud.png');
 
 		this.load.image('gui-arrow-left', 'assets/img/gui-arrow-left.png');
+		this.load.image('droplet', 'assets/img/droplet.png');
 		this.load.text('flower-names', 'assets/names.txt');
 	}
 	
