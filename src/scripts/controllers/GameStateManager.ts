@@ -6,7 +6,7 @@ import { calculateFlowerEffects } from "../deltaCalculators/calculateFlowerDelta
 import { FlowerType } from "../objects/FlowerType";
 import { map, filter } from "rxjs/operators";
 import { Flower } from "../objects/Flower";
-import { CLOUD_LAYOUT_SEED_MAX } from "../constants";
+import { CLOUD_GRID_WIDTH } from "../constants";
 
 export interface FlowerDelta {
     growth: number;
@@ -127,7 +127,8 @@ export class GameStateManager {
             tileSoilDelta,
             flowerDelta,
             seedStatusDelta,
-            placedSeeds
+            placedSeeds,
+            placedCloudTileIndex
         } = this.nextDelta$.value!;
 
         let flowersToRemove: Flower[] = [];
@@ -159,10 +160,37 @@ export class GameStateManager {
             tileSoilDelta[tile.index].potassium += returnedNutrients;
         });
 
-        tileSoilDelta.forEach((soilDelta, index) => {
-            copiedData.tiles[index].soil.nitrogenContent += soilDelta.nitrogen;
-            copiedData.tiles[index].soil.phosphorousContent += soilDelta.phosphorous;
-            copiedData.tiles[index].soil.potassiumContent += soilDelta.potassium;
+        tileSoilDelta.forEach((soilDelta, tileIndex) => {
+            copiedData.tiles[tileIndex].soil.nitrogenContent += soilDelta.nitrogen;
+            copiedData.tiles[tileIndex].soil.phosphorousContent += soilDelta.phosphorous;
+            copiedData.tiles[tileIndex].soil.potassiumContent += soilDelta.potassium;
+        });
+        
+        let rainFallTiles: number[] = [];
+
+        if (placedCloudTileIndex != null) {
+            const cloudLayout = gameState.getCloudLayout();
+            rainFallTiles = cloudLayout.map((isPlaced, index) => {
+                if (isPlaced) {
+                    const x = Math.floor(index / CLOUD_GRID_WIDTH)
+                    const y = index % CLOUD_GRID_WIDTH;
+                    return placedCloudTileIndex + x + (y * gameState.numTilesX);
+                } else {
+                    return null;
+                }
+            })
+            .filter(tileIndex => tileIndex != null)
+            .map(tileIndex => tileIndex!);
+        }
+
+        copiedData.tiles.forEach((_, tileIndex) => {
+            let waterDelta: number;
+            if (rainFallTiles.indexOf(tileIndex) !== -1) {
+                waterDelta = +3; // Rainfall adds 3 turns of water content to a tile
+            } else {
+                waterDelta = -1; // Water content degrades by 1 per turn
+            }
+            copiedData.tiles[tileIndex].waterContent += waterDelta;
         });
         
         Object.keys(placedSeeds).forEach(type => {
