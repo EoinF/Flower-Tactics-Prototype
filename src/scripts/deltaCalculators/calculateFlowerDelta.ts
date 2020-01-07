@@ -42,19 +42,24 @@ export function getFlowerEffect(tile: Tile, flower: Flower, flowerTypes: StringM
     const flowerDeltaMap = new Map<number, FlowerDelta>();
     const seedDelta = new Map<string, SeedStatusDelta>();
     
-    const isNourished = isRequirementsSatisfied(tile.soil, flowerTypes[flower.type])
-    if (isNourished) {
-        let growth = 1;
-        if (flower.growth >= turnsUntilGrown) {
+    const isNourished = isRequirementsSatisfied(tile.soil, flowerTypes[flower.type]);
+    let growth: number;
+    if (flower.growth < turnsUntilGrown) {
+        if (isNourished) {
+            growth = 1;
+        } else {
             growth = 0;
-            seedDelta.set(flower.type, {
-                quantity: 0,
-                progress: seedProductionRate,
-                type: flower.type
-            })
         }
-        flowerDeltaMap.set(flower.index, { growth, isNourished });
+    } else {
+        growth = 0;
+        seedDelta.set(flower.type, {
+            quantity: 0,
+            progress: seedProductionRate,
+            type: flower.type
+        });
     }
+    
+    flowerDeltaMap.set(flower.index, { growth, isNourished });
 
     const totalDelta = soilConsumptionRate;
     const soilDelta = {
