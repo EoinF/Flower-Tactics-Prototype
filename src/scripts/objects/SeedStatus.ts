@@ -1,5 +1,5 @@
 export interface SeedStatus {
     type: string;
     quantity: number;
-    growthProgress: number;
+    progress: number;
 }

@@ -8,8 +8,10 @@ import { RGBtoHSL } from "./extensions";
 import { FlowerType } from "./objects/FlowerType";
 import { StringMap } from "./types";
 import { SeedStatusDelta } from "./controllers/GameStateManager";
+import { Player } from "./objects/Player";
 
 export interface ObjectData {
+    players: StringMap<Player>;
     flowersMap: StringMap<Flower>;
     mountains: Mountain[];
     rivers: River[];

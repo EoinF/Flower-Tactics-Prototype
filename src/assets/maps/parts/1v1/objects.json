@@ -1,7 +1,22 @@
 {
+    "players": {
+        "1": {
+            "seedsOwned": ["1"],
+            "flowers": ["0"]
+        },
+        "2": {
+            "seedsOwned": ["2"],
+            "flowers": ["1"]
+        }
+    },
     "seedStatus": {
         "1": {
             "type": "1",
+            "quantity": 0,
+            "progress": 0
+        },
+        "2": {
+            "type": "2",
             "quantity": 0,
             "progress": 0
         }
@@ -10,6 +25,23 @@
         "1": {
             "type": "1",
             "name": "Daisy",
+            "turnsUntilGrown": 4,
+            "soilConsumptionRate": 45,
+            "seedProductionRate": 25,
+            "tenacity": 0,
+            "nitrogenRequirements": {
+                "min": 1600, "max": 2100
+            },
+            "phosphorousRequirements": {
+                "min": 1800, "max": 2300
+            },
+            "potassiumRequirements": {
+                "min": 700, "max": 1000
+            }
+        },
+        "2": {
+            "type": "2",
+            "name": "Daffodil",
             "turnsUntilGrown": 4,
             "soilConsumptionRate": 45,
             "seedProductionRate": 25,
@@ -143,7 +175,7 @@
         "1": {
             "x": 6,
             "y": 0,
-            "type": "1",
+            "type": "2",
             "growth": 0
         }
     }

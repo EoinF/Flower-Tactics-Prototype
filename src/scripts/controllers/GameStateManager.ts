@@ -1,12 +1,13 @@
 import { GameState, GameStateData } from "../objects/GameState";
 import { StringMap } from "../types";
-import { Observable, ReplaySubject, BehaviorSubject } from "rxjs";
+import { Observable, ReplaySubject, BehaviorSubject, Subject } from "rxjs";
 import { calculateRiverEffects } from "../deltaCalculators/calculateRiverDelta";
 import { calculateFlowerEffects } from "../deltaCalculators/calculateFlowerDelta";
 import { FlowerType } from "../objects/FlowerType";
 import { map, filter } from "rxjs/operators";
 import { Flower } from "../objects/Flower";
 import { CLOUD_GRID_WIDTH } from "../constants";
+import { SeedStatus } from "../objects/SeedStatus";
 
 export interface FlowerDelta {
     growth: number;
@@ -21,8 +22,13 @@ export interface SoilDelta {
 
 export interface SeedStatusDelta {
     type: string;
-    quantity: number;
     progress: number;
+    quantity: number;
+}
+
+export interface PlayerDelta {
+    flowersToRemove: string[];
+    seedStatusDelta: string[];
 }
 
 export interface GameStateDelta {

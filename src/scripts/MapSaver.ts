@@ -16,7 +16,10 @@ export class MapSaver {
                 mountains: gameState.mountains,
                 rivers: gameState.rivers,
                 seedStatus: gameState.seedStatus,
-                tiles: gameState.tiles
+                players: gameState.players,
+                tiles: gameState.tiles,
+                cloudLayoutSeed: gameState.cloudLayoutSeed,
+                randomNumberGeneratorSeed: gameState.randomNumberGeneratorSeed
             } as GameStateData
         } else {
             data = gameState

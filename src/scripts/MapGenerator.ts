@@ -29,6 +29,7 @@ export class MapGenerator {
             flowersMap: {},
             mountains: [],
             rivers: this.generateRivers(numTilesX, numTilesY),
+            players: {},
             flowerTypes: {},
             seedStatus: {},
             randomNumberGeneratorSeed: "0",

@@ -4,9 +4,10 @@ import { Mountain } from "./Mountain";
 import { River } from "./River";
 import { FlowerType } from "./FlowerType";
 import { StringMap } from "../types";
-import { SeedStatusDelta } from "../controllers/GameStateManager";
 import { CLOUD_LAYOUT_SEED_MAX } from "../constants";
 import { CloudLayout } from "../controllers/HeldObjectController";
+import { SeedStatus } from "./SeedStatus";
+import { Player } from "./Player";
 
 export interface GameStateData {
     cloudLayoutSeed: number | null;
@@ -18,7 +19,8 @@ export interface GameStateData {
     mountains: Mountain[];
     rivers: River[];
     flowerTypes: StringMap<FlowerType>;
-    seedStatus: StringMap<SeedStatusDelta>;
+    players: StringMap<Player>;
+    seedStatus: StringMap<SeedStatus>;
 }
 
 export class GameState implements GameStateData {
@@ -32,13 +34,14 @@ export class GameState implements GameStateData {
     flowersMap: StringMap<Flower>;
     mountains: Mountain[];
     rivers: River[];
+    players: StringMap<Player>;
     flowerTypes: StringMap<FlowerType>;
 
     tileToFlowerMap: Map<Tile, Flower>;
     tileToRiverMap: Map<Tile, River>;
     tileToMountainMap: Map<Tile, Mountain>;
+    seedStatus: StringMap<SeedStatus>;
     flowers: Flower[];
-    seedStatus: StringMap<SeedStatusDelta>;
 
     constructor(data: GameStateData) {
         const {
@@ -52,7 +55,8 @@ export class GameState implements GameStateData {
         this.tileToRiverMap = new Map<Tile, River>();
         this.tileToMountainMap = new Map<Tile, Mountain>();
         this.randomNumberGenerator = new Phaser.Math.RandomDataGenerator(data.randomNumberGeneratorSeed);
-        this.flowers = Object.keys(this.flowersMap).map(key => this.flowersMap[key]);
+        
+        this.flowers = Object.keys(data.flowersMap).map(key => data.flowersMap[key]);
 
         this.mapTilesToFlowers(data.flowersMap, this.tileToFlowerMap);
         this.mapTilesToRivers(data.rivers, this.tileToRiverMap);
@@ -60,8 +64,8 @@ export class GameState implements GameStateData {
     }
 
     private mapTilesToFlowers(flowers: StringMap<Flower>, map: Map<Tile, Flower>) {
-        Object.keys(flowers).forEach(key => {
-            const flower = flowers[key];
+        Object.keys(flowers).forEach(type => {
+            const flower = flowers[type];
             const tile = this.getTileAt(flower.x, flower.y)!;
             const existingFlower = map.get(tile);
             if (existingFlower != null) {

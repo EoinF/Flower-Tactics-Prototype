@@ -7,7 +7,7 @@ import { BaseUIObject } from "../../widgets/generic/UIObject";
 import { SeedInventoryTile } from "../../widgets/specific/SeedInventoryTile";
 import { combineLatest } from "rxjs";
 import { EvolveSeedController, StagedSeed } from "../../controllers/EvolveSeedController";
-import { filter, pairwise, map, startWith, tap, first, mergeMapTo } from "rxjs/operators";
+import { filter, pairwise, map, startWith, tap, first, mergeMapTo, withLatestFrom } from "rxjs/operators";
 import { StringMap } from "../../types";
 import { RadioButtonGroup } from "../../widgets/generic/RadioButtonGroup";
 import { BaseButton } from "../../widgets/generic/BaseButton";
