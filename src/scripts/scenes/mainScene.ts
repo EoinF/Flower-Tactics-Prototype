@@ -22,7 +22,15 @@ export default class MainScene extends Phaser.Scene {
         } else {
           this.scene.resume();
         }
-	  });
+    });
+
+    const shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+    shiftKey.on('down', () => {
+      guiController.setIsHoldingShiftKey(true);
+    })
+    shiftKey.on('up', () => {
+        guiController.setIsHoldingShiftKey(false);
+    });
   }
 
   update() {

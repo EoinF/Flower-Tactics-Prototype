@@ -22,6 +22,7 @@ export class GuiController {
     private mousePosition$: Subject<MapLocation>;
     private mouseOverSeedContainer$: Subject<boolean>;
     private mouseOverFlowerSelection$: Subject<boolean>;
+    private isHoldingShiftKey$: ReplaySubject<boolean>;
 
     constructor() {
         this.endTurn$ = new ReplaySubject(1);
@@ -38,6 +39,7 @@ export class GuiController {
         this.mousePosition$ = new Subject();
         this.mouseOverSeedContainer$ = new ReplaySubject(1);
         this.mouseOverFlowerSelection$ = new ReplaySubject(1);
+        this.isHoldingShiftKey$ = new ReplaySubject(1);
     }
 
     setMouseOverFlowerSelector(isMouseOver: boolean) {
@@ -108,6 +110,10 @@ export class GuiController {
         this.mousePosition$.next({x, y});
     }
 
+    setIsHoldingShiftKey(isHoldingShiftKey: boolean) {
+        this.isHoldingShiftKey$.next(isHoldingShiftKey);
+    }
+
     onClickInfoButtonObservable(): Observable<void> {
         return this.onClickInfoButton$;
     }
@@ -150,5 +156,11 @@ export class GuiController {
 
     mousePositionObservable(): Observable<MapLocation> {
         return this.mousePosition$;
+    }
+
+    isHoldingShiftKeyObservable(): Observable<boolean> {
+        return this.isHoldingShiftKey$.pipe(
+            startWith(false)
+        );
     }
 }

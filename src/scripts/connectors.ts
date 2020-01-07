@@ -40,6 +40,7 @@ export function setupConnectors(
     const endTurn$ = guiController.endTurnObservable();
     const isMouseOverSeedContainer$ = guiController.mouseOverSeedContainerObservable();
     const isMouseOverFlowerSelection$ = guiController.mouseOverFlowerSelectionObservable();
+    const isHoldingShiftKey$ = guiController.isHoldingShiftKeyObservable();
 
     const pickedUpSeed$ = heldObjectController.heldSeedObservable();
     const heldClouds$ = heldObjectController.heldCloudObservable();
@@ -98,8 +99,11 @@ export function setupConnectors(
                 gameState$,
                 gameStateDelta$,
                 pickedUpSeed$
+            ),
+            withLatestFrom(
+                isHoldingShiftKey$
             )
-        ).subscribe(([clickedTile, isMouseOverSeedContainer, isMouseOverFlowerSelection, gameState, gameStateDelta, heldSeed]) => {
+        ).subscribe(([[clickedTile, isMouseOverSeedContainer, isMouseOverFlowerSelection, gameState, gameStateDelta, heldSeed], isHoldingShiftKey]) => {
             if (!isMouseOverSeedContainer && !isMouseOverFlowerSelection) {
                 if (heldSeed != null) {
                     const isOtherSeedTypeBlockingTile = Object.keys(gameStateDelta.placedSeeds)
@@ -130,11 +134,15 @@ export function setupConnectors(
                         guiController.createAlertMessage("You can only place seeds near your existing flowers.");
                     }
                     else {
-                        gameStateManager.placeSeed(heldSeed.type, clickedTile);
+                        if (isHoldingShiftKey) {
+                            gameStateManager.removeSeed(heldSeed.type, clickedTile);
+                        } else {
+                            gameStateManager.placeSeed(heldSeed.type, clickedTile);
+                        }
                     }
                 }
             }
-        });
+        }, null, () => {});
 
     clickTile$
         .pipe(

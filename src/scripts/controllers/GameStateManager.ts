@@ -280,9 +280,11 @@ export class GameStateManager {
 
     removeSeed(type: string, tileIndex: number) {
         const delta = this.nextDelta$.value!;
-        delta.seedStatusDelta[type].quantity++;
-        this._removeSeed(delta, type, tileIndex);
-        this.nextDelta$.next(delta);
+        if (delta.placedSeeds[type].get(tileIndex) != null && delta.placedSeeds[type].get(tileIndex)! > 0) {
+            delta.seedStatusDelta[type].quantity++;
+            this._removeSeed(delta, type, tileIndex);
+            this.nextDelta$.next(delta);
+        }
     }
 
     applyEvolveResult(seeds: Array<{type: string, amount: number}>, newFlower: FlowerType) {
