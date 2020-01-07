@@ -124,6 +124,12 @@ export function setupConnectors(
                             return gameState.getFlowerAtTile(adjacentTile) != null
                         }
                     );
+                    let placedSeeds = 0;
+                    gameStateDelta.placedSeeds[heldSeed.type].forEach(amount => {
+                        placedSeeds += amount;
+                    });
+
+                    const hasSufficientSeeds = (gameState.seedStatus[heldSeed.type].quantity - placedSeeds) > 0;
 
                     if (isOtherSeedTypeBlockingTile) {
                         guiController.createAlertMessage("Another type of seed is already placed on this tile.");
@@ -133,8 +139,9 @@ export function setupConnectors(
                         guiController.createAlertMessage("A mountain is blocking seed placement.");
                     } else if (!isFlowerAdjacent) {
                         guiController.createAlertMessage("You can only place seeds near your existing flowers.");
-                    }
-                    else {
+                    } else if (!hasSufficientSeeds) {
+                        guiController.createAlertMessage("You don't have any seeds remaining.");
+                    } else {
                         if (isHoldingShiftKey) {
                             gameStateManager.removeSeed(heldSeed.type, clickedTile);
                         } else {

@@ -103,19 +103,6 @@ export class SeedContainerView {
                 });
             }
         })
-
-        combineLatest(gameStateManager.nextStateObservable(), gameStateManager.nextDeltaObservable(), heldObjectController.heldSeedObservable())
-            .pipe(
-                filter(([_,__, heldSeed]) => heldSeed != null)
-            ).subscribe(([state, delta, heldSeed]) => {
-                let placedSeeds = 0;
-                delta.placedSeeds[heldSeed!.type].forEach(amount => {
-                    placedSeeds += amount;
-                });
-                if (state.seedStatus[heldSeed!.type].quantity <= placedSeeds) {
-                    heldObjectController.dropObject();
-                }
-            })
         
         combineLatest(gameStateManager.nextStateObservable(), gameStateManager.nextDeltaObservable(), flowerSelectionController.selectedFlowerTypeObservable())
             .subscribe(([nextState, nextDelta, selectedFlowerType]) => {
