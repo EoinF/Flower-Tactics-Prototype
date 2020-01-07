@@ -133,20 +133,18 @@
             "y": 9
         }
     ],
-    "flowers": [
-        {
-            "index": 0,
+    "flowersMap": {
+        "0": {
             "x": 7,
             "y": 13,
             "type": "1",
             "growth": 0
         },
-        {
-            "index": 1,
+        "1": {
             "x": 6,
             "y": 0,
             "type": "1",
             "growth": 0
         }
-    ]
+    }
 }

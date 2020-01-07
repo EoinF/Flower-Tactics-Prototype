@@ -7,21 +7,25 @@ import { GameState } from "../objects/GameState";
 import { isRequirementsSatisfied } from "./helpers";
 
 export function calculateFlowerEffects(gameState: GameState, gameStateDelta: GameStateDelta) {
-    gameState.tileToFlowerMap.forEach((flower, tile) => {
-        const deltas = getFlowerEffect(tile, flower, gameState.flowerTypes);
+    Object.keys(gameState.flowersMap).forEach((key) => {
+        const flower = gameState.flowersMap[key];
+        const tile = gameState.getTileAt(flower.x, flower.y)!;
+        const deltas = getFlowerEffect(tile, flower, key, gameState.flowerTypes);
         gameStateDelta.tileSoilDelta[tile.index].nitrogen += deltas.soilDelta.nitrogen;
         gameStateDelta.tileSoilDelta[tile.index].phosphorous += deltas.soilDelta.phosphorous;
         gameStateDelta.tileSoilDelta[tile.index].potassium += deltas.soilDelta.potassium;
 
-        deltas.flowerDeltaMap.forEach((flowerDelta, flowerIndex) => {
-            const existingDelta = gameStateDelta.flowerDelta.get(flowerIndex)!;
-            gameStateDelta.flowerDelta.set(flowerIndex, {
+        Object.keys(deltas.flowerDeltaMap).forEach((flowerIndex) => {
+            const flowerDelta = deltas.flowerDeltaMap[flowerIndex];
+            const existingDelta = gameStateDelta.flowerDelta[flowerIndex]!;
+            gameStateDelta.flowerDelta[flowerIndex] = {
                 growth: existingDelta.growth + flowerDelta.growth,
                 isNourished: flowerDelta.isNourished
-            });
+            };
         });
 
-        deltas.seedDelta.forEach((seedDelta, type) => {
+        Object.keys(deltas.seedDelta).forEach((type) => {
+            const seedDelta = deltas.seedDelta[type];
             const existingEntry = gameStateDelta.seedStatusDelta[type];
             gameStateDelta.seedStatusDelta[type] = {
                 quantity: existingEntry.quantity + seedDelta.quantity,
@@ -32,15 +36,15 @@ export function calculateFlowerEffects(gameState: GameState, gameStateDelta: Gam
     });
 }
 
-export function getFlowerEffect(tile: Tile, flower: Flower, flowerTypes: StringMap<FlowerType>): {soilDelta: SoilDelta, flowerDeltaMap: Map<number, FlowerDelta>, seedDelta: Map<string, SeedStatusDelta>} {
+export function getFlowerEffect(tile: Tile, flower: Flower, flowerKey: string, flowerTypes: StringMap<FlowerType>): {soilDelta: SoilDelta, flowerDeltaMap: StringMap<FlowerDelta>, seedDelta: StringMap<SeedStatusDelta>} {
     const {
         turnsUntilGrown,
         soilConsumptionRate,
         seedProductionRate
     } = flowerTypes[flower.type];
     
-    const flowerDeltaMap = new Map<number, FlowerDelta>();
-    const seedDelta = new Map<string, SeedStatusDelta>();
+    const flowerDeltaMap: StringMap<FlowerDelta> = {};
+    const seedDelta: StringMap<SeedStatusDelta> = {};
     
     const isNourished = isRequirementsSatisfied(tile.soil, flowerTypes[flower.type]);
     let growth: number;
@@ -52,14 +56,14 @@ export function getFlowerEffect(tile: Tile, flower: Flower, flowerTypes: StringM
         }
     } else {
         growth = 0;
-        seedDelta.set(flower.type, {
+        seedDelta[flower.type] = {
             quantity: 0,
             progress: seedProductionRate,
             type: flower.type
-        });
+        };
     }
     
-    flowerDeltaMap.set(flower.index, { growth, isNourished });
+    flowerDeltaMap[flowerKey] = { growth, isNourished };
 
     const totalDelta = soilConsumptionRate;
     const soilDelta = {

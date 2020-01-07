@@ -26,7 +26,7 @@ export class MapGenerator {
             numTilesX,
             numTilesY,
             tiles: this.generateTiles(numTilesX, numTilesY),
-            flowers: [],
+            flowersMap: {},
             mountains: [],
             rivers: this.generateRivers(numTilesX, numTilesY),
             flowerTypes: {},

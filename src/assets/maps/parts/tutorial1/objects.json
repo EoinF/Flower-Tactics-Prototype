@@ -48,13 +48,12 @@
             "y": 3
         }
     ],
-    "flowers": [
-        {
-            "index": 0,
+    "flowersMap": {
+        "0": {
             "x": 0,
             "y": 6,
             "type": "1",
             "growth": 0
         }
-    ]
+    }
 }

@@ -12,7 +12,7 @@ export class MapSaver {
                 numTilesX: gameState.numTilesX,
                 numTilesY: gameState.numTilesY,
                 flowerTypes: gameState.flowerTypes,
-                flowers: gameState.flowers,
+                flowersMap: gameState.flowersMap,
                 mountains: gameState.mountains,
                 rivers: gameState.rivers,
                 seedStatus: gameState.seedStatus,

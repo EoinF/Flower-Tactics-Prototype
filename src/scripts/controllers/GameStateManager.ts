@@ -27,7 +27,7 @@ export interface SeedStatusDelta {
 
 export interface GameStateDelta {
     tileSoilDelta: Array<SoilDelta>;
-    flowerDelta: Map<number, FlowerDelta>;
+    flowerDelta: StringMap<FlowerDelta>;
     seedStatusDelta: StringMap<SeedStatusDelta>;
     placedSeeds: StringMap<Map<number, number>>;
     placedCloudTileIndex: number | null;
@@ -77,13 +77,13 @@ export class GameStateManager {
         return seedStatusDelta;
     }
 
-    private generateFlowerDeltaMap(gameState: GameState): Map<number, FlowerDelta> {
-        const flowerDeltaMap = new Map<number, FlowerDelta>();
-        gameState.flowers.forEach(flower => {
-            flowerDeltaMap.set(flower.index, {
+    private generateFlowerDeltaMap(gameState: GameState): StringMap<FlowerDelta> {
+        const flowerDeltaMap: StringMap<FlowerDelta> = {};
+        Object.keys(gameState.flowersMap).forEach(key => {
+            flowerDeltaMap[key] = {
                 growth: 0, isNourished: false
-            });
-        })
+            };
+        });
 
         return flowerDeltaMap;
     }
@@ -144,25 +144,26 @@ export class GameStateManager {
             placedCloudTileIndex
         } = this.nextDelta$.value!;
 
-        let flowersToRemove: Flower[] = [];
-        copiedData.flowers.forEach((copiedFlower) => {
-            const { growth, isNourished } = flowerDelta.get(copiedFlower.index)!;
+        let flowersToRemove: string[] = [];
+        Object.keys(gameState.flowersMap).forEach((key) => {
+            const { growth, isNourished } = flowerDelta[key]!;
             if (isNourished) {
-                copiedFlower.growth += growth;
+                copiedData.flowersMap[key].growth += growth;
             } else {
                 const {
                     tenacity,
                     turnsUntilGrown
-                } = copiedData.flowerTypes[copiedFlower.type];
-                const growthNeeded = turnsUntilGrown - copiedFlower.growth;
+                } = copiedData.flowerTypes[gameState.flowersMap[key].type];
+                const growthNeeded = turnsUntilGrown - copiedData.flowersMap[key].growth;
                 let survivalChance = tenacity - growthNeeded * 5;
                 if (gameState.getNextRandomNumber(0, 99) >= survivalChance) {
-                    flowersToRemove.push(copiedFlower);
+                    flowersToRemove.push(key);
                 }
             }
         });
         
-        flowersToRemove.forEach((flower) => {
+        flowersToRemove.forEach((key) => {
+            const flower = gameState.flowersMap[key];
             const tile = gameState.getTileAt(flower.x, flower.y)!;
             const {
                 soilConsumptionRate
@@ -211,14 +212,14 @@ export class GameStateManager {
         Object.keys(placedSeeds).forEach(type => {
             placedSeeds[type].forEach((seedAmount, tileIndex) => {
                 if (seedAmount > 0) {
-                    const newIndex = Math.max(...copiedData.flowers.map(flower => flower.index)) + 1;
-                    copiedData.flowers.push({
+                    const newIndex = Math.max(...Object.keys(copiedData.flowersMap).map(type => parseInt(type))) + 1;
+                    copiedData.flowersMap[newIndex] = {
                         index: newIndex,
                         x: tileIndex % this.nextState$.value!.numTilesX,
                         y: Math.floor(tileIndex / this.nextState$.value!.numTilesX),
                         type,
                         growth: 0
-                    })
+                    };
                 }
             })
         });
@@ -231,9 +232,9 @@ export class GameStateManager {
             copiedSeedStatus.progress %= 100;
         });
 
-        copiedData.flowers = copiedData.flowers.filter(
-            flower => flowersToRemove.indexOf(flower) < 0
-        );
+        flowersToRemove.forEach(key => {
+            delete copiedData.flowersMap[key];
+        });
 
         const newState = new GameState(copiedData);
         newState.generateNextCloudLayout();

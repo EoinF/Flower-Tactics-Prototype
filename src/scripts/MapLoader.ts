@@ -10,7 +10,7 @@ import { StringMap } from "./types";
 import { SeedStatusDelta } from "./controllers/GameStateManager";
 
 export interface ObjectData {
-    flowers: Flower[];
+    flowersMap: StringMap<Flower>;
     mountains: Mountain[];
     rivers: River[];
     flowerTypes: StringMap<FlowerType>;

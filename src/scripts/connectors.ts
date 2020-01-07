@@ -42,7 +42,7 @@ export function setupConnectors(
     const isMouseOverFlowerSelection$ = guiController.mouseOverFlowerSelectionObservable();
     const isHoldingShiftKey$ = guiController.isHoldingShiftKeyObservable();
 
-    const pickedUpSeed$ = heldObjectController.heldSeedObservable();
+    const heldSeed$ = heldObjectController.heldSeedObservable();
     const heldClouds$ = heldObjectController.heldCloudObservable();
 
     const gameState$ = gameStateManager.nextStateObservable();
@@ -94,11 +94,11 @@ export function setupConnectors(
     clickTile$
         .pipe(
             withLatestFrom(
-                isMouseOverSeedContainer$, 
+                isMouseOverSeedContainer$,
                 isMouseOverFlowerSelection$,
                 gameState$,
                 gameStateDelta$,
-                pickedUpSeed$
+                heldSeed$
             ),
             withLatestFrom(
                 isHoldingShiftKey$
@@ -142,7 +142,7 @@ export function setupConnectors(
                     }
                 }
             }
-        }, null, () => {});
+        });
 
     clickTile$
         .pipe(

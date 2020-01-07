@@ -14,7 +14,7 @@ export interface GameStateData {
     numTilesX: number;
     numTilesY: number;
     tiles: Tile[];
-    flowers: Flower[];
+    flowersMap: StringMap<Flower>;
     mountains: Mountain[];
     rivers: River[];
     flowerTypes: StringMap<FlowerType>;
@@ -29,7 +29,7 @@ export class GameState implements GameStateData {
     numTilesX: number;
     numTilesY: number;
     tiles: Tile[];
-    flowers: Flower[];
+    flowersMap: StringMap<Flower>;
     mountains: Mountain[];
     rivers: River[];
     flowerTypes: StringMap<FlowerType>;
@@ -37,6 +37,7 @@ export class GameState implements GameStateData {
     tileToFlowerMap: Map<Tile, Flower>;
     tileToRiverMap: Map<Tile, River>;
     tileToMountainMap: Map<Tile, Mountain>;
+    flowers: Flower[];
     seedStatus: StringMap<SeedStatusDelta>;
 
     constructor(data: GameStateData) {
@@ -51,15 +52,16 @@ export class GameState implements GameStateData {
         this.tileToRiverMap = new Map<Tile, River>();
         this.tileToMountainMap = new Map<Tile, Mountain>();
         this.randomNumberGenerator = new Phaser.Math.RandomDataGenerator(data.randomNumberGeneratorSeed);
-        
+        this.flowers = Object.keys(this.flowersMap).map(key => this.flowersMap[key]);
 
-        this.mapTilesToFlowers(data.flowers, this.tileToFlowerMap);
+        this.mapTilesToFlowers(data.flowersMap, this.tileToFlowerMap);
         this.mapTilesToRivers(data.rivers, this.tileToRiverMap);
         this.mapTilesToMountains(data.mountains, this.tileToMountainMap);
     }
 
-    private mapTilesToFlowers(flowers: Flower[], map: Map<Tile, Flower>) {
-        flowers.forEach(flower => {
+    private mapTilesToFlowers(flowers: StringMap<Flower>, map: Map<Tile, Flower>) {
+        Object.keys(flowers).forEach(key => {
+            const flower = flowers[key];
             const tile = this.getTileAt(flower.x, flower.y)!;
             const existingFlower = map.get(tile);
             if (existingFlower != null) {
