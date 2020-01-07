@@ -5,9 +5,7 @@ import { calculateRiverEffects } from "../deltaCalculators/calculateRiverDelta";
 import { calculateFlowerEffects } from "../deltaCalculators/calculateFlowerDelta";
 import { FlowerType } from "../objects/FlowerType";
 import { map, filter } from "rxjs/operators";
-import { Flower } from "../objects/Flower";
 import { CLOUD_GRID_WIDTH } from "../constants";
-import { SeedStatus } from "../objects/SeedStatus";
 
 export interface FlowerDelta {
     growth: number;
@@ -43,10 +41,12 @@ export class GameStateManager {
     private loadMap$: ReplaySubject<GameState>;
     private nextState$: BehaviorSubject<GameState | null>;
     private nextDelta$: BehaviorSubject<GameStateDelta | null>;
+    private currentPlayer$: ReplaySubject<string>;
     constructor(seed: number) {
         this.loadMap$ = new ReplaySubject(1);
         this.nextState$ = new BehaviorSubject<GameState | null>(null);
         this.nextDelta$ = new BehaviorSubject<GameStateDelta | null>(null);
+        this.currentPlayer$ = new ReplaySubject<string>(1);
     }
 
     setState(gameStateOrData: GameState | GameStateData) {
@@ -61,6 +61,7 @@ export class GameStateManager {
         }
         
         this.nextState$.next(gameState);
+        this.currentPlayer$.next(Object.keys(gameState.players)[0])
         this.loadMap$.next(gameState);
         this.nextDelta$.next(this.calculateDelta(gameState));
     }
@@ -246,6 +247,10 @@ export class GameStateManager {
         newState.generateNextCloudLayout();
         this.nextState$.next(newState);
         this.nextDelta$.next(this.calculateDelta(newState));
+    }
+
+    currentPlayerObservable(): Observable<string> {
+        return this.currentPlayer$;
     }
 
     nextStateObservable(): Observable<GameState> {

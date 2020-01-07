@@ -50,7 +50,8 @@ export class SeedInventoryView extends BaseUIObject {
         const seedState$ = combineLatest(
             gameStateManager.nextStateObservable(),
             gameStateManager.nextDeltaObservable(),
-            evolveSeedController.stagedSeedsObservable()
+            evolveSeedController.stagedSeedsObservable(),
+            gameStateManager.currentPlayerObservable()
         );
 
         this.radioGroup = new RadioButtonGroup([], COLOURS.LIGHT_YELLOW, COLOURS.YELLOW, COLOURS.GRAY, 1)
@@ -123,27 +124,29 @@ export class SeedInventoryView extends BaseUIObject {
         this.radioGroup.setButtons(this.seedSelectionGrid.children as Array<BaseButton>);
     }
 
-    simplifySeedStates(state: GameState, delta: GameStateDelta, stagedSeed: StagedSeed | null) {
+    simplifySeedStates(state: GameState, delta: GameStateDelta, stagedSeed: StagedSeed | null, currentPlayerId: string) {
         let isAnyStaged = false;
-        const seedInventoryItems = Object.keys(state.seedStatus).map(type => {
-            let amountPlaced = 0;
-            if (type in delta.placedSeeds) {
-                delta.placedSeeds[type].forEach((amount) => {
-                    amountPlaced += amount
-                });
-            }
-            let amountStagedIndex = 0;
-            if (stagedSeed != null && type === stagedSeed.type) {
-                isAnyStaged = true;
-                amountStagedIndex = stagedSeed.stagedAmount;
-            }
+        const seedInventoryItems = Object.keys(state.seedStatus)
+            .filter(type => state.players[currentPlayerId].seedsOwned.indexOf(type) !== -1)
+            .map(type => {
+                let amountPlaced = 0;
+                if (type in delta.placedSeeds) {
+                    delta.placedSeeds[type].forEach((amount) => {
+                        amountPlaced += amount
+                    });
+                }
+                let amountStagedIndex = 0;
+                if (stagedSeed != null && type === stagedSeed.type) {
+                    isAnyStaged = true;
+                    amountStagedIndex = stagedSeed.stagedAmount;
+                }
 
-            const amount = state.seedStatus[type].quantity - amountPlaced - SEED_INTERVALS[amountStagedIndex];
-            const name = state.flowerTypes[type].name;
-            return {
-                amount, name, type, amountStagedIndex
-            }
-        });
+                const amount = state.seedStatus[type].quantity - amountPlaced - SEED_INTERVALS[amountStagedIndex];
+                const name = state.flowerTypes[type].name;
+                return {
+                    amount, name, type, amountStagedIndex
+                }
+            });
         return {
             seedInventoryItems,
             isAnyStaged

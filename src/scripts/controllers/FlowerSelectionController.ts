@@ -1,6 +1,4 @@
 import { ReplaySubject, Observable, Subject, BehaviorSubject } from "rxjs";
-import { FlowerType } from "../objects/FlowerType";
-import { publishReplay, publish, shareReplay, startWith } from "rxjs/operators";
 
 export class FlowerSelectionController {
     private selectedFlowerType$: Subject<string>;

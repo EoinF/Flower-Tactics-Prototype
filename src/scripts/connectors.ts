@@ -47,6 +47,7 @@ export function setupConnectors(
 
     const gameState$ = gameStateManager.nextStateObservable();
     const gameStateDelta$ = gameStateManager.nextDeltaObservable();
+    const currentPlayer$ = gameStateManager.currentPlayerObservable();
 
     const mapCamera$ = mapController.cameraObservable();
     const clickTile$ = mapController.clickTileObservable();
@@ -71,8 +72,8 @@ export function setupConnectors(
         selectedObjectController.setSelectedFlowerType(flowerType);
     })
 
-    const flowerTypesArray$ = gameState$.pipe(
-        map(state => Object.keys(state.flowerTypes))
+    const flowerTypesArray$ = combineLatest(gameState$, currentPlayer$).pipe(
+        map(([state, currentPlayerId]) => state.players[currentPlayerId as string].seedsOwned)
     );
     
     combineLatest(selectedFlowerIndex$, flowerTypesArray$.pipe(first()), (selectedIndex) => selectedIndex)
