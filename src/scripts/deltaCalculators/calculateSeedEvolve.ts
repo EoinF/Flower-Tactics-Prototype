@@ -45,6 +45,7 @@ function applyImprovements(newFlower: FlowerType, gameState: GameState, improvem
     // 2) improve seedProductionRate (small increase but not so rare)
     // 3) improve soilConsumptionRate (should be small and rarish)
     // 4,5,6) improve any of the soil requirements (common)
+    // 7) improve tenacity for surviving without nutrients
     //
     // And also, any of the above can be disimproved in semi rare cases
     // Weighted as follows
@@ -53,7 +54,8 @@ function applyImprovements(newFlower: FlowerType, gameState: GameState, improvem
         'growth': 1,
         'soil consumption': 2,
         'seed production': 3,
-        'requirements': 4
+        'requirements': 4,
+        'tenacity': 3
     }
     // points should be distributed randomly (based on the above weights) to improve each of these stats
 
@@ -61,7 +63,8 @@ function applyImprovements(newFlower: FlowerType, gameState: GameState, improvem
         'growth': 17 - newFlower.turnsUntilGrown,
         'soil consumption': 50 - Math.min(40, newFlower.soilConsumptionRate),
         'seed production': 35 - Math.min(30, newFlower.seedProductionRate),
-        'requirements': 1
+        'requirements': 1,
+        'tenacity': 1 + Math.floor(newFlower.tenacity / 20)
     };
 
     while(improvementPoints > 0) {
@@ -97,6 +100,9 @@ function applyImprovementDelta(newFlower: FlowerType, improvementType: string, g
             } else {
                 newFlower.phosphorousRequirements = improveRequirements(newFlower.phosphorousRequirements, gameState, delta);
             }
+            break;
+        case 'tenacity':
+            newFlower.tenacity += delta;
             break;
     }
 }
