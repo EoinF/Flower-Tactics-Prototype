@@ -100,16 +100,29 @@ export class GameStateManager {
     private getBlankDelta(gameState: GameState): GameStateDelta {
         return {
             flowerDelta: this.generateFlowerDeltaMap(gameState),
-            tileSoilDelta: gameState.tiles.map(() => ({
-                    nitrogen: 0,
-                    potassium: 0,
-                    phosphorous: 0
-                })
-            ),
+            tileSoilDelta: this.generateSoilDeltaMap(gameState),
             seedStatusDelta: this.getBlankSeedStatusDelta(gameState),
             placedSeeds: this.generatePlacedSeedsMap(gameState),
             placedCloudTileIndex: null
         };
+    }
+
+    private generateSoilDeltaMap(gameState: GameState): Array<SoilDelta> {
+        return gameState.tiles.map((tile) => {
+            if (tile.waterContent === 0 || tile.waterContent >= 10) {
+                return {
+                    nitrogen: -25,
+                    potassium: -25,
+                    phosphorous: -25
+                }
+            } else {
+                return {
+                    nitrogen: 0,
+                    potassium: 0,
+                    phosphorous: 0
+                }
+            }
+        });
     }
 
     private calculateDelta(state: GameState) {
@@ -187,8 +200,10 @@ export class GameStateManager {
             let waterDelta: number;
             if (rainFallTiles.indexOf(tileIndex) !== -1) {
                 waterDelta = +3; // Rainfall adds 3 turns of water content to a tile
-            } else {
+            } else if (copiedData.tiles[tileIndex].waterContent > 0) {
                 waterDelta = -1; // Water content degrades by 1 per turn
+            } else {
+                waterDelta = 0;
             }
             copiedData.tiles[tileIndex].waterContent += waterDelta;
         });

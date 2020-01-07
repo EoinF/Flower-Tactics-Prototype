@@ -24,8 +24,8 @@ export function calculateRiverEffects(gameState: GameState, gameStateDelta: Game
 
 function getRiverEffect(tile: Tile, amount: number): SoilDelta {
     return {
-        nitrogen: 0.02 * amount,
-        potassium: 0.02 * amount,
-        phosphorous: 0.02 * amount
+        nitrogen: 2 * amount,
+        potassium: 2 * amount,
+        phosphorous: 2 * amount
     };
 }
