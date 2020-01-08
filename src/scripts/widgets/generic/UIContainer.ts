@@ -15,6 +15,8 @@ export class UIContainer implements UIObject {
     width: number;
     height: number;
     alpha: number;
+    private alphaMode: "auto" | "inherit"
+    private depthMode: "auto" | "inherit"
     private verticalAlignment: VerticalAlignment;
     private horizontalAlignment: HorizontalAlignment;
     depth: number;
@@ -39,6 +41,8 @@ export class UIContainer implements UIObject {
         this.originX = this.originY = 0;
 
         this.alpha = 1;
+        this.alphaMode = "auto";
+        this.depthMode = "inherit";
         this.depth = 0;
         this.width = width;
         this.height = height;
@@ -97,8 +101,12 @@ export class UIContainer implements UIObject {
 
         this.children.push(child);
         child.setPosition(ax + this.x, ay + this.y);
-        child.setAlpha(this.alpha);
-        child.setDepth(this.depth + 1);
+        if (this.alphaMode === "inherit") {
+            child.setAlpha(this.alpha);
+        }
+        if (this.depthMode === "inherit") {
+            child.setDepth(this.depth + 1);
+        }
         if (!this.visible) {
             child.setVisible(false);
         }
@@ -123,9 +131,12 @@ export class UIContainer implements UIObject {
         return this;
     }
 
-    setDepth(depth: number) {
+    setDepth(depth: number, depthMode: "auto" | "inherit" = "inherit") {
         this.depth = depth;
-        this.children.forEach(child => child.setDepth(this.depth + 1));
+        this.depthMode = depthMode;
+        if (depthMode === "inherit") {
+            this.children.forEach(child => child.setDepth(this.depth + 1));
+        }
         this.backgroundImage.setDepth(this.depth);
         return this;
     }
@@ -184,10 +195,13 @@ export class UIContainer implements UIObject {
         );
     }
 
-    setAlpha(alpha: number) {
+    setAlpha(alpha: number, alphaMode: "auto" | "inherit" = "auto") {
         this.alpha = alpha;
+        this.alphaMode = alphaMode;
         this.backgroundImage.setAlpha(alpha);
-        this.children.forEach(child => child.setAlpha(alpha));
+        if (alphaMode === "inherit") {
+            this.children.forEach(child => child.setAlpha(alpha));
+        }
         return this;
     }
 }

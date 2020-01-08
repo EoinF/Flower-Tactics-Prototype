@@ -70,7 +70,7 @@ export class MapView {
 	setupTileSprites(gameState: GameState) {
 		this.tileButtons.forEach(s => s.destroy());
 		this.tileButtons = gameState.tiles.map((tile, index) => {
-			return new TileWidget(this.scene, index, gameState.numTilesX, tile.soil, this.soilColourConverter);
+			return new TileWidget(this.scene, index, gameState.numTilesX, tile.soil, tile.waterContent, this.soilColourConverter);
 		});
 	}
 
@@ -99,7 +99,7 @@ export class MapView {
         gameStateManager.nextStateObservable().subscribe((newState) => {
 			this.tileButtons.forEach(button => {
 				const tile = newState.getTileAt(button.tileX, button.tileY)!;
-				button.setSoil(tile.soil);
+				button.setTileState(tile.soil, tile.waterContent);
 			});
 			this.setupFlowerSprites(newState);
 		});
@@ -129,9 +129,22 @@ export class MapView {
 				}
 			});
 		
-		heldObjectController.heldSeedObservable().pipe(
-			withLatestFrom(gameStateManager.nextStateObservable())
-		).subscribe(([pickedUpSeed, gameState]) => {
+		combineLatest(
+			heldObjectController.heldCloudObservable(),
+			gameStateManager.nextStateObservable().pipe()
+		).subscribe(([heldCloud, gameState]) => {
+			if (heldCloud != null) {
+				for (let i = 0; i < gameState.tiles.length; i++) {
+					const tile = gameState.tiles[i];
+				
+					this.tileButtons[tile.index].setTileState(tile.soil, tile.waterContent);
+					this.tileButtons[tile.index].setPlacementState("water", "n/a");
+				};
+			}
+		});
+		
+		combineLatest(heldObjectController.heldSeedObservable(), gameStateManager.nextStateObservable())
+		.subscribe(([pickedUpSeed, gameState]) => {
 			if (pickedUpSeed != null) {
 				for (let i = 0; i < gameState.tiles.length; i++) {
 					const tile = gameState.tiles[i];
@@ -146,16 +159,16 @@ export class MapView {
 						
 					const isViable = isRequirementsSatisfied(tile.soil, gameState.flowerTypes[pickedUpSeed.type]);
 
-					this.tileButtons[tile.index].setState(isPlaceable ? "allowed": "blocked", isViable ? "viable" : "unviable");
+					this.tileButtons[tile.index].setPlacementState(isPlaceable ? "allowed": "blocked", isViable ? "viable" : "unviable");
 				};
 			}
 		});
 
-		heldObjectController.heldSeedObservable()
-			.pipe(filter(heldSeed => heldSeed == null))
+		heldObjectController.heldObjectObservable()
+			.pipe(filter(heldObject => heldObject == null))
 			.subscribe(() => {
 				for (let i = 0; i < this.tileButtons.length; i++) {
-					this.tileButtons[i].setState("n/a", "n/a");
+					this.tileButtons[i].setPlacementState("n/a", "n/a");
 				}
 			});
 
