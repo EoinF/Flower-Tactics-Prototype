@@ -94,7 +94,7 @@ export class TileWidget extends ClickableWidget {
                     tintColour = COLOURS.PINK_100;
                     break;
                 case "water":
-                    const colour = Phaser.Display.Color.Interpolate.ColorWithColor(COLOURS.WHITE, COLOURS.BLUE_700, 20, 10 + this.waterContent);
+                    const colour = Phaser.Display.Color.Interpolate.ColorWithColor(COLOURS.WHITE, COLOURS.BLUE_700, 20, Math.min(20, 10 + this.waterContent));
                     tintColour = new Phaser.Display.Color(colour.r, colour.g, colour.b, colour.a);
                     colourRatio = 90;
             }
@@ -106,8 +106,10 @@ export class TileWidget extends ClickableWidget {
         this.soilImage.setTint(finalColour.color);
         this.viableSprite.setVisible(this.viabilityState === "viable");
 
+        const waterDropScale = Math.min(1, 0.3 + (0.7 * this.waterContent / 10));
         this.waterLabel.setText(this.waterContent.toString());
-        this.waterImage.setVisible(this.placementState === "water");
+        this.waterImage.setVisible(this.placementState === "water")
+            .setScale(waterDropScale);
         this.waterLabel.setVisible(this.placementState === "water");
     }
 }
