@@ -2,15 +2,17 @@ import { UIContainer } from "../../widgets/generic/UIContainer";
 import { COLOURS, SEED_INTERVALS } from "../../constants";
 import { TextLabel } from "../../widgets/generic/TextLabel";
 import { GameState } from "../../objects/GameState";
-import { GameStateDelta, GameStateManager } from "../../controllers/GameStateManager";
+import { GameStateController } from "../../controllers/GameStateController";
 import { BaseUIObject } from "../../widgets/generic/UIObject";
 import { SeedInventoryTile } from "../../widgets/specific/SeedInventoryTile";
 import { combineLatest } from "rxjs";
 import { EvolveSeedController, StagedSeed } from "../../controllers/EvolveSeedController";
-import { filter, pairwise, map, startWith, tap, first, mergeMapTo, withLatestFrom } from "rxjs/operators";
+import { filter, pairwise, map, startWith, tap, first, mergeMapTo } from "rxjs/operators";
 import { StringMap } from "../../types";
 import { RadioButtonGroup } from "../../widgets/generic/RadioButtonGroup";
 import { BaseButton } from "../../widgets/generic/BaseButton";
+import { GameDeltaController } from "../../controllers/GameDeltaController";
+import { GameStateDelta } from "../../connectors/gameDeltaConnectors";
 
 interface SeedInventoryItem {
     type: string;
@@ -31,7 +33,8 @@ export class SeedInventoryView extends BaseUIObject {
 
     constructor(scene: Phaser.Scene, x: number, y: number,
         width: number, height: number,
-        gameStateManager: GameStateManager, evolveSeedController: EvolveSeedController
+        gameStateController: GameStateController, gameDeltaController: GameDeltaController,
+        evolveSeedController: EvolveSeedController
     ) {
         super(scene, x, y, width, height);
         this.scene = scene;
@@ -48,10 +51,10 @@ export class SeedInventoryView extends BaseUIObject {
         this.cellHeight = 52;
 
         const seedState$ = combineLatest(
-            gameStateManager.nextStateObservable(),
-            gameStateManager.nextDeltaObservable(),
+            gameStateController.gameStateObservable(),
+            gameDeltaController.gameDeltaObservable(),
             evolveSeedController.stagedSeedsObservable(),
-            gameStateManager.currentPlayerObservable()
+            gameStateController.currentPlayerObservable()
         );
 
         this.radioGroup = new RadioButtonGroup([], COLOURS.LIGHT_YELLOW, COLOURS.YELLOW, COLOURS.GRAY, 1)

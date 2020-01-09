@@ -2,7 +2,7 @@ import { HeldObjectController, CloudLayout } from "../controllers/HeldObjectCont
 import { GuiController } from "../controllers/GuiController";
 import { withLatestFrom, filter, map } from "rxjs/operators";
 import { MapController } from "../controllers/MapController";
-import { gameStateManager } from "../game";
+import { gameStateController } from "../game";
 import { HeldCloudsWidget } from "../widgets/specific/HeldCloudsWidget";
 
 export class HeldObjectView {
@@ -34,7 +34,7 @@ export class HeldObjectView {
 
         mapController.mouseOverTileObservable()
             .pipe(
-                withLatestFrom(mapController.cameraObservable(), gameStateManager.nextStateObservable())
+                withLatestFrom(mapController.cameraObservable(), gameStateController.gameStateObservable())
             )
             .subscribe(([tile, mapCamera, state]) => {
                 if (tile != null) {

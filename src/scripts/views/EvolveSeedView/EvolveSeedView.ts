@@ -1,15 +1,17 @@
 import { UIContainer } from "../../widgets/generic/UIContainer";
 import { GuiController } from "../../controllers/GuiController";
-import { GameStateManager } from "../../controllers/GameStateManager";
+import { GameStateController } from "../../controllers/GameStateController";
 import { COLOURS } from "../../constants";
 import { EvolveSeedController } from "../../controllers/EvolveSeedController";
 import { SeedInventoryView } from "./SeedInventoryView";
 import { SeedStatsView } from "./SeedStatsView";
 import { EvolveControlsView } from "./EvolveControlsView";
+import { GameDeltaController } from "../../controllers/GameDeltaController";
 
 export class EvolveSeedView {
-    constructor(scene: Phaser.Scene, 
-        guiController: GuiController, gameStateManager: GameStateManager, 
+    constructor(scene: Phaser.Scene,
+        guiController: GuiController,
+        gameStateController: GameStateController, gameDeltaController: GameDeltaController,
         evolveSeedController: EvolveSeedController
     ) {
         const canvas = scene.game.canvas;
@@ -19,15 +21,15 @@ export class EvolveSeedView {
 
         // Left hand panel
         const seedInventoryView = new SeedInventoryView(scene, 16, 16, (canvas.width * 0.6) - 24, canvas.height - 32,
-            gameStateManager, evolveSeedController);
+            gameStateController, gameDeltaController, evolveSeedController);
 
         // Top right panel
         const seedStatsView = new SeedStatsView(scene, 16, 16, (canvas.width * 0.4) - 16, (canvas.height * 0.4) - 20,
-            gameStateManager, evolveSeedController);
+            gameStateController, evolveSeedController);
 
         // Bottom right panel
         const evolveControlsView = new EvolveControlsView(scene, 16, 16, (canvas.width * 0.4) - 16, (canvas.height * 0.6) - 20,
-            gameStateManager, evolveSeedController, guiController);
+            gameStateController, evolveSeedController, guiController);
         
         mainContainer.addChild(seedInventoryView, "Top", "Left");
         mainContainer.addChild(seedStatsView, "Top", "Right");

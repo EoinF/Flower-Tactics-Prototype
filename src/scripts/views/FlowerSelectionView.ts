@@ -1,4 +1,4 @@
-import { GameStateManager } from "../controllers/GameStateManager";
+import { GameStateController } from "../controllers/GameStateController";
 import { UIContainer } from "../widgets/generic/UIContainer";
 import { withLatestFrom } from "rxjs/operators";
 import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
@@ -10,20 +10,20 @@ import { GuiController } from "../controllers/GuiController";
 
 export class FlowerSelectionView {
     scene: Phaser.Scene;
-    gameStateManager: GameStateManager;
+    gameStateController: GameStateController;
     flowerSelector: UIContainer;
     flowerSelectLeft: ImageButton;
     flowerSelectRight: ImageButton;
     flowerText: TextLabel;
 
     constructor(scene: Phaser.Scene,
-        gameStateManager: GameStateManager,
+        gameStateController: GameStateController,
         guiController: GuiController,
         flowerSelectionController: FlowerSelectionController,
         x: number, y: number,
         width: number
     ) {
-        this.gameStateManager = gameStateManager;
+        this.gameStateController = gameStateController;
         this.scene = scene;
 
         this.flowerSelector = new FlexUIContainer(scene, x, y, width, "auto", "Bottom", "Right")
@@ -51,7 +51,7 @@ export class FlowerSelectionView {
         });
 
         flowerSelectionController.selectedFlowerTypeObservable().pipe(
-            withLatestFrom(gameStateManager.nextStateObservable())
+            withLatestFrom(gameStateController.gameStateObservable())
         ).subscribe(([flowerType, gameState]) => {
             this.flowerText.setText(gameState.flowerTypes[flowerType].name);
         })

@@ -1,5 +1,5 @@
 import { SoilColourConverter } from "../SoilColourConverter";
-import { GameStateManager } from "../controllers/GameStateManager";
+import { GameStateController } from "../controllers/GameStateController";
 import { MapController } from "../controllers/MapController";
 import { startWith, pairwise, distinctUntilChanged, withLatestFrom, map, filter } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
@@ -11,6 +11,7 @@ import { HeldObjectController } from "../controllers/HeldObjectController";
 import { HeldCloudsWidget } from "../widgets/specific/HeldCloudsWidget";
 import { COLOURS } from "../constants";
 import { isRequirementsSatisfied } from "../deltaCalculators/helpers";
+import { GameDeltaController } from "../controllers/GameDeltaController";
 
 export class MapView {
     scene: Phaser.Scene;
@@ -25,7 +26,8 @@ export class MapView {
 
     constructor(
       scene: Phaser.Scene, 
-      gameStateManager: GameStateManager, 
+	  gameStateController: GameStateController,
+	  gameDeltaController: GameDeltaController,
       soilColourConverter: SoilColourConverter,
 	  heldObjectController: HeldObjectController,
 	  mapController: MapController
@@ -39,12 +41,12 @@ export class MapView {
 		this.placedSeedSprites = new Map<number, PlacedSeedWidget>();
 		this.placedCloudSprite = new HeldCloudsWidget(scene, 0, 0, COLOURS.withAlpha(COLOURS.WHITE, 0.1), COLOURS.TRANSPARENT)
 			.setDepth(5);
-        this.setupSprites(scene, gameStateManager);
-        this.setupCallbacks(gameStateManager, mapController, heldObjectController);
+        this.setupSprites(scene, gameStateController);
+        this.setupCallbacks(gameStateController, gameDeltaController, mapController, heldObjectController);
     }
 
-    setupSprites(scene: Phaser.Scene, gameStateManager: GameStateManager) {
-		gameStateManager.loadMapObservable().subscribe((gameState) => {
+    setupSprites(scene: Phaser.Scene, gameStateController: GameStateController) {
+		gameStateController.loadMapObservable().subscribe((gameState) => {
 			this.setupTileSprites(gameState);
 			this.setupFlowerSprites(gameState);
 		
@@ -88,7 +90,8 @@ export class MapView {
 	}
 
 	setupCallbacks(
-		gameStateManager: GameStateManager, mapController: MapController, heldObjectController: HeldObjectController
+		gameStateController: GameStateController, gameDeltaController: GameDeltaController,
+		mapController: MapController, heldObjectController: HeldObjectController
 	) {
         this.tileButtons.forEach(button => {
             button.onClick(() => {
@@ -96,7 +99,7 @@ export class MapView {
             });
         });
 
-        gameStateManager.nextStateObservable().subscribe((newState) => {
+        gameStateController.gameStateObservable().subscribe((newState) => {
 			this.tileButtons.forEach(button => {
 				const tile = newState.getTileAt(button.tileX, button.tileY)!;
 				button.setTileState(tile.soil, tile.waterContent);
@@ -104,9 +107,9 @@ export class MapView {
 			this.setupFlowerSprites(newState);
 		});
 		
-		gameStateManager.nextDeltaObservable()
+		gameDeltaController.gameDeltaObservable()
 			.pipe(
-				withLatestFrom(gameStateManager.nextStateObservable())
+				withLatestFrom(gameStateController.gameStateObservable())
 			)
 			.subscribe(([newStateDelta, newState]) => {
 				this.placedSeedSprites.forEach(sprite => sprite.destroy());
@@ -131,7 +134,7 @@ export class MapView {
 		
 		combineLatest(
 			heldObjectController.heldCloudObservable(),
-			gameStateManager.nextStateObservable().pipe()
+			gameStateController.gameStateObservable()
 		).subscribe(([heldCloud, gameState]) => {
 			if (heldCloud != null) {
 				for (let i = 0; i < gameState.tiles.length; i++) {
@@ -143,7 +146,7 @@ export class MapView {
 			}
 		});
 		
-		combineLatest(heldObjectController.heldSeedObservable(), gameStateManager.nextStateObservable())
+		combineLatest(heldObjectController.heldSeedObservable(), gameStateController.gameStateObservable())
 		.subscribe(([pickedUpSeed, gameState]) => {
 			if (pickedUpSeed != null) {
 				for (let i = 0; i < gameState.tiles.length; i++) {

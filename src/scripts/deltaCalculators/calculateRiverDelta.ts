@@ -1,6 +1,6 @@
 import { GameState } from "../objects/GameState";
-import { GameStateDelta, SoilDelta } from "../controllers/GameStateManager";
 import { Tile } from "../objects/Tile";
+import { GameStateDelta, SoilDelta } from "../connectors/gameDeltaConnectors";
 
 export function calculateRiverEffects(gameState: GameState, gameStateDelta: GameStateDelta) {
     gameState.rivers.forEach(river => {

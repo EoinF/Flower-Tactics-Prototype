@@ -1,4 +1,3 @@
-import { GameStateManager } from "../../controllers/GameStateManager";
 import { Tile } from "../../objects/Tile";
 import { SelectedObjectController } from "../../controllers/SelectedObjectController";
 import { UIContainer } from "../../widgets/generic/UIContainer";
@@ -9,10 +8,11 @@ import { GameState } from "../../objects/GameState";
 import { FlowerTab } from "./FlowerTab";
 import { SoilTab } from "./SoilTab";
 import { COLOURS } from "../../constants";
-import { GuiController } from "../../controllers/GuiController";
-import { mapController, heldObjectController } from "../../game";
 import { MapController } from "../../controllers/MapController";
 import { withLatestFrom, filter } from "rxjs/operators";
+import { GameStateController } from "../../controllers/GameStateController";
+import { HeldObjectController } from "../../controllers/HeldObjectController";
+import { gameStateController } from "../../game";
 
 export interface SelectedTileTab {
     show: (gameState: GameState, tile: Tile) => void;
@@ -32,7 +32,12 @@ export class SelectedTileView {
 
     private tabs: SelectedTileTab[];
 
-    constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, selectedObjectController: SelectedObjectController, mapController: MapController) {
+    constructor(scene: Phaser.Scene, 
+        gameStateController: GameStateController, 
+        selectedObjectController: SelectedObjectController, 
+        mapController: MapController,
+        heldObjectController: HeldObjectController
+    ) {
         this.popup = new UIContainer(scene, 8, 8, 412, 96, "Bottom")
             .setVisible(false)
             .setInteractive()
@@ -70,10 +75,10 @@ export class SelectedTileView {
             filter(([_, heldObject]) => heldObject == null)
         ).subscribe(([tileIndex]) => {
             selectedObjectController.setSelectedTile(tileIndex);
-        })
+        });
 
         combineLatest(
-            gameStateManager.nextStateObservable(),
+            gameStateController.gameStateObservable(),
             selectedObjectController.selectedTileObservable(),
             selectedObjectController.activeTabObservable()
         ).subscribe(([newState, tileIndex, activeTab]) => {

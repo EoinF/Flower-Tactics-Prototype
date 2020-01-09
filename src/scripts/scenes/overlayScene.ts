@@ -1,4 +1,4 @@
-import { guiController, gameStateManager, mapController } from "../game";
+import { guiController, gameStateController, mapController } from "../game";
 import { TutorialRunner } from "../tutorial/TutorialRunner";
 import { Tutorial1 } from "../tutorial/Tutorial1";
 import { MessageQueueView } from "../views/MessageQueueView";

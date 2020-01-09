@@ -1,4 +1,4 @@
-import { guiController, gameStateManager, evolveSeedController } from "../game";
+import { guiController, gameStateController, evolveSeedController, gameDeltaController } from "../game";
 import { combineLatest } from "rxjs";
 import { EvolveSeedView } from "../views/EvolveSeedView/EvolveSeedView";
 
@@ -10,7 +10,7 @@ export default class EvolveSeedScene extends Phaser.Scene {
     create() {
         this.scene.setVisible(false);
         this.scene.pause();
-        new EvolveSeedView(this, guiController, gameStateManager, evolveSeedController);
+        new EvolveSeedView(this, guiController, gameStateController, gameDeltaController, evolveSeedController);
 
         evolveSeedController.setFlowerNames(
             (this.cache.text.get('flower-names') as string)

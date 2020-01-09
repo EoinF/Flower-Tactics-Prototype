@@ -3,11 +3,12 @@ import { COLOURS } from "../constants";
 import { HeldObjectController } from "../controllers/HeldObjectController";
 import { GuiController } from "../controllers/GuiController";
 import { withLatestFrom, distinctUntilChanged } from "rxjs/operators";
-import { gameStateManager } from "../game";
 import { combineLatest } from "rxjs";
+import { GameStateController } from "../controllers/GameStateController";
 
 export class CloudUIView {
     constructor(scene: Phaser.Scene, heldObjectController: HeldObjectController, guiController: GuiController, 
+        gameStateController: GameStateController,
         x: number, y: number
     ) {
         const cloudPlacementButton = new ImageButton(scene, x, y, 'button-cloud', "auto", "auto", COLOURS.PURPLE_200,
@@ -19,7 +20,7 @@ export class CloudUIView {
 
         combineLatest(
             guiController.onClickCloudPlacementButtonObservable(), 
-            gameStateManager.nextStateObservable().pipe(distinctUntilChanged())
+            gameStateController.gameStateObservable().pipe(distinctUntilChanged())
         ).pipe(
             withLatestFrom(heldObjectController.heldCloudObservable())
         ).subscribe(([[_, state], heldObject]) => {

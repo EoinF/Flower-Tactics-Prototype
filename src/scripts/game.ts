@@ -4,14 +4,15 @@ import PreloadScene from './scenes/preloadScene'
 import UIScene from './scenes/uiScene'
 import OverlayScene from './scenes/overlayScene'
 import EvolveSeedScene from './scenes/evolveSeedScene'
-import { GameStateManager } from './controllers/GameStateManager'
 import { GuiController } from './controllers/GuiController'
 import { SelectedObjectController } from './controllers/SelectedObjectController'
 import { MapController } from './controllers/MapController'
-import { setupConnectors } from './connectors'
 import { FlowerSelectionController } from './controllers/FlowerSelectionController'
 import { EvolveSeedController } from './controllers/EvolveSeedController'
 import { HeldObjectController } from './controllers/HeldObjectController'
+import { GameStateController } from './controllers/GameStateController'
+import { GameDeltaController } from './controllers/GameDeltaController'
+import { setupConnectors } from './connectors/connectors'
 
 const DEFAULT_WIDTH = 1280
 const DEFAULT_HEIGHT = 720
@@ -41,7 +42,8 @@ window.addEventListener('load', () => {
   let game = new Phaser.Game(config);
 })
 
-export const gameStateManager = new GameStateManager(0);
+export const gameStateController = new GameStateController();
+export const gameDeltaController = new GameDeltaController();
 export const selectedObjectController = new SelectedObjectController();
 export const guiController = new GuiController();
 export const mapController = new MapController();
@@ -50,7 +52,8 @@ export const evolveSeedController = new EvolveSeedController();
 export const heldObjectController = new HeldObjectController();
 setupConnectors(
   guiController,
-  gameStateManager,
+  gameStateController,
+  gameDeltaController,
   mapController,
   flowerSelectionController,
   selectedObjectController,

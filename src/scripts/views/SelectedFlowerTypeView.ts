@@ -1,13 +1,12 @@
-import { GameStateManager } from "../controllers/GameStateManager";
+import { GameStateController } from "../controllers/GameStateController";
 import { SelectedObjectController } from "../controllers/SelectedObjectController";
 import { UIContainer } from "../widgets/generic/UIContainer";
 import { combineLatest } from "rxjs";
 import { GameState } from "../objects/GameState";
 import { TextLabel } from "../widgets/generic/TextLabel";
 import { FlowerType } from "../objects/FlowerType";
-import { NumberRangeDisplay } from "../widgets/generic/NumberDisplay/NumberRangeDisplay";
 import { FlexUIContainer } from "../widgets/generic/FlexUIContainer";
-import { POTASSIUM_VALUE_RANGE, NITROGEN_VALUE_RANGE, PHOSPHOROUS_VALUE_RANGE, COLOURS } from "../constants";
+import { COLOURS } from "../constants";
 import { FlowerStatsDisplay } from "../widgets/specific/FlowerStatsDisplay";
 
 export class SelectedFlowerTypeView {
@@ -20,7 +19,7 @@ export class SelectedFlowerTypeView {
     private popupText: TextLabel;
     private flowerStatsDisplay: FlowerStatsDisplay;
 
-    constructor(scene: Phaser.Scene, gameStateManager: GameStateManager, SelectedObjectController: SelectedObjectController) {
+    constructor(scene: Phaser.Scene, gameStateController: GameStateController, SelectedObjectController: SelectedObjectController) {
 
         this.popup = new UIContainer(scene, 8, 8, 412, 96, "Bottom")
             .setVisible(false)
@@ -45,7 +44,7 @@ export class SelectedFlowerTypeView {
         this.popup.addChild(popupContent);
 
         combineLatest(
-            gameStateManager.nextStateObservable(),
+            gameStateController.gameStateObservable(),
             SelectedObjectController.selectedFlowerTypeObservable()
         )
         .subscribe(([newState, selectedFlowerType]) => {

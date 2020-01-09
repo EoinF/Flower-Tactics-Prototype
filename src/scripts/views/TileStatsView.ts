@@ -1,7 +1,7 @@
 import { SelectedObjectController } from "../controllers/SelectedObjectController";
 import { indexToMapCoordinates } from "../widgets/utils";
 import { withLatestFrom } from "rxjs/operators";
-import { gameStateManager } from "../game";
+import { gameStateController } from "../game";
 
 export class TileStatsView {
     private highlightImage: Phaser.GameObjects.Rectangle;
@@ -16,7 +16,7 @@ export class TileStatsView {
             .setVisible(false);
 
         this.selectedObjectController.selectedTileObservable().pipe(
-            withLatestFrom(gameStateManager.nextStateObservable())
+            withLatestFrom(gameStateController.gameStateObservable())
         ).subscribe(([tileIndex, gameState]) => {
             if (tileIndex != null) {
                 const coords = indexToMapCoordinates(tileIndex, gameState.numTilesX);

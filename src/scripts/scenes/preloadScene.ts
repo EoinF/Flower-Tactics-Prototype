@@ -1,6 +1,6 @@
 import { SoilColourConverter } from "../SoilColourConverter";
 import { MapLoader, ObjectData } from "../MapLoader";
-import { gameStateManager, guiController, mapController } from "../game";
+import { gameStateController, guiController, mapController } from "../game";
 import { MapGenerator } from "../MapGenerator";
 import { MapSaver } from "../MapSaver";
 import { GameStateData } from "../objects/GameState";
@@ -49,7 +49,7 @@ export default class PreloadScene extends Phaser.Scene {
 
 	create() {
 		const soilColourConverter = new SoilColourConverter();
-		const tutorialRunner = new TutorialRunner(guiController, mapController, gameStateManager)
+		const tutorialRunner = new TutorialRunner(guiController, mapController, gameStateController)
 		const mapLoader = new MapLoader(soilColourConverter);
 		const mapSaver = new MapSaver();
 		const mapGenerator = new MapGenerator(1);
@@ -75,8 +75,8 @@ export default class PreloadScene extends Phaser.Scene {
 	}
 
 	onReady(initialState: GameStateData) {
-		// gameStateManager.setState(mapGenerator.generateNewMap({numTilesX: 100, numTilesY: 100}));
-		gameStateManager.setState(initialState);
+		// gameStateController.setState(mapGenerator.generateNewMap({numTilesX: 100, numTilesY: 100}));
+		gameStateController.loadGame(initialState);
 
 		this.scene.start('MainScene');
 		this.scene.start('UIScene');

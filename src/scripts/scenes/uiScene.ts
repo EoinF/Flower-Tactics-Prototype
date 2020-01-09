@@ -1,4 +1,4 @@
-import { guiController, gameStateManager, selectedObjectController, flowerSelectionController, heldObjectController, mapController } from "../game";
+import { guiController, gameStateController, selectedObjectController, flowerSelectionController, heldObjectController, mapController, gameDeltaController } from "../game";
 import { SelectedTileView } from "../views/SelectedTileView/SelectedTileView";
 import { SelectedFlowerTypeView } from "../views/SelectedFlowerTypeView";
 import { AlertMessageView } from "../views/AlertMessageView";
@@ -16,7 +16,7 @@ export default class UIScene extends Phaser.Scene {
     }
     
   create() {
-	new SelectedTileView(this, gameStateManager, selectedObjectController, mapController);
+	new SelectedTileView(this, gameStateController, selectedObjectController, mapController, heldObjectController);
 	
 	const flowerSelectionWidth = 300;
 	const endTurnButtonPadding = 10;
@@ -29,11 +29,11 @@ export default class UIScene extends Phaser.Scene {
 
 	const offsetX = endTurnButton.width + endTurnButtonPadding * 2;
 
-	const seedView = new SeedContainerView(this, gameStateManager, guiController, heldObjectController, flowerSelectionController, offsetX, 8, flowerSelectionWidth);
-	const flowerSelectionView = new FlowerSelectionView(this, gameStateManager, guiController, flowerSelectionController, offsetX, 12 + seedView.height, flowerSelectionWidth);
-	new CloudUIView(this, heldObjectController, guiController, offsetX, 16 + seedView.height + flowerSelectionView.flowerSelector.height);
+	const seedView = new SeedContainerView(this, gameStateController, gameDeltaController, guiController, heldObjectController, flowerSelectionController, offsetX, 8, flowerSelectionWidth);
+	const flowerSelectionView = new FlowerSelectionView(this, gameStateController, guiController, flowerSelectionController, offsetX, 12 + seedView.height, flowerSelectionWidth);
+	new CloudUIView(this, heldObjectController, guiController, gameStateController, offsetX, 16 + seedView.height + flowerSelectionView.flowerSelector.height);
 
-	new SelectedFlowerTypeView(this, gameStateManager, selectedObjectController);
+	new SelectedFlowerTypeView(this, gameStateController, selectedObjectController);
 	new AlertMessageView(this, guiController);
 
 	new HeldObjectView(this, heldObjectController, guiController, mapController);

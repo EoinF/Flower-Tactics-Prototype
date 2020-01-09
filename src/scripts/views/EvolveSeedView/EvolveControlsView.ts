@@ -1,7 +1,6 @@
 import { BaseUIObject } from "../../widgets/generic/UIObject";
 import { COLOURS, SEED_INTERVALS } from "../../constants";
 import { EvolveSeedController } from "../../controllers/EvolveSeedController";
-import { GameStateManager } from "../../controllers/GameStateManager";
 import { TextButton } from "../../widgets/generic/TextButton";
 import { GuiController } from "../../controllers/GuiController";
 import { TextLabel } from "../../widgets/generic/TextLabel";
@@ -9,12 +8,12 @@ import { tap, debounceTime, filter, withLatestFrom } from "rxjs/operators";
 import { combineLatest } from "rxjs";
 import { EvolveChanceView } from "./EvolveChanceView";
 import { FlexUIContainer } from "../../widgets/generic/FlexUIContainer";
-import { UIContainer } from "../../widgets/generic/UIContainer";
+import { GameStateController } from "../../controllers/GameStateController";
 
 export class EvolveControlsView extends BaseUIObject {
     constructor(scene: Phaser.Scene, x: number, y: number,
         width: number, height: number,
-        gameStateManager: GameStateManager, evolveSeedController: EvolveSeedController, guiController: GuiController
+        gameStateController: GameStateController, evolveSeedController: EvolveSeedController, guiController: GuiController
     ) {
         super(scene, x, y, width, height);
         this.container.setBackground(COLOURS.PURPLE_200)
@@ -60,7 +59,7 @@ export class EvolveControlsView extends BaseUIObject {
         this.container.addChild(evolveStatusLabel, "Bottom");
 
         evolveSeedController.stagedSeedsObservable().pipe(
-            withLatestFrom(gameStateManager.nextStateObservable())
+            withLatestFrom(gameStateController.gameStateObservable())
         ).subscribe(([stagedSeed, gameState]) => {
             evolveButton.setVisible(stagedSeed != null);
             let name = "-";
@@ -83,7 +82,7 @@ export class EvolveControlsView extends BaseUIObject {
             evolveStatusLabel.setVisible(false);
         });
 
-        combineLatest(gameStateManager.nextStateObservable(), evolveSeedController.stagedSeedsObservable())
+        combineLatest(gameStateController.gameStateObservable(), evolveSeedController.stagedSeedsObservable())
             .pipe(
                 filter(([gameState, stagedSeed]) => {
                     return stagedSeed != null &&

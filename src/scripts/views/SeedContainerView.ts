@@ -1,4 +1,4 @@
-import { GameStateManager, GameStateDelta } from "../controllers/GameStateManager";
+import { GameStateController } from "../controllers/GameStateController";
 import { UIContainer } from "../widgets/generic/UIContainer";
 import { GameState } from "../objects/GameState";
 import { combineLatest } from "rxjs";
@@ -13,19 +13,21 @@ import { TextLabel } from "../widgets/generic/TextLabel";
 import { FlexUIContainer } from "../widgets/generic/FlexUIContainer";
 import { GuiController } from "../controllers/GuiController";
 import { HeldObjectController } from "../controllers/HeldObjectController";
+import { GameDeltaController } from "../controllers/GameDeltaController";
 
 export class SeedContainerView {
     width: number;
     height: number;
     scene: Phaser.Scene;
-    gameStateManager: GameStateManager;
+    gameStateController: GameStateController;
     mainContainer: UIContainer;
     infoButton: ImageButton;
     evolveButton: TextButton;
 
     constructor(
         scene: Phaser.Scene,
-        gameStateManager: GameStateManager,
+        gameStateController: GameStateController,
+        gameDeltaController: GameDeltaController,
         guiController: GuiController,
         heldObjectController: HeldObjectController,
         flowerSelectionController: FlowerSelectionController,
@@ -33,7 +35,7 @@ export class SeedContainerView {
         y: number,
         width: number
     ) {
-        this.gameStateManager = gameStateManager;
+        this.gameStateController = gameStateController;
         this.scene = scene;
 
         this.mainContainer = new FlexUIContainer(scene, x, y, width, 32, "Bottom", "Right")
@@ -104,7 +106,7 @@ export class SeedContainerView {
             }
         })
         
-        combineLatest(gameStateManager.nextStateObservable(), gameStateManager.nextDeltaObservable(), flowerSelectionController.selectedFlowerTypeObservable())
+        combineLatest(gameStateController.gameStateObservable(), gameDeltaController.gameDeltaObservable(), flowerSelectionController.selectedFlowerTypeObservable())
             .subscribe(([nextState, nextDelta, selectedFlowerType]) => {
                 const selectedSeedStatus = nextState.seedStatus[selectedFlowerType];
                 let amountAlreadyPlaced = 0;
@@ -120,7 +122,7 @@ export class SeedContainerView {
                 seedAmountLabel.setText(`x${amount}`);
             });
 
-        combineLatest(gameStateManager.nextStateObservable(), flowerSelectionController.selectedFlowerTypeObservable())
+        combineLatest(gameStateController.gameStateObservable(), flowerSelectionController.selectedFlowerTypeObservable())
             .subscribe(([nextState, selectedFlowerType]) => {
                 seedProgressBar.setValue(nextState.seedStatus[selectedFlowerType].progress);
             })

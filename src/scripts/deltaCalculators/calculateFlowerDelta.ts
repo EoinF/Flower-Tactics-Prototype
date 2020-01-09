@@ -2,9 +2,9 @@ import { Tile } from "../objects/Tile";
 import { Flower } from "../objects/Flower";
 import { StringMap } from "../types";
 import { FlowerType } from "../objects/FlowerType";
-import { SoilDelta, FlowerDelta, SeedStatusDelta, GameStateDelta } from "../controllers/GameStateManager";
 import { GameState } from "../objects/GameState";
 import { isRequirementsSatisfied } from "./helpers";
+import { GameStateDelta, SoilDelta, FlowerDelta, SeedStatusDelta } from "../connectors/gameDeltaConnectors";
 
 export function calculateFlowerEffects(gameState: GameState, gameStateDelta: GameStateDelta) {
     Object.keys(gameState.flowersMap).forEach((key) => {

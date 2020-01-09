@@ -7,8 +7,8 @@ import { River } from "./objects/River";
 import { RGBtoHSL } from "./extensions";
 import { FlowerType } from "./objects/FlowerType";
 import { StringMap } from "./types";
-import { SeedStatusDelta } from "./controllers/GameStateManager";
 import { Player } from "./objects/Player";
+import { SeedStatus } from "./objects/SeedStatus";
 
 export interface ObjectData {
     players: StringMap<Player>;
@@ -16,7 +16,7 @@ export interface ObjectData {
     mountains: Mountain[];
     rivers: River[];
     flowerTypes: StringMap<FlowerType>;
-    seedStatus: StringMap<SeedStatusDelta>;
+    seedStatus: StringMap<SeedStatus>;
     randomNumberGeneratorSeed: string;
     cloudLayoutSeed: number | null;
 }

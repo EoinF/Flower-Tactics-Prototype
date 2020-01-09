@@ -1,5 +1,5 @@
 import { GuiController } from "../controllers/GuiController";
-import { GameStateManager } from "../controllers/GameStateManager";
+import { GameStateController } from "../controllers/GameStateController";
 import { first, withLatestFrom, skip } from "rxjs/operators";
 import { TutorialBase } from "./TutorialBase";
 import { Subject, combineLatest } from "rxjs";
@@ -16,14 +16,14 @@ export interface TutorialRunnerCallbacks {
 export class TutorialRunner {
     private guiController: GuiController;
     private mapController: MapController;
-    private gameStateManager: GameStateManager;
+    private gameStateController: GameStateController;
     private tutorial$: Subject<TutorialBase>;
     
-    constructor(guiController: GuiController, mapController: MapController, gameStateManager: GameStateManager) {
+    constructor(guiController: GuiController, mapController: MapController, gameStateController: GameStateController) {
         this.tutorial$ = new Subject();
         this.guiController = guiController;
         this.mapController = mapController;
-        this.gameStateManager = gameStateManager;
+        this.gameStateController = gameStateController;
 
         const callbacks = {
             showTips: (messages: MessagePrompt[]) => this.showTips(messages),
@@ -32,14 +32,14 @@ export class TutorialRunner {
         } as TutorialRunnerCallbacks;
 
         combineLatest(
-            gameStateManager.nextStateObservable()
+            gameStateController.gameStateObservable()
             .pipe(
                 first(),
             ),
             this.tutorial$
         ).subscribe(([state, tutorial]) => tutorial.startGame(state, callbacks));
 
-        gameStateManager.nextStateObservable()
+        gameStateController.gameStateObservable()
             .pipe(
                 skip(1), 
                 withLatestFrom(this.tutorial$)
@@ -52,7 +52,7 @@ export class TutorialRunner {
     }
 
     private focusTile(tile: Tile) {
-        combineLatest(this.mapController.cameraObservable(), this.gameStateManager.nextStateObservable())
+        combineLatest(this.mapController.cameraObservable(), this.gameStateController.gameStateObservable())
             .pipe(first())
             .subscribe(([mapCamera, nextState]) => {
                 const mapX = 48 * tile.index % nextState.numTilesX;
