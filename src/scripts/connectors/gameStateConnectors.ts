@@ -21,6 +21,7 @@ export function setupGameStateManager(
 ) {
     const gameState$ = gameStateController.gameStateObservable();
     const gameDelta$ = gameDeltaController.gameDeltaObservable();
+    const currentPlayerId$ = gameStateController.currentPlayerObservable();
     const flowerNames$ = evolveSeedController.flowerNamesObservable();
     const stagedSeeds$ = evolveSeedController.stagedSeedsObservable();
     const onClickEvolveButton$ = guiController.onClickEvolveButtonObservable();
@@ -36,8 +37,8 @@ export function setupGameStateManager(
         map(([_, gameState, flowerNames]) => {
             return flowerNames[gameState.getNextRandomNumber(0, flowerNames.length - 1)];
         }),
-        withLatestFrom(gameState$, stagedSeeds$)
-    ).subscribe(([newFlowerName, gameState, stagedSeed]) => {
+        withLatestFrom(gameState$, stagedSeeds$, currentPlayerId$)
+    ).subscribe(([newFlowerName, gameState, stagedSeed, currentPlayerId]) => {
         if (stagedSeed != null) {
             const result = calculateSeedEvolve(stagedSeed, gameState, newFlowerName);
             evolveSeedController.setEvolveStatus(result.outcomeType);
@@ -48,7 +49,7 @@ export function setupGameStateManager(
             }];
 
             if (result.outcomeType != 'FAILURE' && result.newFlower != null) {
-                gameStateController.setState(applyEvolveResult(gameState, seedsToDelete, result.newFlower));
+                gameStateController.setState(applyEvolveResult(gameState, seedsToDelete, result.newFlower, currentPlayerId));
             } else {
                 gameStateController.setState(deleteSeeds(gameState, seedsToDelete));
             }
@@ -158,7 +159,7 @@ function applyDeltas(gameData: GameStateData, deltas: GameStateDelta): GameState
     return gameData;
 }
 
-function applyEvolveResult(gameState: GameState, seeds: Array<{type: string, amount: number}>, newFlower: FlowerType) {
+function applyEvolveResult(gameState: GameState, seeds: Array<{type: string, amount: number}>, newFlower: FlowerType, currentPlayerId: string) {
     const copiedData = getCopiedState(gameState);
     copiedData.flowerTypes[newFlower.type] = newFlower;
     copiedData.seedStatus[newFlower.type] = {
@@ -169,6 +170,7 @@ function applyEvolveResult(gameState: GameState, seeds: Array<{type: string, amo
     seeds.forEach((seed) => {
         copiedData.seedStatus[seed.type].quantity -= seed.amount;
     });
+    copiedData.players[currentPlayerId].seedsOwned.push(newFlower.type);
     return new GameState(copiedData);
 }
 

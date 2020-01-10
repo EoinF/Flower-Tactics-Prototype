@@ -5,14 +5,14 @@ import { GameState } from "../../objects/GameState";
 import { GameStateController } from "../../controllers/GameStateController";
 import { BaseUIObject } from "../../widgets/generic/UIObject";
 import { SeedInventoryTile } from "../../widgets/specific/SeedInventoryTile";
-import { combineLatest } from "rxjs";
+import { combineLatest, merge } from "rxjs";
 import { EvolveSeedController, StagedSeed } from "../../controllers/EvolveSeedController";
-import { filter, pairwise, map, startWith, tap, first, mergeMapTo } from "rxjs/operators";
+import { filter, pairwise, map, withLatestFrom, startWith, first, tap } from "rxjs/operators";
 import { StringMap } from "../../types";
 import { RadioButtonGroup } from "../../widgets/generic/RadioButtonGroup";
 import { BaseButton } from "../../widgets/generic/BaseButton";
 import { GameDeltaController } from "../../controllers/GameDeltaController";
-import { PlacedSeedsMap, PlacedSeed } from "../../controllers/GameActionController";
+import { PlacedSeed } from "../../controllers/GameActionController";
 import { GameStateDelta } from "../../objects/GameStateDelta";
 
 interface SeedInventoryItem {
@@ -50,39 +50,42 @@ export class SeedInventoryView extends BaseUIObject {
         this.cellsPerRow = 3;
         this.cellWidth = this.seedSelectionGrid.width / this.cellsPerRow;
         this.cellHeight = 52;
-
+        
         const seedState$ = combineLatest(
             gameStateController.gameStateObservable(),
-            gameDeltaController.gameDeltaObservable(),
             evolveSeedController.stagedSeedsObservable(),
             gameStateController.currentPlayerObservable()
-        );
+        ).pipe(withLatestFrom(
+            gameDeltaController.gameDeltaObservable()
+        ));
 
         this.radioGroup = new RadioButtonGroup([], COLOURS.LIGHT_YELLOW, COLOURS.YELLOW, COLOURS.GRAY, 1)
             .onChange((button) => {
                 evolveSeedController.setSelectedFlowerType(button.getData("type"));
             });
 
-        const numFlowerTypes$ = seedState$
-            .pipe(
-                map(([state]) => Object.keys(state.flowerTypes).length),
-                startWith(0),
-                pairwise()
-            );
-
-        numFlowerTypes$.pipe(
-            filter(([previous, current]) => previous !== current),
-            mergeMapTo(seedState$.pipe(first())),
-            map((states) => this.simplifySeedStates(...states))
-        ).subscribe(({seedInventoryItems}) => {
+        merge(
+            seedState$.pipe(first()),
+            seedState$.pipe(
+                pairwise(),
+                //tap(([previous, current]) => console.log("!==", Object.keys(previous[0][0].flowerTypes).length, Object.keys(current[0][0].flowerTypes).length)),
+                filter(([previous, current]) => Object.keys(previous[0][0].flowerTypes).length !== Object.keys(current[0][0].flowerTypes).length),
+                map(([_, current]) => current)
+            )
+        ).pipe(
+            map(([[gameState, stagedSeeds, currentPlayerId], gameDelta]) => this.simplifySeedStates(gameState, gameDelta, stagedSeeds, currentPlayerId))
+        ).subscribe(({seedInventoryItems, isAnyStaged}) => {
             this.seedSelectionGrid.clear();
-            this.createGrid(seedInventoryItems, evolveSeedController);
+            this.createGrid(seedInventoryItems, evolveSeedController, isAnyStaged);
         });
         
-        numFlowerTypes$.pipe(
-            filter(([previous, current]) => previous === current),
-            mergeMapTo(seedState$.pipe(first())),
-            map((states) => this.simplifySeedStates(...states))
+        seedState$.pipe(
+            pairwise(),
+            //tap(([previous, current]) => console.log("===", Object.keys(previous[0][0].flowerTypes).length, Object.keys(current[0][0].flowerTypes).length)),
+            filter(([previous, current]) => Object.keys(previous[0][0].flowerTypes).length === Object.keys(current[0][0].flowerTypes).length),
+            map(([_, current]) => current)
+        ).pipe(
+            map(([[gameState, stagedSeeds, currentPlayerId], gameDelta]) => this.simplifySeedStates(gameState, gameDelta, stagedSeeds, currentPlayerId))
         ).subscribe(({seedInventoryItems, isAnyStaged}) => {
             seedInventoryItems.forEach(item => {
                 if (item.amountStagedIndex > 0) {
@@ -106,7 +109,7 @@ export class SeedInventoryView extends BaseUIObject {
 
     }
 
-    createGrid(seedInventoryItems: SeedInventoryItem[], evolveSeedController: EvolveSeedController) {
+    createGrid(seedInventoryItems: SeedInventoryItem[], evolveSeedController: EvolveSeedController, isAnyStaged: boolean) {
         this.inventoryMap = {};
         seedInventoryItems.map((item, index) => {
             const x = (index % this.cellsPerRow) * this.cellWidth;
@@ -121,7 +124,8 @@ export class SeedInventoryView extends BaseUIObject {
                 .onRemoveSeed(() => {
                     evolveSeedController.unstageSeedForEvolution();
                 })
-                .setData("type", item.type);
+                .setData("type", item.type)
+                .setAmount(item.amount, item.amountStagedIndex, isAnyStaged);
             this.seedSelectionGrid.addChild(cell);
             this.inventoryMap[item.type] = cell;
         });

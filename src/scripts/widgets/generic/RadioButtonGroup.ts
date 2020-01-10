@@ -103,6 +103,9 @@ export class RadioButtonGroup {
                 }
             });
         });
+        if (this.selectedButtonIndex >= 0) {
+            this.setSelected(this.selectedButtonIndex);
+        }
     }
 
     onChange(callback: (button: BaseButton, index: number) => void) {
