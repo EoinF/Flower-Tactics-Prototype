@@ -14,6 +14,8 @@ import { FlexUIContainer } from "../widgets/generic/FlexUIContainer";
 import { GuiController } from "../controllers/GuiController";
 import { HeldObjectController } from "../controllers/HeldObjectController";
 import { GameDeltaController } from "../controllers/GameDeltaController";
+import { PlacedSeed } from "../controllers/GameActionController";
+import { StringMap } from "../types";
 
 export class SeedContainerView {
     width: number;
@@ -110,13 +112,9 @@ export class SeedContainerView {
             .subscribe(([nextState, nextDelta, selectedFlowerType]) => {
                 const selectedSeedStatus = nextState.seedStatus[selectedFlowerType];
                 let amountAlreadyPlaced = 0;
-                if (selectedSeedStatus.type in nextDelta.placedSeeds) {
-                    const valuesIterator = nextDelta.placedSeeds[selectedSeedStatus.type].values();
-                    let value = valuesIterator.next();
-                    while (!value.done) {
-                        amountAlreadyPlaced += value.value;
-                        value = valuesIterator.next();
-                    }
+                const placedSeedsMap = nextDelta.getIntermediateDelta<StringMap<PlacedSeed[]>>("placedSeeds");
+                if (placedSeedsMap != null && selectedSeedStatus.type in placedSeedsMap) {
+                    amountAlreadyPlaced = placedSeedsMap[selectedSeedStatus.type].reduce((total, placedSeed) => total + placedSeed.amount, 0);
                 }
                 const amount = selectedSeedStatus.quantity - amountAlreadyPlaced;
                 seedAmountLabel.setText(`x${amount}`);

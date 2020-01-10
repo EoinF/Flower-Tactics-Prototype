@@ -12,7 +12,8 @@ import { StringMap } from "../../types";
 import { RadioButtonGroup } from "../../widgets/generic/RadioButtonGroup";
 import { BaseButton } from "../../widgets/generic/BaseButton";
 import { GameDeltaController } from "../../controllers/GameDeltaController";
-import { GameStateDelta } from "../../connectors/gameDeltaConnectors";
+import { PlacedSeedsMap, PlacedSeed } from "../../controllers/GameActionController";
+import { GameStateDelta } from "../../objects/GameStateDelta";
 
 interface SeedInventoryItem {
     type: string;
@@ -133,10 +134,9 @@ export class SeedInventoryView extends BaseUIObject {
             .filter(type => state.players[currentPlayerId].seedsOwned.indexOf(type) !== -1)
             .map(type => {
                 let amountPlaced = 0;
-                if (type in delta.placedSeeds) {
-                    delta.placedSeeds[type].forEach((amount) => {
-                        amountPlaced += amount
-                    });
+                const placedSeeds = delta.getIntermediateDelta<StringMap<PlacedSeed[]>>("placedSeeds");
+                if (placedSeeds != null && type in placedSeeds) {
+                    amountPlaced = placedSeeds[type].reduce((total, placedSeed) => total + placedSeed.amount, 0);
                 }
                 let amountStagedIndex = 0;
                 if (stagedSeed != null && type === stagedSeed.type) {

@@ -54,7 +54,7 @@ export default class PreloadScene extends Phaser.Scene {
 		const mapSaver = new MapSaver();
 		const mapGenerator = new MapGenerator(1);
 
-		const mapName: string = "1v1";
+		const mapName: string = "test";
 
 		this.load.on('complete', () => {
 			const imageData = this.getMapImageData();

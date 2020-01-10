@@ -11,7 +11,7 @@ import { HeldObjectController } from "../controllers/HeldObjectController";
 import { HeldCloudsWidget } from "../widgets/specific/HeldCloudsWidget";
 import { COLOURS } from "../constants";
 import { isRequirementsSatisfied } from "../deltaCalculators/helpers";
-import { GameDeltaController } from "../controllers/GameDeltaController";
+import { GameActionController } from "../controllers/GameActionController";
 
 export class MapView {
     scene: Phaser.Scene;
@@ -27,7 +27,7 @@ export class MapView {
     constructor(
       scene: Phaser.Scene, 
 	  gameStateController: GameStateController,
-	  gameDeltaController: GameDeltaController,
+	  gameActionController: GameActionController,
       soilColourConverter: SoilColourConverter,
 	  heldObjectController: HeldObjectController,
 	  mapController: MapController
@@ -42,7 +42,7 @@ export class MapView {
 		this.placedCloudSprite = new HeldCloudsWidget(scene, 0, 0, COLOURS.withAlpha(COLOURS.WHITE, 0.1), COLOURS.TRANSPARENT)
 			.setDepth(5);
         this.setupSprites(scene, gameStateController);
-        this.setupCallbacks(gameStateController, gameDeltaController, mapController, heldObjectController);
+        this.setupCallbacks(gameStateController, gameActionController, mapController, heldObjectController);
     }
 
     setupSprites(scene: Phaser.Scene, gameStateController: GameStateController) {
@@ -90,7 +90,7 @@ export class MapView {
 	}
 
 	setupCallbacks(
-		gameStateController: GameStateController, gameDeltaController: GameDeltaController,
+		gameStateController: GameStateController, gameActionController: GameActionController,
 		mapController: MapController, heldObjectController: HeldObjectController
 	) {
         this.tileButtons.forEach(button => {
@@ -107,26 +107,28 @@ export class MapView {
 			this.setupFlowerSprites(newState);
 		});
 		
-		gameDeltaController.gameDeltaObservable()
+		gameActionController.placedSeedsMapObservable()
 			.pipe(
 				withLatestFrom(gameStateController.gameStateObservable())
 			)
-			.subscribe(([newStateDelta, newState]) => {
+			.subscribe(([placedSeeds, gameState]) => {
 				this.placedSeedSprites.forEach(sprite => sprite.destroy());
 				this.placedSeedSprites.clear();
-				Object.keys(newStateDelta.placedSeeds)
-					.forEach(type => {
-						newStateDelta.placedSeeds[type]
-							.forEach((seedAmount, tileIndex) => {
-								if (seedAmount > 0) {
-									this.addNewSeed(tileIndex, type, seedAmount, newState, mapController);
-								}
-							})
-					});
-				if (newStateDelta.placedCloudTileIndex != null) {
-					const location = indexToMapCoordinates(newStateDelta.placedCloudTileIndex, newState.numTilesX);
+				placedSeeds.forEach((placedSeed, tileIndex) => {
+					if (placedSeed.amount > 0) {
+						this.addNewSeed(tileIndex, placedSeed.type, placedSeed.amount, gameState, mapController);
+					}
+				});
+			});
+
+		gameActionController.placedCloudsObservable()
+			.pipe(
+				withLatestFrom(gameStateController.gameStateObservable())
+			).subscribe(([placedCloudsIndex, gameState]) => {
+				if (placedCloudsIndex != null) {
+					const location = indexToMapCoordinates(placedCloudsIndex, gameState.numTilesX);
 					this.placedCloudSprite.setPosition(location.x * 48, location.y * 48);
-					this.placedCloudSprite.setCloudLayout(newState.getCloudLayout());
+					this.placedCloudSprite.setCloudLayout(gameState.getCloudLayout());
 				} else {
 					this.placedCloudSprite.hideCloudLayout();
 				}

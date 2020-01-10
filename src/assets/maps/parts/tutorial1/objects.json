@@ -1,4 +1,10 @@
 {
+    "players": {
+        "1": {
+            "seedsOwned": ["1"],
+            "flowers": ["1"]
+        }
+    },
     "seedStatus": {
         "1": {
             "type": "1",

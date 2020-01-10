@@ -1,140 +1,27 @@
 import { GameState } from "../objects/GameState";
-import { StringMap } from "../types";
 import { GameDeltaController } from "../controllers/GameDeltaController";
 import { GameStateController } from "../controllers/GameStateController";
 import { calculateRiverEffects } from "../deltaCalculators/calculateRiverDelta";
 import { calculateFlowerEffects } from "../deltaCalculators/calculateFlowerDelta";
-import { MapController } from "../controllers/MapController";
-import { withLatestFrom } from "rxjs/operators";
-import { GuiController } from "../controllers/GuiController";
-import { HeldObjectController } from "../controllers/HeldObjectController";
-import { indexToMapCoordinates } from "../widgets/utils";
-
-
-export interface FlowerDelta {
-    growth: number;
-    isNourished: boolean;
-}
-
-export interface SoilDelta {
-    nitrogen: number;
-    phosphorous: number;
-    potassium: number;
-}
-
-export interface SeedStatusDelta {
-    type: string;
-    progress: number;
-    quantity: number;
-}
-
-export interface PlayerDelta {
-    flowersToRemove: string[];
-    seedStatusDelta: string[];
-}
-
-export interface GameStateDelta {
-    tileSoilDelta: Array<SoilDelta>;
-    flowerDelta: StringMap<FlowerDelta>;
-    seedStatusDelta: StringMap<SeedStatusDelta>;
-    placedSeeds: StringMap<Map<number, number>>;
-    placedCloudTileIndex: number | null;
-}
+import { GameStateDelta } from "../objects/GameStateDelta";
+import { CLOUD_GRID_WIDTH } from "../constants";
+import { GameActionController, PlacedSeedsMap, PlacedSeed } from "../controllers/GameActionController";
+import { combineLatest } from "rxjs";
+import { StringMap } from "../types";
 
 export function setupGameDeltaManager(
     gameStateController: GameStateController,
     gameDeltaController: GameDeltaController,
-    guiController: GuiController,
-    mapController: MapController,
-    heldObjectController: HeldObjectController
+    gameActionController: GameActionController
 ) {
-    const gameState$ = gameStateController.gameStateObservable();
-    const gameStateDelta$ = gameDeltaController.gameDeltaObservable();
-    const heldSeed$ = heldObjectController.heldSeedObservable();
-    const heldClouds$ = heldObjectController.heldCloudObservable();
-    const isHoldingShiftKey$ = guiController.isHoldingShiftKeyObservable();
-    const clickTile$ = mapController.clickTileObservable()
-
-    gameStateController.gameStateObservable().subscribe(gameState => {
-        gameDeltaController.setDelta(calculateDelta(gameState))
-    });
-    
-    clickTile$
-        .pipe(
-            withLatestFrom(
-                gameState$,
-                gameStateDelta$,
-                heldSeed$,
-                isHoldingShiftKey$
-            )
-        ).subscribe(([clickedTile, gameState, gameDelta, heldSeed, isHoldingShiftKey]) => {
-            if (heldSeed != null) {
-                const isOtherSeedTypeBlockingTile = Object.keys(gameDelta.placedSeeds)
-                    .filter(type => type != heldSeed.type)
-                    .some(type => {
-                        return gameDelta.placedSeeds[type].has(clickedTile)
-                            && gameDelta.placedSeeds[type].get(clickedTile)! > 0;
-                    });
-
-                const tile = gameState.tiles[clickedTile];
-                const location = indexToMapCoordinates(clickedTile, gameState.numTilesX);
-                const isFlowerBlockingTile = (gameState.getFlowerAtTile(tile) != null);
-                const isMountainBlockingTile = (gameState.getMountainAtTile(tile) != null);
-
-                const isFlowerAdjacent = gameState.getTilesAdjacent(location.x, location.y).some(
-                    adjacentTile => {
-                        return gameState.getFlowerAtTile(adjacentTile) != null
-                    }
-                );
-                let placedSeeds = 0;
-                gameDelta.placedSeeds[heldSeed.type].forEach(amount => {
-                    placedSeeds += amount;
-                });
-
-                const hasSufficientSeeds = (gameState.seedStatus[heldSeed.type].quantity - placedSeeds) > 0;
-
-                if (isOtherSeedTypeBlockingTile) {
-                    guiController.createAlertMessage("Another type of seed is already placed on this tile.");
-                } else if (isFlowerBlockingTile) {
-                    guiController.createAlertMessage("A flower is blocking seed placement.");
-                } else if (isMountainBlockingTile) {
-                    guiController.createAlertMessage("A mountain is blocking seed placement.");
-                } else if (!isFlowerAdjacent) {
-                    guiController.createAlertMessage("You can only place seeds near your existing flowers.");
-                } else if (!hasSufficientSeeds) {
-                    guiController.createAlertMessage("You don't have any seeds remaining.");
-                } else {
-                    if (isHoldingShiftKey) {
-                        gameDeltaController.setDelta(removeSeed(gameDelta, heldSeed.type, clickedTile));
-                    } else {
-                        gameDeltaController.setDelta(placeSeed(gameDelta, heldSeed.type, clickedTile));
-                    }
-                }
-            }
-        });
-
-    clickTile$
-        .pipe(
-            withLatestFrom(heldClouds$, gameStateDelta$)
-        )
-        .subscribe(([tileIndex, heldCloud, gameDelta]) => {
-            if (heldCloud != null) {
-                gameDeltaController.setDelta(placeClouds(gameDelta, tileIndex));
-            }
+    combineLatest(gameStateController.gameStateObservable(), gameActionController.placedSeedsMapObservable(), gameActionController.placedCloudsObservable())
+        .subscribe(([gameState, placedSeedsMap, placedCloudTileIndex]) => {
+            gameDeltaController.setDelta(calculateDelta(gameState, placedSeedsMap, placedCloudTileIndex));
         });
 }
 
-function generatePlacedSeedsMap(gameState: GameState) {
-    const placedSeeds: StringMap<Map<number, number>> = {};
-    
-    Object.keys(gameState.flowerTypes).forEach(type => {
-        placedSeeds[type] = new Map<number, number>();
-    })
-    return placedSeeds;
-}
-
-function getBlankSeedStatusDelta(gameState: GameState): StringMap<SeedStatusDelta> {
-    const seedStatusDelta = {};
+function getBlankSeedStatusDelta(gameState: GameState): GameStateDelta {
+    const seedStatusDelta = new GameStateDelta();
     Object.keys(gameState.seedStatus).forEach(
         key => {
             seedStatusDelta[key] = {type: key, quantity: 0, progress: 0};
@@ -142,84 +29,89 @@ function getBlankSeedStatusDelta(gameState: GameState): StringMap<SeedStatusDelt
     return seedStatusDelta;
 }
 
-function generateFlowerDeltaMap(gameState: GameState): StringMap<FlowerDelta> {
-    const flowerDeltaMap: StringMap<FlowerDelta> = {};
-    Object.keys(gameState.flowersMap).forEach(key => {
-        flowerDeltaMap[key] = {
-            growth: 0, isNourished: false
-        };
-    });
-
-    return flowerDeltaMap;
-}
-
 function getBlankDelta(gameState: GameState): GameStateDelta {
-    return {
-        flowerDelta: generateFlowerDeltaMap(gameState),
-        tileSoilDelta: generateSoilDeltaMap(gameState),
-        seedStatusDelta: getBlankSeedStatusDelta(gameState),
-        placedSeeds: generatePlacedSeedsMap(gameState),
-        placedCloudTileIndex: null
-    };
+    const tileSoilDelta = generateSoilDeltaMap(gameState);
+    const seedStatusDelta = getBlankSeedStatusDelta(gameState);
+    return tileSoilDelta
+        .combineDeltas(seedStatusDelta);
 }
 
-function generateSoilDeltaMap(gameState: GameState): Array<SoilDelta> {
-    return gameState.tiles.map((tile) => {
-        if (tile.waterContent === 0 || tile.waterContent >= 10) {
-            return {
-                nitrogen: -25,
-                potassium: -25,
-                phosphorous: -25
-            }
-        } else {
-            return {
-                nitrogen: 0,
-                potassium: 0,
-                phosphorous: 0
-            }
+function generateSoilDeltaMap(gameState: GameState): GameStateDelta {
+    const soilDeltas = new GameStateDelta();
+    gameState.tiles.forEach((tile) => {
+        if (tile.waterContent <= 0 || tile.waterContent > 9) {
+            const degredationAmount = -25;
+            soilDeltas.addDelta(["tiles", tile.index, "soil", "nitrogenContent"], degredationAmount);
+            soilDeltas.addDelta(["tiles", tile.index, "soil", "potassiumContent"], degredationAmount);
+            soilDeltas.addDelta(["tiles", tile.index, "soil", "phosphorousContent"], degredationAmount);
         }
     });
+    return soilDeltas;
 }
 
-function calculateDelta(state: GameState) {
+function calculateCloudEffects(gameState: GameState, gameDelta: GameStateDelta, placedCloudTileIndex: number | null) {
+    let rainFallTiles: number[] = [];
+
+    if (placedCloudTileIndex != null) {
+        const cloudLayout = gameState.getCloudLayout();
+        rainFallTiles = cloudLayout.map((isPlaced, index) => {
+            if (isPlaced) {
+                const x = Math.floor(index / CLOUD_GRID_WIDTH)
+                const y = index % CLOUD_GRID_WIDTH;
+                return placedCloudTileIndex + x + (y * gameState.numTilesX);
+            } else {
+                return null;
+            }
+        })
+        .filter(tileIndex => tileIndex != null)
+        .map(tileIndex => tileIndex!);
+    }
+
+    gameState.tiles.forEach((_, tileIndex) => {
+        let waterDelta: number;
+        if (rainFallTiles.indexOf(tileIndex) !== -1) {
+            waterDelta = +3; // Rainfall adds 3 turns of water content to a tile
+        } else if (gameState.tiles[tileIndex].waterContent > 0) {
+            waterDelta = -1; // Water content degrades by 1 per turn
+        } else {
+            waterDelta = 0;
+        }
+        gameDelta.addDelta(["tiles", tileIndex, "waterContent"], waterDelta)
+    });
+}
+
+function calculateSeedPlacementEffects(state: GameState, delta: GameStateDelta, placedSeeds: PlacedSeedsMap) {
+    placedSeeds.forEach((placedSeed) => {
+        delta.addDelta(["seedStatus", placedSeed.type, "quantity"], - placedSeed.amount);
+        delta.addIntermediateDelta<StringMap<PlacedSeed[]>>("placedSeeds", existingValue => {
+            if (existingValue == null) {
+                return {
+                    [placedSeed.type]: [{
+                        ...placedSeed,
+                        amount: placedSeed.amount 
+                    }]
+                }
+            } else {
+                return {
+                    ...existingValue,
+                    [placedSeed.type]: [
+                        ...existingValue[placedSeed.type],
+                        {
+                            ...placedSeed, 
+                            amount: placedSeed.amount
+                        }
+                    ]
+                }
+            }
+        });
+    });
+}
+
+function calculateDelta(state: GameState, placedSeeds: PlacedSeedsMap, placedCloudTileIndex: number | null) {
     const delta = getBlankDelta(state);
     calculateRiverEffects(state, delta);
     calculateFlowerEffects(state, delta);
+    calculateCloudEffects(state, delta, placedCloudTileIndex);
+    calculateSeedPlacementEffects(state, delta, placedSeeds);
     return delta;
-}
-
-function placeSeed(delta: GameStateDelta, type: string, tileIndex: number) {
-    delta.seedStatusDelta[type].quantity--;
-    _addSeed(delta, type, tileIndex);
-    return delta;
-}
-
-function placeClouds(delta: GameStateDelta, tileIndex: number) {
-    delta.placedCloudTileIndex = tileIndex;
-    return delta;
-}
-
-function removeSeed(delta: GameStateDelta, type: string, tileIndex: number) {
-    if (delta.placedSeeds[type].get(tileIndex) != null && delta.placedSeeds[type].get(tileIndex)! > 0) {
-        delta.seedStatusDelta[type].quantity++;
-        _removeSeed(delta, type, tileIndex);
-    }
-    return delta;
-}
-
-function _addSeed(delta: GameStateDelta, type: string, tileIndex: number) {
-    let existingAmount = 0;
-    if (delta.placedSeeds[type].has(tileIndex)) {
-        existingAmount = delta.placedSeeds[type].get(tileIndex)!;
-    }
-    delta.placedSeeds[type].set(tileIndex, existingAmount + 1);
-}
-function _removeSeed(delta: GameStateDelta, type: string, tileIndex: number) {
-    delta.placedSeeds[type].set(tileIndex, delta.placedSeeds[type].get(tileIndex)! -1);
-}
-
-export {
-    placeSeed,
-    removeSeed,
-    placeClouds
 }

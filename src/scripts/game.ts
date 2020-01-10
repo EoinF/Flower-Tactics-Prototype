@@ -13,6 +13,7 @@ import { HeldObjectController } from './controllers/HeldObjectController'
 import { GameStateController } from './controllers/GameStateController'
 import { GameDeltaController } from './controllers/GameDeltaController'
 import { setupConnectors } from './connectors/connectors'
+import { GameActionController } from './controllers/GameActionController'
 
 const DEFAULT_WIDTH = 1280
 const DEFAULT_HEIGHT = 720
@@ -44,6 +45,7 @@ window.addEventListener('load', () => {
 
 export const gameStateController = new GameStateController();
 export const gameDeltaController = new GameDeltaController();
+export const gameActionController = new GameActionController();
 export const selectedObjectController = new SelectedObjectController();
 export const guiController = new GuiController();
 export const mapController = new MapController();
@@ -54,6 +56,7 @@ setupConnectors(
   guiController,
   gameStateController,
   gameDeltaController,
+  gameActionController,
   mapController,
   flowerSelectionController,
   selectedObjectController,

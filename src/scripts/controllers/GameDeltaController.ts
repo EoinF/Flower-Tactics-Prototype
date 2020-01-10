@@ -1,5 +1,5 @@
 import { Subject, Observable, ReplaySubject } from "rxjs";
-import { GameStateDelta } from "../connectors/gameDeltaConnectors";
+import { GameStateDelta } from "../objects/GameStateDelta";
 
 export class GameDeltaController {
 

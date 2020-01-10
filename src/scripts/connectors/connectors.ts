@@ -10,6 +10,8 @@ import { HeldObjectController } from '../controllers/HeldObjectController';
 import { GameDeltaController } from '../controllers/GameDeltaController';
 import { setupGameDeltaManager } from './gameDeltaConnectors';
 import { setupGameStateManager } from './gameStateConnectors';
+import { GameActionController } from '../controllers/GameActionController';
+import { setupGameInputConnectors } from './gameInputConnectors';
 
 interface TileLocation {
     tileX: number,
@@ -30,6 +32,7 @@ export function setupConnectors(
     guiController: GuiController,
     gameStateController: GameStateController,
     gameDeltaController: GameDeltaController,
+    gameActionController: GameActionController,
     mapController: MapController,
     flowerSelectionController: FlowerSelectionController,
     selectedObjectController: SelectedObjectController,
@@ -52,7 +55,8 @@ export function setupConnectors(
     const evolveSeed_selectedFlowerType$ = evolveSeedController.selectedFlowerTypeObservable();
 
     setupGameStateManager(gameStateController, gameDeltaController, guiController, evolveSeedController);
-    setupGameDeltaManager(gameStateController, gameDeltaController, guiController, mapController, heldObjectController);
+    setupGameDeltaManager(gameStateController, gameDeltaController, gameActionController);
+    setupGameInputConnectors(gameStateController, gameDeltaController, heldObjectController, guiController, mapController, gameActionController);
 
     const flowerTypeOnClickingInfoButton$ = onClickInfoButton$.pipe(
         flatMap(() => flowerSelection_selectedFlowerType$),
