@@ -9,6 +9,7 @@ import { FlowerType } from "./objects/FlowerType";
 import { StringMap } from "./types";
 import { Player } from "./objects/Player";
 import { SeedStatus } from "./objects/SeedStatus";
+import { FlowerAugmentation } from "./objects/FlowerAugmentation";
 
 export interface ObjectData {
     players: StringMap<Player>;
@@ -17,6 +18,7 @@ export interface ObjectData {
     rivers: River[];
     flowerTypes: StringMap<FlowerType>;
     seedStatus: StringMap<SeedStatus>;
+    flowerAugmentations: StringMap<FlowerAugmentation[]>;
     randomNumberGeneratorSeed: string;
     cloudLayoutSeed: number | null;
 }

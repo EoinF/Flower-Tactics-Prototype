@@ -8,6 +8,7 @@ import { CLOUD_LAYOUT_SEED_MAX } from "../constants";
 import { CloudLayout } from "../controllers/HeldObjectController";
 import { SeedStatus } from "./SeedStatus";
 import { Player } from "./Player";
+import { FlowerAugmentation } from "./FlowerAugmentation";
 
 export interface GameStateData {
     cloudLayoutSeed: number | null;
@@ -21,6 +22,7 @@ export interface GameStateData {
     flowerTypes: StringMap<FlowerType>;
     players: StringMap<Player>;
     seedStatus: StringMap<SeedStatus>;
+    flowerAugmentations: StringMap<FlowerAugmentation[]>;
 }
 
 export class GameState implements GameStateData {
@@ -42,6 +44,7 @@ export class GameState implements GameStateData {
     tileToMountainMap: Map<Tile, Mountain>;
     seedStatus: StringMap<SeedStatus>;
     flowers: Flower[];
+    flowerAugmentations: StringMap<FlowerAugmentation[]>;
 
     constructor(data: GameStateData) {
         const {

@@ -32,6 +32,7 @@ export class MapGenerator {
             players: {},
             flowerTypes: {},
             seedStatus: {},
+            flowerAugmentations: {},
             randomNumberGeneratorSeed: "0",
             cloudLayoutSeed: null
         };

@@ -1,6 +1,6 @@
 import { GameState, GameStateData } from "../objects/GameState";
 import { FlowerType } from "../objects/FlowerType";
-import { CLOUD_GRID_WIDTH, SEED_INTERVALS } from "../constants";
+import { SEED_INTERVALS } from "../constants";
 import { GuiController } from "../controllers/GuiController";
 import { GameStateController } from "../controllers/GameStateController";
 import { withLatestFrom, map } from "rxjs/operators";
@@ -12,6 +12,7 @@ import { isRequirementsSatisfied } from "../deltaCalculators/helpers";
 import { PlacedSeed } from "../controllers/GameActionController";
 import { StringMap } from "../types";
 import { Flower } from "../objects/Flower";
+import { FlowerAugmentation } from "../objects/FlowerAugmentation";
 
 export function setupGameStateManager(
     gameStateController: GameStateController,
@@ -70,15 +71,16 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): G
     let flowersToRemove: string[] = [];
 
     Object.keys(gameState.flowersMap).forEach((key) => {
-        const flower = gameState.flowersMap[key]
-        const flowerType = gameState.flowerTypes[flower.type];
+        const flower = gameState.flowersMap[key];
+        const augmentations = gameState.flowerAugmentations[key] || [];
+        const flowerStatsAfterAugmentation = applyAugmentations(gameState.flowerTypes[flower.type], augmentations);
         const tile = gameState.getTileAt(flower.x, flower.y)!;
-        const isNourished = isRequirementsSatisfied(tile.soil, flowerType);
+        const isNourished = isRequirementsSatisfied(tile.soil, flowerStatsAfterAugmentation);
         if (!isNourished) {
             const {
                 tenacity,
                 turnsUntilGrown
-            } = gameState.flowerTypes[gameState.flowersMap[key].type];
+            } = flowerStatsAfterAugmentation;
             const growthNeeded = turnsUntilGrown - gameState.flowersMap[key].growth;
             let survivalChance = tenacity - growthNeeded * 5;
             if (gameState.getNextRandomNumber(0, 99) >= survivalChance) {
@@ -172,6 +174,21 @@ function applyEvolveResult(gameState: GameState, seeds: Array<{type: string, amo
     });
     copiedData.players[currentPlayerId].seedsOwned.push(newFlower.type);
     return new GameState(copiedData);
+}
+
+function applyAugmentations(flowerType: FlowerType, flowerAugmentations: FlowerAugmentation[]): FlowerType {
+    let augmentedFlowerStats = {...flowerType};
+    flowerAugmentations.forEach((augmentation: FlowerAugmentation) => {
+        if (augmentation.type === "tenacity") {
+            augmentedFlowerStats = {
+                ...augmentedFlowerStats,
+                tenacity: augmentedFlowerStats.tenacity + augmentation.strength
+            }
+        } else {
+            console.warn('Warning: Unknown augmentation type', augmentation);
+        }
+    }, flowerType);
+    return augmentedFlowerStats;
 }
 
 function deleteSeeds(gameState: GameState, seeds: Array<{type: string, amount: number}>) {

@@ -21,6 +21,18 @@
             "progress": 0
         }
     },
+    "flowerAugmentations": {
+        "0": [{
+            "type": "tenacity",
+            "strength": 100,
+            "turnsRemaining": 10
+        }],
+        "1": [{
+            "type": "tenacity",
+            "strength": 100,
+            "turnsRemaining": 10
+        }]
+    },
     "flowerTypes": {
         "1": {
             "type": "1",
