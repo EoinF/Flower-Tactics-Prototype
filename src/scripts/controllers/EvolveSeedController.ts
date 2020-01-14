@@ -1,25 +1,34 @@
 import { Subject, BehaviorSubject, Observable } from "rxjs";
 import { StringMap } from "../types";
 import { EvolutionOutcome } from "../deltaCalculators/calculateSeedEvolve";
+import { GameStateDelta } from "../objects/GameStateDelta";
 
 export interface StagedSeed {
     type: string;
     stagedAmount: number;
 }
 
-export type EvolveStatus = EvolutionOutcome | 'INSUFFICIENT_SEEDS';
+export interface EvolutionChoice {
+    baseFlowerType: string;
+    newFlowerDelta: GameStateDelta;
+    newFlowerName: string;
+}
 
 export class EvolveSeedController {
     private stagedSeed$: BehaviorSubject<StagedSeed | null>;
     private selectedFlowerType$: Subject<string>;
-    private evolveStatus$: Subject<EvolveStatus>;
+    private evolveStatus$: Subject<EvolutionOutcome>;
     private flowerNames$: Subject<string[]>;
+    private evolveChoices$: Subject<EvolutionChoice[]>;
+    private selectedEvolveChoice$: Subject<number>;
     
     constructor() {
         this.flowerNames$ = new Subject();
         this.stagedSeed$ = new BehaviorSubject<StagedSeed | null>(null);
         this.selectedFlowerType$ = new Subject();
         this.evolveStatus$ = new Subject();
+        this.evolveChoices$ = new Subject();
+        this.selectedEvolveChoice$ = new Subject();
     }
 
     setFlowerNames(names: string[]) {
@@ -62,8 +71,16 @@ export class EvolveSeedController {
         this.stagedSeed$.next(null);
     }
 
-    setEvolveStatus(evolveStatus: EvolveStatus) {
+    setEvolveStatus(evolveStatus: EvolutionOutcome) {
         this.evolveStatus$.next(evolveStatus);
+    }
+
+    setEvolveChoices(evolveChoices: EvolutionChoice[]) {
+        this.evolveChoices$.next(evolveChoices);
+    }
+
+    selectEvolveChoice(choice: number) {
+        this.selectedEvolveChoice$.next(choice)
     }
 
     stagedSeedsObservable(): Observable<StagedSeed | null> {
@@ -74,8 +91,16 @@ export class EvolveSeedController {
         return this.selectedFlowerType$;
     }
 
-    evolveStatusObservable(): Observable<EvolveStatus> {
+    evolveStatusObservable(): Observable<EvolutionOutcome> {
         return this.evolveStatus$;
+    }
+
+    evolveChoicesObservable(): Observable<EvolutionChoice[]> {
+        return this.evolveChoices$;
+    }
+
+    onSelectEvolveChoiceObservable(): Observable<number> {
+        return this.selectedEvolveChoice$;
     }
 
     flowerNamesObservable(): Observable<string[]> {

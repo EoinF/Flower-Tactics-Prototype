@@ -5,14 +5,14 @@ import { GuiController } from "../controllers/GuiController";
 import { GameStateController } from "../controllers/GameStateController";
 import { withLatestFrom, map } from "rxjs/operators";
 import { GameDeltaController } from "../controllers/GameDeltaController";
-import { EvolveSeedController } from "../controllers/EvolveSeedController";
+import { EvolveSeedController, EvolutionChoice } from "../controllers/EvolveSeedController";
 import { GameStateDelta } from "../objects/GameStateDelta";
 import { isRequirementsSatisfied } from "../deltaCalculators/helpers";
 import { PlacedSeed } from "../controllers/GameActionController";
 import { StringMap } from "../types";
 import { Flower } from "../objects/Flower";
 import { FlowerAugmentation } from "../objects/FlowerAugmentation";
-import { calculateSeedEvolutionResult } from "../deltaCalculators/calculateSeedEvolve";
+import { calculateSeedEvolutionOutcome, calculateSeedEvolutionResults } from "../deltaCalculators/calculateSeedEvolve";
 
 export function setupGameStateManager(
     gameStateController: GameStateController,
@@ -26,6 +26,7 @@ export function setupGameStateManager(
     const flowerNames$ = evolveSeedController.flowerNamesObservable();
     const stagedSeeds$ = evolveSeedController.stagedSeedsObservable();
     const onClickEvolveButton$ = guiController.onClickEvolveButtonObservable();
+    const evolveChoices$ = evolveSeedController.evolveChoicesObservable();
 
     guiController.endTurnObservable().pipe(
         withLatestFrom(gameState$, gameDelta$)
@@ -34,28 +35,45 @@ export function setupGameStateManager(
     });
     
     onClickEvolveButton$.pipe(
-        withLatestFrom(gameState$, flowerNames$),
-        map(([_, gameState, flowerNames]) => {
-            return flowerNames[gameState.getNextRandomNumber(0, flowerNames.length - 1)];
-        }),
-        withLatestFrom(gameState$, stagedSeeds$, currentPlayerId$)
-    ).subscribe(([newFlowerName, gameState, stagedSeed, currentPlayerId]) => {
+        withLatestFrom(gameState$, stagedSeeds$)
+    ).subscribe(([_, gameState, stagedSeed]) => {
         if (stagedSeed != null) {
-            const result = calculateSeedEvolutionResult(stagedSeed, gameState, newFlowerName);
-            evolveSeedController.setEvolveStatus(result.outcomeType);
-
-            const seedsToDelete = [{
-                type: stagedSeed.type,
-                amount: SEED_INTERVALS[stagedSeed.stagedAmount]
-            }];
-
-            if (result.outcomeType != 'FAILURE' && result.newFlower != null) {
-                gameStateController.setState(applyEvolveResult(gameState, seedsToDelete, result.newFlower, currentPlayerId));
-            } else {
-                gameStateController.setState(deleteSeeds(gameState, seedsToDelete));
-            }
+            const result = calculateSeedEvolutionOutcome(stagedSeed, gameState);
+            evolveSeedController.setEvolveStatus(result);
         }
-    })
+    });
+
+    evolveSeedController.evolveStatusObservable()
+        .pipe(
+            withLatestFrom(gameState$, flowerNames$, stagedSeeds$)
+        ).subscribe(([evolveStatus, gameState, flowerNames, _stagedSeeds]) => {
+            const stagedSeeds = _stagedSeeds!;
+            const seedsToDelete = [{
+                type: stagedSeeds.type,
+                amount: SEED_INTERVALS[stagedSeeds.stagedAmount]
+            }];
+            gameStateController.setState(deleteSeeds(gameState, seedsToDelete));
+            
+            const evolutionResults = calculateSeedEvolutionResults(evolveStatus, stagedSeeds, gameState);
+            
+            const choices = evolutionResults.map(result => ({
+                baseFlowerType: stagedSeeds.type,
+                newFlowerDelta: result,
+                newFlowerName: flowerNames[gameState.getNextRandomNumber(0, flowerNames.length - 1)]
+            }));
+            console.log(choices);
+            evolveSeedController.setEvolveChoices(choices);
+        });
+
+    evolveSeedController.onSelectEvolveChoiceObservable()
+        .pipe(
+            withLatestFrom(evolveChoices$),
+            map(([index, evolveChoice]) => evolveChoice[index]),
+            withLatestFrom(gameState$, currentPlayerId$)
+        )
+        .subscribe(([evolveChoice, gameState, currentPlayerId]) => {
+            gameStateController.setState(applyEvolveResult(gameState, evolveChoice, currentPlayerId));
+        });
 }
 
 function getCopiedState(gameState: GameState): GameStateData {
@@ -145,7 +163,7 @@ function nextState(gameState: GameState, gameDelta: GameStateDelta) {
     return newState;
 }
 
-function applyDeltas(gameData: GameStateData, deltas: GameStateDelta): GameStateData {
+function applyDeltas<T>(gameData: T, deltas: GameStateDelta): T {
     deltas.getDeltas().forEach(delta => {
         const currentEntry = delta.keys.slice(0, delta.keys.length - 1).reduce((currentEntry, key) => {
             return currentEntry[key];
@@ -166,17 +184,21 @@ function applyDeltas(gameData: GameStateData, deltas: GameStateDelta): GameState
     return gameData;
 }
 
-function applyEvolveResult(gameState: GameState, seeds: Array<{type: string, amount: number}>, newFlower: FlowerType, currentPlayerId: string) {
+function applyEvolveResult(gameState: GameState, evolveChoice: EvolutionChoice, currentPlayerId: string) {
     const copiedData = getCopiedState(gameState);
-    copiedData.flowerTypes[newFlower.type] = newFlower;
-    copiedData.seedStatus[newFlower.type] = {
+    const existingFlowerCopy = JSON.parse(JSON.stringify(gameState.flowerTypes[evolveChoice.baseFlowerType])) as FlowerType;
+    const existingTypes = Object.keys(gameState.flowerTypes).map(type => parseInt(type));
+    const nextType = (Math.max(...existingTypes) + 1).toString();
+    const newFlower = {
+        ...applyDeltas(existingFlowerCopy, evolveChoice.newFlowerDelta),
+        type: nextType
+    }
+    copiedData.flowerTypes[nextType] = newFlower;
+    copiedData.seedStatus[nextType] = {
         type: newFlower.type,
         quantity: 1,
         progress: 0
     };
-    seeds.forEach((seed) => {
-        copiedData.seedStatus[seed.type].quantity -= seed.amount;
-    });
     copiedData.players[currentPlayerId].seedsOwned.push(newFlower.type);
     return new GameState(copiedData);
 }

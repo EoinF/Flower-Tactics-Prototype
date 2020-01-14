@@ -2,44 +2,58 @@ import { StagedSeed } from "../controllers/EvolveSeedController";
 import { SUCCESS_INTERVALS, SUCCESS_PLUS_INTERVALS, SUCCESS_PLUS_2_INTERVALS, SUCCESS_PLUS_3_INTERVALS } from "../constants";
 import { FlowerType } from "../objects/FlowerType";
 import { GameState } from "../objects/GameState";
-import { NumberRange } from "../types";
+import { GameStateDelta } from "../objects/GameStateDelta";
 
 export type EvolutionOutcome = 'SUCCESS' | 'FAILURE' | 'SUCCESS+' | 'SUCCESS++' | 'SUCCESS+++';
 
-export interface EvolutionResult {
-    outcomeType: EvolutionOutcome;
-    newFlower: FlowerType | null;
+export function calculateSeedEvolutionOutcome(stagedSeed: StagedSeed, gameState: GameState): EvolutionOutcome {
+    if (gameState.getNextRandomNumber(1, 100) <= SUCCESS_PLUS_3_INTERVALS[stagedSeed.stagedAmount]) {
+        return 'SUCCESS+++';
+    } else if (gameState.getNextRandomNumber(1, 100) <= SUCCESS_PLUS_2_INTERVALS[stagedSeed.stagedAmount]) {
+        return 'SUCCESS++';
+    } else if (gameState.getNextRandomNumber(1, 100) <= SUCCESS_PLUS_INTERVALS[stagedSeed.stagedAmount]) {
+        return 'SUCCESS+';
+    } else if (gameState.getNextRandomNumber(1, 100) <= SUCCESS_INTERVALS[stagedSeed.stagedAmount]) {
+        return 'SUCCESS';
+    } else {
+        return 'FAILURE';
+    }
 }
 
-export function calculateSeedEvolutionResult(stagedSeed: StagedSeed, gameState: GameState, nextName: string): EvolutionResult {
-    const newFlower = JSON.parse(JSON.stringify(gameState.flowerTypes[stagedSeed.type])) as FlowerType;
-    const existingTypes = Object.keys(gameState.flowerTypes).map(type => parseInt(type));
-    const nextType = (Math.max(...existingTypes) + 1).toString();
-    let outcomeType: EvolutionOutcome = 'FAILURE';
+export function calculateSeedEvolutionResults(outcomeType: EvolutionOutcome, stagedSeed: StagedSeed, gameState: GameState): GameStateDelta[] {
+    const existingFlower = gameState.flowerTypes[stagedSeed.type];
 
-    newFlower.name = nextName;
-    newFlower.type = nextType;
-    if (gameState.getNextRandomNumber(1, 100) <= SUCCESS_PLUS_3_INTERVALS[stagedSeed.stagedAmount]) {
-        outcomeType = 'SUCCESS+++';
-        applyImprovements(newFlower, gameState, 30);
-    } else if (gameState.getNextRandomNumber(1, 100) <= SUCCESS_PLUS_2_INTERVALS[stagedSeed.stagedAmount]) {
-        outcomeType = 'SUCCESS++';
-        applyImprovements(newFlower, gameState, 18);
-    } else if (gameState.getNextRandomNumber(1, 100) <= SUCCESS_PLUS_INTERVALS[stagedSeed.stagedAmount]) {
-        outcomeType = 'SUCCESS+';
-        applyImprovements(newFlower, gameState, 10);
-    } else if (gameState.getNextRandomNumber(1, 100) <= SUCCESS_INTERVALS[stagedSeed.stagedAmount]) {
-        outcomeType = 'SUCCESS';
-        applyImprovements(newFlower, gameState, 5);
+    let newFlowerDeltas: GameStateDelta[] = [];
+    if (outcomeType === 'SUCCESS+++') {
+        newFlowerDeltas = [
+            applyImprovements(existingFlower, gameState, 30),
+            applyImprovements(existingFlower,  gameState, 30),
+            applyImprovements(existingFlower,  gameState, 30),
+            applyImprovements(existingFlower,  gameState, 30)
+        ]
+    } else if (outcomeType === 'SUCCESS++') {
+        newFlowerDeltas = [
+            applyImprovements(existingFlower, gameState, 18),
+            applyImprovements(existingFlower,  gameState, 18),
+            applyImprovements(existingFlower,  gameState, 18)
+        ]
+    } else if (outcomeType === 'SUCCESS+') {
+        newFlowerDeltas = [
+            applyImprovements(existingFlower, gameState, 10),
+            applyImprovements(existingFlower,  gameState, 10),
+            applyImprovements(existingFlower,  gameState, 10)
+        ]
+    } else if (outcomeType === 'SUCCESS') {
+        newFlowerDeltas = [
+            applyImprovements(existingFlower, gameState, 5),
+            applyImprovements(existingFlower,  gameState, 5)
+        ]
     }
     
-    return {
-        outcomeType,
-        newFlower: (outcomeType === 'FAILURE' ? null : newFlower)
-    }
+    return newFlowerDeltas;
 }
 
-function applyImprovements(newFlower: FlowerType, gameState: GameState, improvementPoints: number) {
+function applyImprovements(baseFlower: FlowerType, gameState: GameState, improvementPoints: number): GameStateDelta {
     // Options:
     // 1) improve turns for growth (should be rare)
     // 2) improve seedProductionRate (small increase but not so rare)
@@ -60,12 +74,14 @@ function applyImprovements(newFlower: FlowerType, gameState: GameState, improvem
     // points should be distributed randomly (based on the above weights) to improve each of these stats
 
     const improvementCosts = {
-        'growth': 17 - newFlower.turnsUntilGrown,
-        'soil consumption': 50 - Math.min(40, newFlower.soilConsumptionRate),
-        'seed production': 35 - Math.min(30, newFlower.seedProductionRate),
+        'growth': 17 - baseFlower.turnsUntilGrown,
+        'soil consumption': 50 - Math.min(40, baseFlower.soilConsumptionRate),
+        'seed production': 35 - Math.min(30, baseFlower.seedProductionRate),
         'requirements': 1,
-        'tenacity': 1 + Math.floor(newFlower.tenacity / 20)
+        'tenacity': 1 + Math.floor(baseFlower.tenacity / 20)
     };
+
+    const delta = new GameStateDelta();
 
     while(improvementPoints > 0) {
         let improvementChancesArray: string[] = [];
@@ -75,45 +91,52 @@ function applyImprovements(newFlower: FlowerType, gameState: GameState, improvem
             }
         })
         let roll = gameState.getNextRandomNumber(0, improvementChancesArray.length - 1);
-        applyImprovementDelta(newFlower, improvementChancesArray[roll], gameState, 1);
+        applyImprovementDelta(delta, improvementChancesArray[roll], gameState, 1);
         improvementPoints -= improvementCosts[improvementChancesArray[roll]];
     }
+
+    return delta;
 }
 
-function applyImprovementDelta(newFlower: FlowerType, improvementType: string, gameState: GameState, delta: number) {
+function applyImprovementDelta(delta: GameStateDelta, improvementType: string, gameState: GameState, deltaValue: number) {
     switch(improvementType) {
         case 'growth':
-            newFlower.turnsUntilGrown -= delta;
+            delta.addDelta(["turnsUntilGrown"], -deltaValue);
             break;
         case 'seed production':
-            newFlower.seedProductionRate += delta;
+            delta.addDelta(["seedProductionRate"], deltaValue);
             break;
         case 'soil consumption':
-            newFlower.soilConsumptionRate -= delta;
+            delta.addDelta(["soilConsumptionRate"], -deltaValue);
             break;
         case 'requirements':
             const roll = gameState.getNextRandomNumber(1, 3);
             if (roll === 1) {
-                newFlower.nitrogenRequirements = improveRequirements(newFlower.nitrogenRequirements, gameState, delta);
+                const result = improveRequirements(gameState, deltaValue);
+                delta.addDelta(["nitrogenRequirements", "min"], result.min);
+                delta.addDelta(["nitrogenRequirements", "max"], result.max);
             } else if (roll === 2) {
-                newFlower.potassiumRequirements = improveRequirements(newFlower.potassiumRequirements, gameState, delta);
+                const result = improveRequirements(gameState, deltaValue);
+                delta.addDelta(["potassiumRequirements", "min"], result.min);
+                delta.addDelta(["potassiumRequirements", "max"], result.max);
             } else {
-                newFlower.phosphorousRequirements = improveRequirements(newFlower.phosphorousRequirements, gameState, delta);
+                const result = improveRequirements(gameState, deltaValue);
+                delta.addDelta(["phosphorousRequirements", "min"], result.min);
+                delta.addDelta(["phosphorousRequirements", "max"], result.max);
             }
             break;
         case 'tenacity':
-            newFlower.tenacity += delta;
+            delta.addDelta(["tenacity"], deltaValue);
             break;
     }
 }
 
-function improveRequirements(existingRequirements: NumberRange, gameState: GameState, delta: number) {
+function improveRequirements(gameState: GameState, deltaValue: number) {
     const random = gameState.getNextRandomNumber(0, 1);
     const variance = random === 0 ? -20 : +20;
 
-    const newRequirements = {
-        min: existingRequirements.min + (variance - 10) * delta,
-        max: existingRequirements.max + (10 + variance) * delta
+    return {
+        min: (variance - 10) * deltaValue,
+        max: (10 + variance) * deltaValue
     }
-    return newRequirements;
 }
