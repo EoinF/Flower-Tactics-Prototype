@@ -6,13 +6,13 @@ import { GameStateController } from "../controllers/GameStateController";
 import { withLatestFrom, map } from "rxjs/operators";
 import { GameDeltaController } from "../controllers/GameDeltaController";
 import { EvolveSeedController } from "../controllers/EvolveSeedController";
-import { calculateSeedEvolve } from "../deltaCalculators/calculateSeedEvolve";
 import { GameStateDelta } from "../objects/GameStateDelta";
 import { isRequirementsSatisfied } from "../deltaCalculators/helpers";
 import { PlacedSeed } from "../controllers/GameActionController";
 import { StringMap } from "../types";
 import { Flower } from "../objects/Flower";
 import { FlowerAugmentation } from "../objects/FlowerAugmentation";
+import { calculateSeedEvolutionResult } from "../deltaCalculators/calculateSeedEvolve";
 
 export function setupGameStateManager(
     gameStateController: GameStateController,
@@ -41,7 +41,7 @@ export function setupGameStateManager(
         withLatestFrom(gameState$, stagedSeeds$, currentPlayerId$)
     ).subscribe(([newFlowerName, gameState, stagedSeed, currentPlayerId]) => {
         if (stagedSeed != null) {
-            const result = calculateSeedEvolve(stagedSeed, gameState, newFlowerName);
+            const result = calculateSeedEvolutionResult(stagedSeed, gameState, newFlowerName);
             evolveSeedController.setEvolveStatus(result.outcomeType);
 
             const seedsToDelete = [{
@@ -109,19 +109,19 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): G
     let newIndex = Math.max(...Object.keys(gameState.flowersMap).map(type => parseInt(type))) + 1;
     Object.keys(placedSeeds)
         .map(key => placedSeeds[key])
-        .flat()
+        .reduce((flatArray, nextArray) => [...flatArray, ...nextArray], []) // flatten
         .forEach((placedSeed) => {
-        if (placedSeed.amount > 0) {
-            const newFlower = {
-                x: placedSeed.tileIndex % gameState.numTilesX,
-                y: Math.floor(placedSeed.tileIndex / gameState.numTilesX),
-                type: placedSeed.type,
-                growth: 0
-            } as Flower;
-            finalDelta.addDelta(["flowersMap", newIndex], newFlower, "DELTA_REPLACE");
-            newIndex++;
-        }
-    });
+            if (placedSeed.amount > 0) {
+                const newFlower = {
+                    x: placedSeed.tileIndex % gameState.numTilesX,
+                    y: Math.floor(placedSeed.tileIndex / gameState.numTilesX),
+                    type: placedSeed.type,
+                    growth: 0
+                } as Flower;
+                finalDelta.addDelta(["flowersMap", newIndex], newFlower, "DELTA_REPLACE");
+                newIndex++;
+            }
+        });
     return finalDelta;
 }
 
@@ -133,6 +133,11 @@ function nextState(gameState: GameState, gameDelta: GameStateDelta) {
         const addedSeeds = Math.floor(copiedData.seedStatus[key].progress / 100);
         copiedData.seedStatus[key].quantity += addedSeeds;
         copiedData.seedStatus[key].progress %= 100
+    })
+
+    Object.keys(copiedData.flowerAugmentations).forEach(flowerKey => {
+        copiedData.flowerAugmentations[flowerKey] = copiedData.flowerAugmentations[flowerKey]
+            .filter(augmentation => augmentation != null);
     })
 
     const newState = new GameState(applyDeltas(copiedData, finalDelta));

@@ -6,7 +6,7 @@ import { GameState } from "../objects/GameState";
 import { isRequirementsSatisfied } from "./helpers";
 import { GameStateDelta } from "../objects/GameStateDelta";
 
-export function calculateFlowerEffects(gameState: GameState, gameStateDelta: GameStateDelta) {
+export function calculateFlowerDelta(gameState: GameState, gameStateDelta: GameStateDelta) {
     Object.keys(gameState.flowersMap).forEach((key) => {
         const flower = gameState.flowersMap[key];
         const tile = gameState.getTileAt(flower.x, flower.y)!;
@@ -16,7 +16,7 @@ export function calculateFlowerEffects(gameState: GameState, gameStateDelta: Gam
     });
 }
 
-export function getFlowerEffect(tile: Tile, flower: Flower, flowerKey: string, flowerTypes: StringMap<FlowerType>): GameStateDelta {
+function getFlowerEffect(tile: Tile, flower: Flower, flowerKey: string, flowerTypes: StringMap<FlowerType>): GameStateDelta {
     const {
         turnsUntilGrown,
         soilConsumptionRate,
