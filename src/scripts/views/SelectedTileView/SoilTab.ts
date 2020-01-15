@@ -93,7 +93,7 @@ export class SoilTab implements SelectedTileTab {
         this.firstRowContainer.clear();
         const titleTextLabel = new TextLabel(this.scene, 0, 0, titleText, COLOURS.BLACK, {isBold: true});
         const waterSprite = this.scene.add.image(4, 0, "droplet");
-        const waterRemainingLabel = new TextLabel(this.scene, 0, 0, tile.waterContent.toString(), COLOURS.BLACK, { fontSize: 12 });
+        const waterRemainingLabel = new TextLabel(this.scene, 0, 0, gameState.getTileWaterContent(tile).toString(), COLOURS.BLACK, { fontSize: 12 });
         this.firstRowContainer.addChild(titleTextLabel);
         this.firstRowContainer.addChild(waterSprite, "Middle");
         this.firstRowContainer.addChild(waterRemainingLabel, "Middle");

@@ -72,7 +72,7 @@ export class MapView {
 	setupTileSprites(gameState: GameState) {
 		this.tileButtons.forEach(s => s.destroy());
 		this.tileButtons = gameState.tiles.map((tile, index) => {
-			return new TileWidget(this.scene, index, gameState.numTilesX, tile.soil, tile.waterContent, this.soilColourConverter);
+			return new TileWidget(this.scene, index, gameState.numTilesX, tile.soil, gameState.getTileWaterContent(tile), this.soilColourConverter);
 		});
 	}
 
@@ -102,7 +102,7 @@ export class MapView {
         gameStateController.gameStateObservable().subscribe((newState) => {
 			this.tileButtons.forEach(button => {
 				const tile = newState.getTileAt(button.tileX, button.tileY)!;
-				button.setTileState(tile.soil, tile.waterContent);
+				button.setTileState(tile.soil, newState.getTileWaterContent(tile));
 			});
 			this.setupFlowerSprites(newState);
 		});
@@ -142,8 +142,7 @@ export class MapView {
 				for (let i = 0; i < gameState.tiles.length; i++) {
 					const tile = gameState.tiles[i];
 				
-					this.tileButtons[tile.index].setTileState(tile.soil, tile.waterContent);
-					this.tileButtons[tile.index].setPlacementState("water", "n/a");
+					this.tileButtons[tile.index].setTileState(tile.soil, gameState.getTileWaterContent(tile));
 				};
 			}
 		});

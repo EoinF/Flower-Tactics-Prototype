@@ -34,14 +34,15 @@ export class MapGenerator {
             seedStatus: {},
             flowerAugmentations: {},
             randomNumberGeneratorSeed: "0",
-            cloudLayoutSeed: null
+            cloudLayoutSeed: null,
+            rainfallTiles: []
         };
     }
     
     private generateTiles(numTilesX: number, numTilesY: number): Tile[] {
         return new Array<Tile | undefined>(numTilesX * numTilesY)
             .fill(undefined)
-            .map((_, index) => new Tile(index, 3))
+            .map((_, index) => new Tile(index))
             .map((tile) => {
                 tile.soil = {
                     nitrogenContent: 0.09 * this.rnd.frac(),

@@ -21,6 +21,7 @@ export interface ObjectData {
     flowerAugmentations: StringMap<FlowerAugmentation[]>;
     randomNumberGeneratorSeed: string;
     cloudLayoutSeed: number | null;
+    rainfallTiles: number[];
 }
 
 export class MapLoader {
@@ -44,7 +45,7 @@ export class MapLoader {
 
         const tiles = new Array<Tile | undefined>(numTilesX * numTilesY)
             .fill(undefined)
-            .map((_, index) => new Tile(index, 5))
+            .map((_, index) => new Tile(index))
             .map((tile, index) => {
                 const colour = RGBtoHSL(
                     imageData.data[(index * 4)],

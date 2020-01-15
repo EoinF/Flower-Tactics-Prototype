@@ -6,7 +6,6 @@ import { calculateFlowerDelta } from "../deltaCalculators/calculateFlowerDelta";
 import { GameStateDelta } from "../objects/GameStateDelta";
 import { GameActionController, PlacedSeedsMap } from "../controllers/GameActionController";
 import { combineLatest } from "rxjs";
-import { calculateBaseSoilDelta } from "../deltaCalculators/calculateBaseSoilDelta";
 import { calculateSeedPlacementDelta } from "../deltaCalculators/calculateSeedPlacementDelta";
 import { calculateCloudDelta } from "../deltaCalculators/calculateCloudDelta";
 import { calculateAugmentationDelta } from "../deltaCalculators/calculateAugmentationDelta";
@@ -24,7 +23,6 @@ export function setupGameDeltaManager(
 
 function calculateDelta(state: GameState, placedSeeds: PlacedSeedsMap, placedCloudTileIndex: number | null) {
     const delta = new GameStateDelta();
-    calculateBaseSoilDelta(state, delta);
     calculateRiverDelta(state, delta);
     calculateFlowerDelta(state, delta);
     calculateCloudDelta(state, delta, placedCloudTileIndex);

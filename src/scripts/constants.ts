@@ -52,8 +52,8 @@ export const SUCCESS_PLUS_INTERVALS =       [0, 0,  10, 30, 65, 80, 30,     0]; 
 export const SUCCESS_PLUS_2_INTERVALS =     [0, 0,   0,  0, 10, 50, 70,     80]; // % chance
 export const SUCCESS_PLUS_3_INTERVALS =     [0, 0,   0,  0, 0,   0, 30,     60]; // % chance
 
-// Cloud is either present or not, so that's 2 values per cell. 
+// Cloud is either present or not, so that's 2 values per cell.
 // It's arranged in a AxB grid, so A*B choices are required
-export const CLOUD_GRID_WIDTH = 3;
-export const CLOUD_GRID_HEIGHT = 3;
+export const CLOUD_GRID_WIDTH = 1;
+export const CLOUD_GRID_HEIGHT = 1;
 export const CLOUD_LAYOUT_SEED_MAX = Math.pow(2, CLOUD_GRID_WIDTH * CLOUD_GRID_HEIGHT);

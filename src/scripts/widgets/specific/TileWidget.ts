@@ -3,9 +3,8 @@ import { SoilColourConverter } from "../../SoilColourConverter";
 import { indexToMapCoordinates } from "../utils";
 import { ClickableWidget } from "../generic/ClickableWidget";
 import { COLOURS } from "../../constants";
-import { TextLabel } from "../generic/TextLabel";
 
-type TilePlacementState = "water" | "blocked" | "allowed" | "n/a"
+type TilePlacementState = "blocked" | "allowed" | "n/a"
 type TileViabilityState = "viable" | "unviable" | "n/a"
 
 export class TileWidget extends ClickableWidget {
@@ -13,7 +12,6 @@ export class TileWidget extends ClickableWidget {
     private soilImage: Phaser.GameObjects.Image;
     private viableSprite: Phaser.GameObjects.Image;
     private waterImage: Phaser.GameObjects.Image;
-    private waterLabel: TextLabel;
 
     private isHovering: boolean;
     private viabilityState: TileViabilityState;
@@ -34,17 +32,11 @@ export class TileWidget extends ClickableWidget {
         this.tileX = tileX;
         this.tileY = tileY;
         this.tileIndex = tileIndex;
-        this.waterContent = waterContent;
-
         this.soilColourConverter = soilColourConverter;
 
         this.container.setDepth(this.container.depth, "auto");
         this.soilImage =  scene.add.image(0, 0, "blank-tile");
         this.waterImage = scene.add.image(0, 0, "droplet")
-            .setAlpha(0.5)
-            .setDepth(6);
-        this.waterLabel = new TextLabel(scene, 4, 4, "99", COLOURS.WHITE, { fontSize: 12, strokeColour: COLOURS.BLACK, strokeThickness: 2 })
-            .setOrigin(1, 1)
             .setDepth(6);
 
         this.viableSprite = scene.add.image(x, y, "tile-viable")
@@ -53,18 +45,20 @@ export class TileWidget extends ClickableWidget {
             .setDepth(1);
 
         this.container.addChild(this.soilImage, "Middle", "Middle");
-        this.container.addChild(this.waterImage, "Middle", "Middle");
-        this.container.addChild(this.waterLabel, "Bottom", "Right");
-        this.soilColour = this.soilColourConverter.soilToColour(soil);
+        this.container.addChild(this.waterImage, "Bottom", "Right");
 
         this.isHovering = false;
         this.placementState = "n/a";
-        this.updateDisplay();
+
+        this.setTileState(soil, waterContent);
     }
 
     setTileState(soil: Soil, waterContent: number) {
         this.soilColour = this.soilColourConverter.soilToColour(soil);
         this.waterContent = waterContent;
+        this.waterImage.setVisible(this.waterContent > 0)
+            .setScale(0.5);
+
         this.updateDisplay();
     }
 
@@ -93,10 +87,6 @@ export class TileWidget extends ClickableWidget {
                 case "blocked":
                     tintColour = COLOURS.PINK_100;
                     break;
-                case "water":
-                    const colour = Phaser.Display.Color.Interpolate.ColorWithColor(COLOURS.WHITE, COLOURS.BLUE_700, 20, Math.min(20, 10 + this.waterContent));
-                    tintColour = new Phaser.Display.Color(colour.r, colour.g, colour.b, colour.a);
-                    colourRatio = 90;
             }
         }
         
@@ -105,11 +95,5 @@ export class TileWidget extends ClickableWidget {
         );
         this.soilImage.setTint(finalColour.color);
         this.viableSprite.setVisible(this.viabilityState === "viable");
-
-        const waterDropScale = Math.min(1, 0.3 + (0.7 * this.waterContent / 10));
-        this.waterLabel.setText(this.waterContent.toString());
-        this.waterImage.setVisible(this.placementState === "water")
-            .setScale(waterDropScale);
-        this.waterLabel.setVisible(this.placementState === "water");
     }
 }

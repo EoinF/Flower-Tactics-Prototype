@@ -4,7 +4,7 @@ import { Mountain } from "./Mountain";
 import { River } from "./River";
 import { FlowerType } from "./FlowerType";
 import { StringMap } from "../types";
-import { CLOUD_LAYOUT_SEED_MAX } from "../constants";
+import { CLOUD_LAYOUT_SEED_MAX, CLOUD_GRID_WIDTH, CLOUD_GRID_HEIGHT } from "../constants";
 import { CloudLayout } from "../controllers/HeldObjectController";
 import { SeedStatus } from "./SeedStatus";
 import { Player } from "./Player";
@@ -23,6 +23,7 @@ export interface GameStateData {
     players: StringMap<Player>;
     seedStatus: StringMap<SeedStatus>;
     flowerAugmentations: StringMap<FlowerAugmentation[]>;
+    rainfallTiles: number[];
 }
 
 export class GameState implements GameStateData {
@@ -38,13 +39,14 @@ export class GameState implements GameStateData {
     rivers: River[];
     players: StringMap<Player>;
     flowerTypes: StringMap<FlowerType>;
+    seedStatus: StringMap<SeedStatus>;
+    flowerAugmentations: StringMap<FlowerAugmentation[]>;
+    rainfallTiles: number[];
 
     tileToFlowerMap: Map<Tile, Flower>;
     tileToRiverMap: Map<Tile, River>;
     tileToMountainMap: Map<Tile, Mountain>;
-    seedStatus: StringMap<SeedStatus>;
     flowers: Flower[];
-    flowerAugmentations: StringMap<FlowerAugmentation[]>;
 
     constructor(data: GameStateData) {
         const {
@@ -161,11 +163,11 @@ export class GameState implements GameStateData {
     }
 
     generateNextCloudLayout() {
-        this.cloudLayoutSeed = this.getNextRandomNumber(3, CLOUD_LAYOUT_SEED_MAX);
+        this.cloudLayoutSeed = 1;
         this.cloudLayout = [];
 
         let current = this.cloudLayoutSeed;
-        for (let i = 0; i < 9; i++) {
+        for (let i = 0; i < CLOUD_GRID_WIDTH * CLOUD_GRID_HEIGHT; i++) {
             this.cloudLayout.push(current % 2 == 1);
             current = Math.floor(current / 2);
         }
@@ -173,5 +175,9 @@ export class GameState implements GameStateData {
     
     getCloudLayout() {
         return this.cloudLayout;
+    }
+
+    getTileWaterContent(tile: Tile) {
+        return (this.getRiverAtTile(tile) != null || this.rainfallTiles.indexOf(tile.index) !== -1) ? 1 : 0;
     }
 }

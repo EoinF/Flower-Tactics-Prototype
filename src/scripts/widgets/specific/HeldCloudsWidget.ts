@@ -1,6 +1,6 @@
 import { BaseUIObject, UIObject } from "../generic/UIObject";
 import { CloudLayout } from "../../controllers/HeldObjectController";
-import { COLOURS } from "../../constants";
+import { COLOURS, CLOUD_GRID_WIDTH, CLOUD_GRID_HEIGHT } from "../../constants";
 
 export class HeldCloudsWidget extends BaseUIObject {
 
@@ -8,14 +8,14 @@ export class HeldCloudsWidget extends BaseUIObject {
         backgroundColour: Phaser.Display.Color = COLOURS.withAlpha(COLOURS.TURQUOISE, 0.4),
         borderColour: Phaser.Display.Color = COLOURS.withAlpha(COLOURS.BLACK, 0.3)
     ) {
-        super(scene, x - 24, y - 24, 48 * 3, 48 * 3);
+        super(scene, x - 24, y - 24, 48 * CLOUD_GRID_WIDTH, 48 * CLOUD_GRID_HEIGHT);
         
         this.container
             .setBorder(1, borderColour)
             .setBackground(backgroundColour);
 
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 3; j++)
+        for (let i = 0; i < CLOUD_GRID_WIDTH; i++) {
+            for (let j = 0; j < CLOUD_GRID_HEIGHT; j++)
             this.container.addChild(scene.add.image(i * 48, j * 48, 'cloud'));
         }
     }

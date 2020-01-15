@@ -63,6 +63,7 @@
             "potassiumMax": 1000
         }
     },
+    "rainfallTiles": [],
     "rivers": [
         {
             "x": 0,
