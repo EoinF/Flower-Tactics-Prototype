@@ -24,7 +24,7 @@ export class TextLabel implements UIObject {
     visible: boolean;
 
     constructor(scene: Phaser.Scene,
-        x: number, y: number, text: string,
+        x: number, y: number, text: string | string[],
         colour: Phaser.Display.Color = COLOURS.BLACK, 
         {
             isBold = false,

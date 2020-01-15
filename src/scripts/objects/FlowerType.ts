@@ -1,5 +1,3 @@
-import { NumberRange } from "../types";
-
 export interface FlowerType {
     type: string;
     name: string;
@@ -8,7 +6,10 @@ export interface FlowerType {
     seedProductionRate: number,
     tenacity: number;
     
-    nitrogenRequirements: NumberRange;
-    phosphorousRequirements: NumberRange;
-    potassiumRequirements: NumberRange;
+    nitrogenMin: number;
+    nitrogenMax: number;
+    phosphorousMin: number;
+    phosphorousMax: number;
+    potassiumMin: number;
+    potassiumMax: number;
 }

@@ -23,7 +23,6 @@ export default class EvolveSeedScene extends Phaser.Scene {
             guiController.screenStateObservable(),
             evolveSeedController.isEvolveChoiceShownObservable()
         ).subscribe(([messagePrompt, screenState, isEvolveChoiceShown]) => {
-            console.log({isEvolveChoiceShown})
             if (messagePrompt != null || screenState != "Evolve" || isEvolveChoiceShown) {
                 this.scene.pause();
             } else {

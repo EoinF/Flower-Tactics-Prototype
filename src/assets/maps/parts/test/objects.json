@@ -35,15 +35,12 @@
             "soilConsumptionRate": 10,
             "seedProductionRate": 10,
             "tenacity": 50,
-            "nitrogenRequirements": {
-                "min": 1000, "max": 1500
-            },
-            "phosphorousRequirements": {
-                "min": 2000, "max": 2500
-            },
-            "potassiumRequirements": {
-                "min": 1100, "max": 1500
-            }
+            "nitrogenMin": 1000, 
+            "nitrogenMax": 1500,
+            "phosphorousMin": 2000, 
+            "phosphorousMax": 2500,
+            "potassiumMin": 1100, 
+            "potassiumMax": 1500
         },
         "2": {
             "type": "2",
@@ -52,15 +49,12 @@
             "soilConsumptionRate": 60,
             "seedProductionRate": 34,
             "tenacity": 50,
-            "nitrogenRequirements": {
-                "min": 200, "max": 2500
-            },
-            "phosphorousRequirements": {
-                "min": 100, "max": 2900
-            },
-            "potassiumRequirements": {
-                "min": 1400, "max": 1500
-            }
+            "nitrogenMin": 200, 
+            "nitrogenMax": 2500,
+            "phosphorousMin": 100, 
+            "phosphorousMax": 2900,
+            "potassiumMin": 1400, 
+            "potassiumMax": 1500
         },
         "3": {
             "type": "3",
@@ -69,15 +63,12 @@
             "soilConsumptionRate": 2,
             "seedProductionRate": 150,
             "tenacity": 50,
-            "nitrogenRequirements": {
-                "min": 200, "max": 2500
-            },
-            "phosphorousRequirements": {
-                "min": 100, "max": 2900
-            },
-            "potassiumRequirements": {
-                "min": 1400, "max": 1500
-            }
+            "nitrogenMin": 200,
+            "nitrogenMax": 2500,
+            "phosphorousMin": 100,
+            "phosphorousMax": 2900,
+            "potassiumMin": 1400,
+            "potassiumMax": 1500
         }
     },
     "rivers": [

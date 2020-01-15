@@ -20,15 +20,12 @@
             "soilConsumptionRate": 0,
             "seedProductionRate": 35,
             "tenacity": 0,
-            "nitrogenRequirements": {
-                "min": 1800, "max": 2300
-            },
-            "phosphorousRequirements": {
-                "min": 2000, "max": 2500
-            },
-            "potassiumRequirements": {
-                "min": 1100, "max": 1500
-            }
+            "nitrogenMin": 1800,
+            "nitrogenMax": 2300,
+            "phosphorousMin": 2000,
+            "phosphorousMax": 2500,
+            "potassiumMin": 1100,
+            "potassiumMax": 1500
         }
     },
     "rivers": [],

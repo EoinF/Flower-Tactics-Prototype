@@ -53,16 +53,17 @@ export function setupGameStateManager(
                 amount: SEED_INTERVALS[stagedSeeds.stagedAmount]
             }];
             gameStateController.setState(deleteSeeds(gameState, seedsToDelete));
-            
-            const evolutionResults = calculateSeedEvolutionResults(evolveStatus, stagedSeeds, gameState);
-            
-            const choices = evolutionResults.map(result => ({
-                baseFlowerType: stagedSeeds.type,
-                newFlowerDelta: result,
-                newFlowerName: flowerNames[gameState.getNextRandomNumber(0, flowerNames.length - 1)]
-            }));
-            console.log(choices);
-            evolveSeedController.setEvolveChoices(choices);
+
+            if (evolveStatus != 'FAILURE') {
+                const evolutionResults = calculateSeedEvolutionResults(evolveStatus, stagedSeeds, gameState);
+                
+                const choices = evolutionResults.map(result => ({
+                    baseFlowerType: stagedSeeds.type,
+                    newFlowerDelta: result,
+                    newFlowerName: flowerNames[gameState.getNextRandomNumber(0, flowerNames.length - 1)]
+                }));
+                evolveSeedController.setEvolveChoices(choices);
+            }
         });
 
     evolveSeedController.onSelectEvolveChoiceObservable()

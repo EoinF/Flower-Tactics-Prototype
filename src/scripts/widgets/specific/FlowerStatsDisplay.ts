@@ -83,9 +83,9 @@ export class FlowerStatsDisplay implements UIObject {
     }
     
     setValues(flowerTypeDetails: FlowerType) {
-        this.nitrogenDisplay.setValues(flowerTypeDetails.nitrogenRequirements);
-        this.phosphorousDisplay.setValues(flowerTypeDetails.phosphorousRequirements);
-        this.potassiumDisplay.setValues(flowerTypeDetails.potassiumRequirements);
+        this.nitrogenDisplay.setValues({min: flowerTypeDetails.nitrogenMin, max: flowerTypeDetails.nitrogenMax});
+        this.phosphorousDisplay.setValues({min: flowerTypeDetails.phosphorousMin, max: flowerTypeDetails.phosphorousMax});
+        this.potassiumDisplay.setValues({min: flowerTypeDetails.potassiumMin, max: flowerTypeDetails.potassiumMax});
         this.setVisible(true);
     }
 

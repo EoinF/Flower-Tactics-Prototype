@@ -75,8 +75,8 @@ function applyImprovements(baseFlower: FlowerType, gameState: GameState, improve
 
     const improvementCosts = {
         'growth': 17 - baseFlower.turnsUntilGrown,
-        'soil consumption': 50 - Math.min(40, baseFlower.soilConsumptionRate),
-        'seed production': 35 - Math.min(30, baseFlower.seedProductionRate),
+        'soil consumption': Math.max(2, 15 - Math.round(baseFlower.soilConsumptionRate / 3)),
+        'seed production': Math.max(3, Math.round(baseFlower.seedProductionRate / 2) - 15),
         'requirements': 1,
         'tenacity': 1 + Math.floor(baseFlower.tenacity / 20)
     };
@@ -113,16 +113,16 @@ function applyImprovementDelta(delta: GameStateDelta, improvementType: string, g
             const roll = gameState.getNextRandomNumber(1, 3);
             if (roll === 1) {
                 const result = improveRequirements(gameState, deltaValue);
-                delta.addDelta(["nitrogenRequirements", "min"], result.min);
-                delta.addDelta(["nitrogenRequirements", "max"], result.max);
+                delta.addDelta(["nitrogenMin"], result.min);
+                delta.addDelta(["nitrogenMax"], result.max);
             } else if (roll === 2) {
                 const result = improveRequirements(gameState, deltaValue);
-                delta.addDelta(["potassiumRequirements", "min"], result.min);
-                delta.addDelta(["potassiumRequirements", "max"], result.max);
+                delta.addDelta(["potassiumMin"], result.min);
+                delta.addDelta(["potassiumMax"], result.max);
             } else {
                 const result = improveRequirements(gameState, deltaValue);
-                delta.addDelta(["phosphorousRequirements", "min"], result.min);
-                delta.addDelta(["phosphorousRequirements", "max"], result.max);
+                delta.addDelta(["phosphorousMin"], result.min);
+                delta.addDelta(["phosphorousMax"], result.max);
             }
             break;
         case 'tenacity':

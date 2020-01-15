@@ -2,12 +2,9 @@ import { UIContainer } from "../../widgets/generic/UIContainer";
 import { COLOURS } from "../../constants";
 import { EvolveSeedController } from "../../controllers/EvolveSeedController";
 import { BaseUIObject } from "../../widgets/generic/UIObject";
-import { merge } from "rxjs";
 import { TextLabel } from "../../widgets/generic/TextLabel";
-import { mapTo, startWith, withLatestFrom } from "rxjs/operators";
-import { TextButton } from "../../widgets/generic/TextButton";
+import { startWith, withLatestFrom } from "rxjs/operators";
 import { FlexUIContainer } from "../../widgets/generic/FlexUIContainer";
-import { BaseButton } from "../../widgets/generic/BaseButton";
 import { ContainerButton } from "../../widgets/generic/ContainerButton";
 
 export class EvolveChoiceView extends BaseUIObject {
@@ -15,7 +12,7 @@ export class EvolveChoiceView extends BaseUIObject {
         super(scene, 0, 0, scene.game.canvas.width, scene.game.canvas.height, "Middle", "Middle");
         this.container.setBackground(COLOURS.withAlpha(COLOURS.GRAY, 0.7));
 
-        const popupContainer = new FlexUIContainer(scene, 0, 0, 700, 400)
+        const popupContainer = new FlexUIContainer(scene, 0, 0, 1000, 400)
             .setBackground(COLOURS.PURPLE_200)
             .setBorder(1, COLOURS.BLACK);
 
@@ -59,11 +56,30 @@ export class EvolveChoiceView extends BaseUIObject {
                         const choiceNameLabel = new TextLabel(scene, 0, 8, choice.newFlowerName, COLOURS.WHITE,
                             { maxWidth: widthPerChoice - 8, isBold: true, fontSize: 18 }
                         );
-                        const choiceAttributesLabel = new TextLabel(scene, 0, 32 + choiceNameLabel.height, `choice ${index}`, COLOURS.WHITE,
-                            { maxWidth: widthPerChoice - 8 }
-                        );
+
+                        const sortedDeltas = choice.newFlowerDelta.getDeltas()
+                            .sort(
+                                (a,b) => a.keys[a.keys.length - 1].toString().localeCompare(b.keys[b.keys.length - 1].toString())
+                            );
+                        const choiceNames = sortedDeltas.map(delta => {
+                            let name = delta.keys[delta.keys.length - 1];
+                            return `${name}:`;
+                        });
+                        const choiceValues = sortedDeltas.map(delta => {
+                            const value = delta.deltaValue as number;
+                            const signText = value > 0 ? '+' : '-';
+                            return `${signText} ${Math.abs(value)}`
+                        });
+
+                        const choiceAttributesContainer = new FlexUIContainer(scene, 0, 32 + choiceNameLabel.height, "grow", "auto");
+                        const choiceAttributeNamesLabel = new TextLabel(scene, 0, 0, choiceNames, COLOURS.WHITE)
+                            .setOrigin(0, 0);
+                        const choiceAttributeValuesLabel = new TextLabel(scene, 32, 0, choiceValues, COLOURS.WHITE)
+                            .setOrigin(0, 0);
+                        choiceAttributesContainer.addChild(choiceAttributeNamesLabel);
+                        choiceAttributesContainer.addChild(choiceAttributeValuesLabel);
                         choiceColumn.addChild(choiceNameLabel, "Top", "Middle");
-                        choiceColumn.addChild(choiceAttributesLabel, "Top", "Middle");
+                        choiceColumn.addChild(choiceAttributesContainer, "Top", "Middle");
                         contentContainer.addChild(choiceColumn);
                     })
                 } else {
