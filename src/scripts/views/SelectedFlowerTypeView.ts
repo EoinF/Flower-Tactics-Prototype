@@ -61,6 +61,6 @@ export class SelectedFlowerTypeView {
     private updatePopupText(gameState: GameState, flowerTypeDetails: FlowerType) {
         this.flowerStatsDisplay.setValues(flowerTypeDetails);
         
-        this.popupText.setText(flowerTypeDetails.name + "  -  Soil Requirements");
+        this.popupText.setText(flowerTypeDetails.name + "  -  Requirements");
     }
 }

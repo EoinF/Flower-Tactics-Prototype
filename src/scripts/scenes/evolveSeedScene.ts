@@ -15,7 +15,7 @@ export default class EvolveSeedScene extends Phaser.Scene {
         evolveSeedController.setFlowerNames(
             (this.cache.text.get('flower-names') as string)
                 .split('\n')
-                .map(name => name.replace('\n', ''))
+                .map(name => name.replace(/[\n|\r]/g, ''))
             );
         
         combineLatest(
