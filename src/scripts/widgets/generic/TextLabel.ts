@@ -41,15 +41,18 @@ export class TextLabel implements UIObject {
         }
     ) {
         this.scene = scene;
-        this.textObject = this.scene.add.text(x, y, text, {
-            fontFamily: 'Verdana, "Times New Roman", Tahoma, serif', 
+        const config = {
+            fontFamily: 'Verdana, "Times New Roman", Tahoma, serif',
             fontStyle: isBold ? 'bold' : '',
             fontSize: `${fontSize}px`,
             strokeThickness,
             stroke: strokeColour,
             lineSpacing: 4,
+            align: 'center',
             wordWrap: maxWidth != null ? { width: maxWidth, useAdvancedWrap: true } : {}
-        }).setColor(colour.rgba);
+        }
+        this.textObject = this.scene.add.text(x, y, text, config)
+            .setColor(colour.rgba);
         this.x = x;
         this.y = y;
         

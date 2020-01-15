@@ -29,7 +29,7 @@ const config: GameConfig = {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT
   },
-  scene: [PreloadScene, MainScene, UIScene, OverlayScene, EvolveSeedScene]
+  scene: [PreloadScene, MainScene, UIScene, EvolveSeedScene, OverlayScene]
   // physics: {
   //   default: 'arcade',
   //   arcade: {

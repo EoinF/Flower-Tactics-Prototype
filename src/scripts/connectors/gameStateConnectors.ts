@@ -191,6 +191,7 @@ function applyEvolveResult(gameState: GameState, evolveChoice: EvolutionChoice, 
     const nextType = (Math.max(...existingTypes) + 1).toString();
     const newFlower = {
         ...applyDeltas(existingFlowerCopy, evolveChoice.newFlowerDelta),
+        name: evolveChoice.newFlowerName,
         type: nextType
     }
     copiedData.flowerTypes[nextType] = newFlower;

@@ -1,7 +1,8 @@
-import { Subject, BehaviorSubject, Observable } from "rxjs";
+import { Subject, BehaviorSubject, Observable, merge } from "rxjs";
 import { StringMap } from "../types";
 import { EvolutionOutcome } from "../deltaCalculators/calculateSeedEvolve";
 import { GameStateDelta } from "../objects/GameStateDelta";
+import { mapTo, startWith, distinctUntilChanged } from "rxjs/operators";
 
 export interface StagedSeed {
     type: string;
@@ -97,6 +98,15 @@ export class EvolveSeedController {
 
     evolveChoicesObservable(): Observable<EvolutionChoice[]> {
         return this.evolveChoices$;
+    }
+    
+    isEvolveChoiceShownObservable(): Observable<boolean> {
+        return merge(
+            this.evolveChoices$.pipe(mapTo(true)),
+            this.selectedEvolveChoice$.pipe(mapTo(false))
+        ).pipe(
+            startWith(false)
+        );
     }
 
     onSelectEvolveChoiceObservable(): Observable<number> {

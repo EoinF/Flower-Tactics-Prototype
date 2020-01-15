@@ -1,7 +1,8 @@
-import { guiController, gameStateController, mapController } from "../game";
-import { TutorialRunner } from "../tutorial/TutorialRunner";
-import { Tutorial1 } from "../tutorial/Tutorial1";
+import { guiController, evolveSeedController } from "../game";
 import { MessageQueueView } from "../views/MessageQueueView";
+import { EvolveChoiceView } from "../views/EvolveSeedView/EvolveChoiceView";
+import { combineLatest, merge } from "rxjs";
+import { mapTo, startWith } from "rxjs/operators";
 
 export default class OverlayScene extends Phaser.Scene {
     constructor() {
@@ -10,9 +11,13 @@ export default class OverlayScene extends Phaser.Scene {
     
     create() {
 		new MessageQueueView(this, guiController);
+		new EvolveChoiceView(this, evolveSeedController);
 
-		guiController.messagePromptObservable().subscribe(messagePrompt => {
-			if (messagePrompt == null) {
+		combineLatest(
+			guiController.messagePromptObservable(),
+			evolveSeedController.isEvolveChoiceShownObservable()
+		).subscribe(([messagePrompt, isEvolveChoiceShown]) => {
+			if (messagePrompt == null && !isEvolveChoiceShown) {
 				this.scene.pause();
 			} else {
 				this.scene.resume();

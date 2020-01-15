@@ -4,6 +4,7 @@ import { COLOURS } from "../constants";
 import { TextLabel } from "../widgets/generic/TextLabel";
 import { TextButton } from "../widgets/generic/TextButton";
 import { withLatestFrom } from "rxjs/operators";
+import { BaseUIObject } from "../widgets/generic/UIObject";
 
 export interface MessagePrompt {
     position: {x: number, y: number} | undefined;
@@ -11,16 +12,16 @@ export interface MessagePrompt {
     content: string;
 }
 
-export class MessageQueueView {
+export class MessageQueueView extends BaseUIObject {
     constructor(scene: Phaser.Scene, guiController: GuiController) {
-        const mainContainer = new UIContainer(scene, 0, 0, scene.game.canvas.width, scene.game.canvas.height)
-            .setBackground(COLOURS.withAlpha(COLOURS.GRAY, 0.7));
+        super(scene, 0, 0, scene.game.canvas.width, scene.game.canvas.height);
+        this.container.setBackground(COLOURS.withAlpha(COLOURS.GRAY, 0.7));
         const popupContainer = new UIContainer(scene, 0, 0, 300, 200)
             .setBackground(COLOURS.PURPLE_200)
             .setBorder(1, COLOURS.BLACK)
             .setVisible(false);
 
-        mainContainer.addChild(popupContainer, "Middle", "Middle");
+        this.container.addChild(popupContainer, "Middle", "Middle");
 
         const titleLabel = new TextLabel(scene, 16, 16, "Title here", COLOURS.BLACK, {isBold: true, fontSize: 20});
         const contentLabel = new TextLabel(scene, 16, titleLabel.height + 32, "Content goes here...", COLOURS.BLACK, {
@@ -50,9 +51,9 @@ export class MessageQueueView {
             )
             .subscribe(([messagePrompt, isLastPrompt]) => {
                 if (messagePrompt == null) {
-                    mainContainer.setVisible(false);
+                    this.setVisible(false);
                 } else {
-                    mainContainer.setVisible(true);
+                    this.setVisible(true);
                     if (messagePrompt.position != null) {
                         popupContainer.setPosition(messagePrompt.position.x, messagePrompt.position.y);
                     }
@@ -61,7 +62,6 @@ export class MessageQueueView {
 
                     doneButton.setVisible(isLastPrompt);
                     nextButton.setVisible(!isLastPrompt);
-                    
                 }
             });
     }
