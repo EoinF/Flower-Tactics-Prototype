@@ -93,8 +93,9 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): G
         const augmentations = gameState.flowerAugmentations[key] || [];
         const flowerStatsAfterAugmentation = applyAugmentations(gameState.flowerTypes[flower.type], augmentations);
         const tile = gameState.getTileAt(flower.x, flower.y)!;
-        const isNourished = isRequirementsSatisfied(tile.soil, flowerStatsAfterAugmentation);
-        if (!isNourished) {
+        const isDying = !isRequirementsSatisfied(tile.soil, flowerStatsAfterAugmentation) 
+            || flower.growth > (flowerStatsAfterAugmentation.turnsUntilDead - flowerStatsAfterAugmentation.turnsUntilGrown);
+        if (isDying) {
             const {
                 tenacity,
                 turnsUntilGrown

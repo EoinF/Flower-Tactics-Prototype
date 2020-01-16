@@ -81,7 +81,7 @@ export class MapView {
 		this.flowerSprites = gameState.flowers.map((flower) => {
 			const img = this.scene.add.image(flower.x * 48, flower.y * 48, 'flower');
 			const flowerType = gameState.getFlowerType(flower);
-			img.setScale(0.2 + 0.8 * flower.growth / flowerType.turnsUntilGrown);
+			img.setScale(Math.min(1, 0.2 + 0.8 * flower.growth / flowerType.turnsUntilGrown));
 			img.setDepth(5);
 			img.setData("x", flower.x);
 			img.setData("y", flower.y);

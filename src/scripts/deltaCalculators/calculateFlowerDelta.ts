@@ -32,6 +32,7 @@ function getFlowerEffect(tile: Tile, flower: Flower, flowerKey: string, flowerTy
         }
     } else {
         deltas.addDelta(["seedStatus", flower.type, "progress"], Math.floor(seedProductionRate * bonusMultiplier));
+        deltas.addDelta(["flowersMap", flowerKey, "growth"], +1);
     }
 
     return deltas;
