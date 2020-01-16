@@ -10,13 +10,14 @@ export function calculateFlowerDelta(gameState: GameState, gameStateDelta: GameS
     Object.keys(gameState.flowersMap).forEach((key) => {
         const flower = gameState.flowersMap[key];
         const tile = gameState.getTileAt(flower.x, flower.y)!;
+        const bonusFromWater = 1 + gameState.getTileWaterContent(tile);
         
-        const deltas = getFlowerEffect(tile, flower, key, gameState.flowerTypes);
+        const deltas = getFlowerEffect(tile, flower, key, gameState.flowerTypes, bonusFromWater);
         gameStateDelta.combineDeltas(deltas);
     });
 }
 
-function getFlowerEffect(tile: Tile, flower: Flower, flowerKey: string, flowerTypes: StringMap<FlowerType>): GameStateDelta {
+function getFlowerEffect(tile: Tile, flower: Flower, flowerKey: string, flowerTypes: StringMap<FlowerType>, bonusMultiplier: number): GameStateDelta {
     const {
         turnsUntilGrown,
         soilConsumptionRate,
@@ -27,10 +28,11 @@ function getFlowerEffect(tile: Tile, flower: Flower, flowerKey: string, flowerTy
     
     if (flower.growth < turnsUntilGrown) {
         if (isRequirementsSatisfied(tile.soil, flowerTypes[flower.type])) {
-            deltas.addDelta(["flowersMap", flowerKey, "growth"], +1)
+            const growthDelta = Math.min(Math.floor(+1 * bonusMultiplier), turnsUntilGrown - flower.growth);
+            deltas.addDelta(["flowersMap", flowerKey, "growth"], growthDelta);
         }
     } else {
-        deltas.addDelta(["seedStatus", flower.type, "progress"], seedProductionRate);
+        deltas.addDelta(["seedStatus", flower.type, "progress"], Math.floor(seedProductionRate * bonusMultiplier));
     }
 
     deltas.addDelta(["tiles", tile.index, "soil", "nitrogenContent"], -soilConsumptionRate);

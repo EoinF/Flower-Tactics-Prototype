@@ -26,22 +26,21 @@ export function calculateSeedEvolutionResults(outcomeType: EvolutionOutcome, sta
     let newFlowerDeltas: GameStateDelta[] = [];
     if (outcomeType === 'SUCCESS+++') {
         newFlowerDeltas = [
-            applyImprovements(existingFlower, gameState, 30),
-            applyImprovements(existingFlower,  gameState, 30),
-            applyImprovements(existingFlower,  gameState, 30),
-            applyImprovements(existingFlower,  gameState, 30)
+            applyImprovements(existingFlower,  gameState, 50),
+            applyImprovements(existingFlower,  gameState, 50),
+            applyImprovements(existingFlower,  gameState, 50)
         ]
     } else if (outcomeType === 'SUCCESS++') {
         newFlowerDeltas = [
-            applyImprovements(existingFlower, gameState, 18),
-            applyImprovements(existingFlower,  gameState, 18),
-            applyImprovements(existingFlower,  gameState, 18)
+            applyImprovements(existingFlower, gameState, 25),
+            applyImprovements(existingFlower,  gameState, 25),
+            applyImprovements(existingFlower,  gameState, 25)
         ]
     } else if (outcomeType === 'SUCCESS+') {
         newFlowerDeltas = [
-            applyImprovements(existingFlower, gameState, 10),
-            applyImprovements(existingFlower,  gameState, 10),
-            applyImprovements(existingFlower,  gameState, 10)
+            applyImprovements(existingFlower, gameState, 15),
+            applyImprovements(existingFlower,  gameState, 15),
+            applyImprovements(existingFlower,  gameState, 15)
         ]
     } else if (outcomeType === 'SUCCESS') {
         newFlowerDeltas = [
