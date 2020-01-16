@@ -11,7 +11,7 @@ export class FlowerTab implements SelectedTileTab {
 
     constructor(scene: Phaser.Scene, x: number, y: number) {
         this.mainContainer = new FlexUIContainer(scene, x, y);
-        this.titleText = new TextLabel(scene, 8, 8, "...", COLOURS.BLACK, {isBold: true});
+        this.titleText = new TextLabel(scene, 8, 8, "...", COLOURS.BLACK, {isBold: true, align: 'left'});
         this.mainContainer
             .addChild(this.titleText)
             .setDepth(4)
@@ -21,11 +21,29 @@ export class FlowerTab implements SelectedTileTab {
     show(gameState: GameState, tile: Tile) {
         this.mainContainer.setVisible(true);
         const flower = gameState.getFlowerAtTile(tile);
-        let text = "No flower";
+        let text = ["No flower"];
         
         if (flower != null) {
             const flowerTypeData = gameState.flowerTypes[flower.type];
-            text = `${flowerTypeData.name}: ${flower.growth} / ${flowerTypeData.turnsUntilGrown}`;
+            if (flower.growth < flowerTypeData.turnsUntilGrown) {
+                text = [
+                    flowerTypeData.name, 
+                    `Growing for ${flowerTypeData.turnsUntilGrown} turns.`,
+                    `${flower.growth} / ${flowerTypeData.turnsUntilGrown}`
+                ];
+            } else if (flower.growth < flowerTypeData.turnsUntilGrown + flowerTypeData.turnsUntilDead) {
+                text = [
+                    flowerTypeData.name,
+                    `Producing seeds for ${flowerTypeData.turnsUntilDead} turns.`,
+                    `${flower.growth - flowerTypeData.turnsUntilGrown} / ${flowerTypeData.turnsUntilDead}`
+                ];
+            } else {
+                text = [
+                    flowerTypeData.name,
+                    `Producing seeds (Dying)`,
+                    `Survived ${flower.growth - flowerTypeData.turnsUntilGrown - flowerTypeData.turnsUntilDead} extra turns.`
+                ];
+            }
         }
 
         this.titleText.setText(text);

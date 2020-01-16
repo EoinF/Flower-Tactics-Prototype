@@ -94,13 +94,14 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): G
         const flowerStatsAfterAugmentation = applyAugmentations(gameState.flowerTypes[flower.type], augmentations);
         const tile = gameState.getTileAt(flower.x, flower.y)!;
         const isDying = !isRequirementsSatisfied(tile.soil, flowerStatsAfterAugmentation) 
-            || flower.growth > (flowerStatsAfterAugmentation.turnsUntilDead - flowerStatsAfterAugmentation.turnsUntilGrown);
+            || flower.growth >= (flowerStatsAfterAugmentation.turnsUntilDead + flowerStatsAfterAugmentation.turnsUntilGrown);
+
         if (isDying) {
             const {
                 tenacity,
                 turnsUntilGrown
             } = flowerStatsAfterAugmentation;
-            const growthNeeded = turnsUntilGrown - gameState.flowersMap[key].growth;
+            const growthNeeded = Math.max(0, turnsUntilGrown - flower.growth);
             let survivalChance = tenacity - growthNeeded * 5;
             if (gameState.getNextRandomNumber(0, 99) >= survivalChance) {
                 finalDelta.addDelta(["flowersMap", key], null, "DELTA_REMOVE")

@@ -1,12 +1,15 @@
 import { UIObject } from "./UIObject";
 import { COLOURS } from "../../constants";
 
+type TextAlign = 'center' | 'left' | 'right';
+
 interface TextLabelConfig {
     isBold: boolean;
     maxWidth: number | null;
     fontSize: number;
     strokeThickness: number;
     strokeColour: Phaser.Display.Color;
+    align: TextAlign;
 }
 
 export class TextLabel implements UIObject {
@@ -25,19 +28,21 @@ export class TextLabel implements UIObject {
 
     constructor(scene: Phaser.Scene,
         x: number, y: number, text: string | string[],
-        colour: Phaser.Display.Color = COLOURS.BLACK, 
+        colour: Phaser.Display.Color = COLOURS.BLACK,
         {
             isBold = false,
             maxWidth = null,
             fontSize = 16,
             strokeThickness = 0,
-            strokeColour = COLOURS.BLACK
+            strokeColour = COLOURS.BLACK,
+            align = 'center'
         }: Partial<TextLabelConfig> = {
             isBold: false,
             maxWidth: null,
             fontSize: 16,
             strokeThickness: 0,
-            strokeColour: COLOURS.BLACK
+            strokeColour: COLOURS.BLACK,
+            align: 'center'
         }
     ) {
         this.scene = scene;
@@ -48,7 +53,7 @@ export class TextLabel implements UIObject {
             strokeThickness,
             stroke: strokeColour,
             lineSpacing: 4,
-            align: 'center',
+            align,
             wordWrap: maxWidth != null ? { width: maxWidth, useAdvancedWrap: true } : {}
         }
         this.textObject = this.scene.add.text(x, y, text, config)
