@@ -2,7 +2,7 @@ export interface FlowerType {
     type: string;
     name: string;
     turnsUntilGrown: number;
-    soilConsumptionRate: number,
+    turnsUntilDead: number,
     seedProductionRate: number,
     tenacity: number;
     

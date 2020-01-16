@@ -17,7 +17,7 @@
             "type": "1",
             "name": "Daisy",
             "turnsUntilGrown": 2,
-            "soilConsumptionRate": 0,
+            "turnsUntilDead": 9999,
             "seedProductionRate": 35,
             "tenacity": 0,
             "nitrogenMin": 1800,

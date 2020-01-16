@@ -87,7 +87,6 @@ function getCopiedState(gameState: GameState): GameStateData {
 
 function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): GameStateDelta {
     const finalDelta = gameDelta;
-    let flowersToRemove: string[] = [];
 
     Object.keys(gameState.flowersMap).forEach((key) => {
         const flower = gameState.flowersMap[key];
@@ -103,25 +102,9 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): G
             const growthNeeded = turnsUntilGrown - gameState.flowersMap[key].growth;
             let survivalChance = tenacity - growthNeeded * 5;
             if (gameState.getNextRandomNumber(0, 99) >= survivalChance) {
-                flowersToRemove.push(key);
+                finalDelta.addDelta(["flowersMap", key], null, "DELTA_REMOVE")
             }
         }
-    });
-    
-    flowersToRemove.forEach((key) => {
-        const flower = gameState.flowersMap[key];
-        const tile = gameState.getTileAt(flower.x, flower.y)!;
-        const {
-            soilConsumptionRate
-        } = gameState.flowerTypes[flower.type];
-        const returnedNutrients = soilConsumptionRate * flower.growth;
-        finalDelta.addDelta(["tiles", tile.index, "soil", "nitrogenContent"], returnedNutrients);
-        finalDelta.addDelta(["tiles", tile.index, "soil", "potassiumContent"], returnedNutrients);
-        finalDelta.addDelta(["tiles", tile.index, "soil", "phosphorousContent"], returnedNutrients);
-    });
-    
-    flowersToRemove.forEach(key => {
-        finalDelta.addDelta(["flowersMap", key], null, "DELTA_REMOVE")
     });
 
     const placedSeeds = gameDelta.getIntermediateDelta<StringMap<PlacedSeed[]>>("placedSeeds") || {};

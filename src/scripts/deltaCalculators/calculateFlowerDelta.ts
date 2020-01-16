@@ -20,7 +20,6 @@ export function calculateFlowerDelta(gameState: GameState, gameStateDelta: GameS
 function getFlowerEffect(tile: Tile, flower: Flower, flowerKey: string, flowerTypes: StringMap<FlowerType>, bonusMultiplier: number): GameStateDelta {
     const {
         turnsUntilGrown,
-        soilConsumptionRate,
         seedProductionRate
     } = flowerTypes[flower.type];
     
@@ -34,10 +33,6 @@ function getFlowerEffect(tile: Tile, flower: Flower, flowerKey: string, flowerTy
     } else {
         deltas.addDelta(["seedStatus", flower.type, "progress"], Math.floor(seedProductionRate * bonusMultiplier));
     }
-
-    deltas.addDelta(["tiles", tile.index, "soil", "nitrogenContent"], -soilConsumptionRate);
-    deltas.addDelta(["tiles", tile.index, "soil", "potassiumContent"], -soilConsumptionRate);
-    deltas.addDelta(["tiles", tile.index, "soil", "phosphorousContent"], -soilConsumptionRate);
 
     return deltas;
 }

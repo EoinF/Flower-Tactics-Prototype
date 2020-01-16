@@ -56,7 +56,7 @@ function applyImprovements(baseFlower: FlowerType, gameState: GameState, improve
     // Options:
     // 1) improve turns for growth (should be rare)
     // 2) improve seedProductionRate (small increase but not so rare)
-    // 3) improve soilConsumptionRate (should be small and rarish)
+    // 3) improve turns until dead (should be rare)
     // 4,5,6) improve any of the soil requirements (common)
     // 7) improve tenacity for surviving without nutrients
     //
@@ -65,8 +65,8 @@ function applyImprovements(baseFlower: FlowerType, gameState: GameState, improve
 
     const improvementsChances = {
         'growth': 1,
-        'soil consumption': 2,
         'seed production': 3,
+        'turns until dead': 1,
         'requirements': 4,
         'tenacity': 3
     }
@@ -74,7 +74,7 @@ function applyImprovements(baseFlower: FlowerType, gameState: GameState, improve
 
     const improvementCosts = {
         'growth': 17 - baseFlower.turnsUntilGrown,
-        'soil consumption': Math.max(2, 15 - Math.round(baseFlower.soilConsumptionRate / 3)),
+        'turns until dead': Math.max(7, 15 - baseFlower.turnsUntilDead),
         'seed production': Math.max(3, Math.round(baseFlower.seedProductionRate / 2) - 15),
         'requirements': 1,
         'tenacity': 1 + Math.floor(baseFlower.tenacity / 20)
@@ -105,8 +105,8 @@ function applyImprovementDelta(delta: GameStateDelta, improvementType: string, g
         case 'seed production':
             delta.addDelta(["seedProductionRate"], deltaValue);
             break;
-        case 'soil consumption':
-            delta.addDelta(["soilConsumptionRate"], -deltaValue);
+        case 'turns until dead':
+            delta.addDelta(["turnsUntilDead"], -deltaValue);
             break;
         case 'requirements':
             const roll = gameState.getNextRandomNumber(1, 3);
