@@ -22,9 +22,6 @@ export class GameStateController {
             gameState = gameStateOrData;
         } else {
             gameState = new GameState(gameStateOrData);
-            if (gameStateOrData.cloudLayoutSeed == null) {
-                gameState.generateNextCloudLayout();
-            }
         }
         
         this.gameState$.next(gameState);

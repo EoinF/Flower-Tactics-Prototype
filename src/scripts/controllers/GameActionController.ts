@@ -1,8 +1,15 @@
 import { Subject, Observable, merge, BehaviorSubject } from "rxjs";
 import { scan, map, shareReplay, distinctUntilChanged, startWith, mapTo } from "rxjs/operators";
+import { StringMap } from "../types";
+import { Cloud } from "../objects/Cloud";
 
 interface PlacedSeedInstance {
     type: string;
+    tileIndex: number;
+}
+
+interface PlacedCloud {
+    cloudKey: string;
     tileIndex: number;
 }
 
@@ -17,13 +24,15 @@ export class GameActionController {
     private removeSeed$: Subject<PlacedSeedInstance>;
     private resetSeeds$: Subject<void>;
     private placedSeedsMap$: Observable<PlacedSeedsMap>;
-    private placedCloudsIndex$: BehaviorSubject<number | null>;
+    private onPlaceCloud$: Subject<PlacedCloud>;
+    private resetClouds$: Subject<void>;
 
     constructor() {
         this.placeSeed$ = new Subject();
         this.removeSeed$ = new Subject();
         this.resetSeeds$ = new Subject();
-        this.placedCloudsIndex$ = new BehaviorSubject<number | null>(null);
+        this.onPlaceCloud$ = new Subject();
+        this.resetClouds$ = new Subject();
 
         this.placedSeedsMap$ =
             merge(
@@ -66,12 +75,12 @@ export class GameActionController {
         this.resetSeeds$.next();
     }
 
-    placeClouds(tileIndex: number) {
-        this.placedCloudsIndex$.next(tileIndex);
+    placeCloud(cloudKey: string, tileIndex: number) {
+        this.onPlaceCloud$.next({cloudKey, tileIndex});
     }
     
     resetClouds() {
-        this.placedCloudsIndex$.next(null);
+        this.resetClouds$.next();
     }
 
     onPlaceSeedObservable(): Observable<PlacedSeedInstance> {
@@ -86,7 +95,21 @@ export class GameActionController {
         return this.placedSeedsMap$;
     }
 
-    placedCloudsObservable() {
-        return this.placedCloudsIndex$.pipe(distinctUntilChanged());
+    placedCloudsObservable(): Observable<StringMap<number>> {
+        return merge(
+            this.onPlaceCloud$.pipe(map(placedCloud => ({isReset: false, cloudKey: placedCloud.cloudKey, tileIndex: placedCloud.tileIndex}))),
+            this.resetClouds$.pipe(startWith(null), mapTo({isReset: true, cloudKey: null, tileIndex: null}))
+        ).pipe(
+            scan((accumulator, nextValue) => {
+                if (nextValue.isReset) {
+                    return [];
+                } else {
+                    return {
+                        ...accumulator,
+                        [nextValue.cloudKey!]: nextValue.tileIndex
+                    };
+                }
+            }, {})
+        );
     }
 }

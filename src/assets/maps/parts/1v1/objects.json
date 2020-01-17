@@ -1,10 +1,12 @@
 {
     "players": {
         "1": {
+            "cloudOwned": "2",
             "seedsOwned": ["1"],
             "flowers": ["0"]
         },
         "2": {
+            "cloudOwned": "1",
             "seedsOwned": ["2"],
             "flowers": ["1"]
         }
@@ -61,6 +63,14 @@
             "phosphorousMax": 2300,
             "potassiumMin": 700, 
             "potassiumMax": 1000
+        }
+    },
+    "clouds": {
+        "1": {
+            "tileIndex": -1
+        },
+        "2": {
+            "tileIndex": -1
         }
     },
     "rainfallTiles": [],

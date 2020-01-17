@@ -18,7 +18,6 @@ export class MapSaver {
                 seedStatus: gameState.seedStatus,
                 players: gameState.players,
                 tiles: gameState.tiles,
-                cloudLayoutSeed: gameState.cloudLayoutSeed,
                 randomNumberGeneratorSeed: gameState.randomNumberGeneratorSeed
             } as GameStateData
         } else {

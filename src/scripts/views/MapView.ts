@@ -8,8 +8,6 @@ import { TileWidget } from "../widgets/specific/TileWidget";
 import { indexToMapCoordinates } from "../widgets/utils";
 import { combineLatest } from "rxjs";
 import { HeldObjectController } from "../controllers/HeldObjectController";
-import { HeldCloudsWidget } from "../widgets/specific/HeldCloudsWidget";
-import { COLOURS } from "../constants";
 import { isRequirementsSatisfied } from "../deltaCalculators/helpers";
 import { GameActionController } from "../controllers/GameActionController";
 
@@ -22,7 +20,8 @@ export class MapView {
     mountainSprites: Phaser.GameObjects.Image[];
 	riverSprites: Phaser.GameObjects.Image[];
 	placedSeedSprites: Map<number, PlacedSeedWidget>;
-	placedCloudSprite: HeldCloudsWidget;
+	cloudSprites: Phaser.GameObjects.Image[];
+	placedCloudWidget: Phaser.GameObjects.Image;
 
     constructor(
       scene: Phaser.Scene, 
@@ -38,9 +37,8 @@ export class MapView {
 		this.flowerSprites = [];
 		this.mountainSprites = [];
 		this.riverSprites = [];
+		this.cloudSprites = [];
 		this.placedSeedSprites = new Map<number, PlacedSeedWidget>();
-		this.placedCloudSprite = new HeldCloudsWidget(scene, 0, 0, COLOURS.withAlpha(COLOURS.WHITE, 0.1), COLOURS.TRANSPARENT)
-			.setDepth(5);
         this.setupSprites(scene, gameStateController);
         this.setupCallbacks(gameStateController, gameActionController, mapController, heldObjectController);
     }
@@ -49,6 +47,7 @@ export class MapView {
 		gameStateController.loadMapObservable().subscribe((gameState) => {
 			this.setupTileSprites(gameState);
 			this.setupFlowerSprites(gameState);
+			this.setupCloudSprites(gameState);
 		
 			this.mountainSprites.forEach(s => s.destroy());
 			this.mountainSprites = gameState.mountains.map((mountain) => {
@@ -64,8 +63,11 @@ export class MapView {
 			});
 			this.placedSeedSprites.forEach(s => s.destroy());
 			this.placedSeedSprites.clear();
-			
-			this.placedCloudSprite.setVisible(false);
+
+			this.placedCloudWidget = scene.add.image(0, 0, 'cloud')
+				.setDepth(5)
+				.setAlpha(0.6)
+				.setVisible(false);
 		});
     }
 
@@ -74,6 +76,18 @@ export class MapView {
 		this.tileButtons = gameState.tiles.map((tile, index) => {
 			return new TileWidget(this.scene, index, gameState.numTilesX, tile.soil, gameState.getTileWaterContent(tile), this.soilColourConverter);
 		});
+	}
+
+	setupCloudSprites(gameState: GameState) {
+		this.cloudSprites.forEach(s => s.destroy());
+		this.cloudSprites = Object.keys(gameState.clouds)
+			.filter(key => gameState.clouds[key].tileIndex >= 0)
+			.map(key => {
+				const location = indexToMapCoordinates(gameState.clouds[key].tileIndex, gameState.numTilesX);
+				const img = this.scene.add.image(location.x * 48, location.y * 48, 'cloud')
+					.setDepth(6);
+				return img;
+			});
 	}
 
 	setupFlowerSprites(gameState: GameState) {
@@ -105,6 +119,7 @@ export class MapView {
 				button.setTileState(tile.soil, newState.getTileWaterContent(tile));
 			});
 			this.setupFlowerSprites(newState);
+			this.setupCloudSprites(newState);
 		});
 		
 		gameActionController.placedSeedsMapObservable()
@@ -121,24 +136,11 @@ export class MapView {
 				});
 			});
 
-		gameActionController.placedCloudsObservable()
-			.pipe(
-				withLatestFrom(gameStateController.gameStateObservable())
-			).subscribe(([placedCloudsIndex, gameState]) => {
-				if (placedCloudsIndex != null) {
-					const location = indexToMapCoordinates(placedCloudsIndex, gameState.numTilesX);
-					this.placedCloudSprite.setPosition(location.x * 48, location.y * 48);
-					this.placedCloudSprite.setCloudLayout(gameState.getCloudLayout());
-				} else {
-					this.placedCloudSprite.hideCloudLayout();
-				}
-			});
-		
 		combineLatest(
-			heldObjectController.heldCloudObservable(),
+			heldObjectController.isHoldingCloudObservable(),
 			gameStateController.gameStateObservable()
-		).subscribe(([heldCloud, gameState]) => {
-			if (heldCloud != null) {
+		).subscribe(([isHoldingCloud, gameState]) => {
+			if (isHoldingCloud) {
 				for (let i = 0; i < gameState.tiles.length; i++) {
 					const tile = gameState.tiles[i];
 				
@@ -191,6 +193,19 @@ export class MapView {
 					this.tileButtons[newTile.index].setIsHovering(true);
 				}
 			});
+			
+			gameActionController.placedCloudsObservable().pipe(
+                withLatestFrom(gameStateController.currentPlayerObservable(), gameStateController.gameStateObservable()),
+            ).subscribe(([placedClouds, playerId, gameState]) => {
+				const playerCloud = gameState.players[playerId].cloudOwned;
+				if (Object.keys(placedClouds).indexOf(playerCloud) !== -1) {
+					const location = indexToMapCoordinates(placedClouds[playerCloud], gameState.numTilesX);
+					this.placedCloudWidget.setVisible(true);
+					this.placedCloudWidget.setPosition(location.x * 48, location.y * 48);
+				} else {
+					this.placedCloudWidget.setVisible(false);
+				}
+            })
 	}
 	
 	addNewSeed(tileIndex: number, seedType: string, seedAmount: number, newState: GameState, mapController: MapController) {

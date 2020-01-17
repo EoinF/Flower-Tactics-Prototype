@@ -13,9 +13,11 @@ export function setupGameInputConnectors(
     gameActionController: GameActionController
 ) {
     const gameState$ = gameStateController.gameStateObservable();
+    const currentPlayerId$ = gameStateController.currentPlayerObservable();
+
     const placedSeedsMap$ = gameActionController.placedSeedsMapObservable();
     const heldSeed$ = heldObjectController.heldSeedObservable();
-    const heldClouds$ = heldObjectController.heldCloudObservable();
+    const isHoldingCloud$ = heldObjectController.isHoldingCloudObservable();
     const isHoldingShiftKey$ = guiController.isHoldingShiftKeyObservable();
     const endTurn$ = guiController.endTurnObservable();
     const clickTile$ = mapController.clickTileObservable();
@@ -75,11 +77,11 @@ export function setupGameInputConnectors(
 
     clickTile$
         .pipe(
-            withLatestFrom(heldClouds$)
+            withLatestFrom(isHoldingCloud$, gameState$, currentPlayerId$)
         )
-        .subscribe(([tileIndex, heldClouds]) => {
-            if (heldClouds != null) {
-                gameActionController.placeClouds(tileIndex);
+        .subscribe(([tileIndex, isHoldingCloud, gameState, currentPlayerId]) => {
+            if (isHoldingCloud) {
+                gameActionController.placeCloud(gameState.players[currentPlayerId].cloudOwned, tileIndex);
             }
         });
 }

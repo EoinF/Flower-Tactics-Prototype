@@ -4,14 +4,13 @@ import { Mountain } from "./Mountain";
 import { River } from "./River";
 import { FlowerType } from "./FlowerType";
 import { StringMap } from "../types";
-import { CLOUD_LAYOUT_SEED_MAX, CLOUD_GRID_WIDTH, CLOUD_GRID_HEIGHT } from "../constants";
-import { CloudLayout } from "../controllers/HeldObjectController";
 import { SeedStatus } from "./SeedStatus";
 import { Player } from "./Player";
 import { FlowerAugmentation } from "./FlowerAugmentation";
+import { Cloud } from "./Cloud";
 
 export interface GameStateData {
-    cloudLayoutSeed: number | null;
+    clouds: StringMap<Cloud>;
     randomNumberGeneratorSeed: string;
     numTilesX: number;
     numTilesY: number;
@@ -23,14 +22,12 @@ export interface GameStateData {
     players: StringMap<Player>;
     seedStatus: StringMap<SeedStatus>;
     flowerAugmentations: StringMap<FlowerAugmentation[]>;
-    rainfallTiles: number[];
 }
 
 export class GameState implements GameStateData {
-    cloudLayoutSeed: number;
+    clouds: StringMap<Cloud>;
     randomNumberGeneratorSeed: string;
     private randomNumberGenerator: Phaser.Math.RandomDataGenerator;
-    private cloudLayout: CloudLayout;
     numTilesX: number;
     numTilesY: number;
     tiles: Tile[];
@@ -41,7 +38,6 @@ export class GameState implements GameStateData {
     flowerTypes: StringMap<FlowerType>;
     seedStatus: StringMap<SeedStatus>;
     flowerAugmentations: StringMap<FlowerAugmentation[]>;
-    rainfallTiles: number[];
 
     tileToFlowerMap: Map<Tile, Flower>;
     tileToRiverMap: Map<Tile, River>;
@@ -49,12 +45,8 @@ export class GameState implements GameStateData {
     flowers: Flower[];
 
     constructor(data: GameStateData) {
-        const {
-            cloudLayoutSeed,
-            ...otherData
-        } = data;
-        Object.keys(otherData).forEach(key => {
-            this[key] = otherData[key];
+        Object.keys(data).forEach(key => {
+            this[key] = data[key];
         });
         this.tileToFlowerMap = new Map<Tile, Flower>();
         this.tileToRiverMap = new Map<Tile, River>();
@@ -162,22 +154,10 @@ export class GameState implements GameStateData {
         return this.randomNumberGenerator.state();
     }
 
-    generateNextCloudLayout() {
-        this.cloudLayoutSeed = 1;
-        this.cloudLayout = [];
-
-        let current = this.cloudLayoutSeed;
-        for (let i = 0; i < CLOUD_GRID_WIDTH * CLOUD_GRID_HEIGHT; i++) {
-            this.cloudLayout.push(current % 2 == 1);
-            current = Math.floor(current / 2);
-        }
-    }
-    
-    getCloudLayout() {
-        return this.cloudLayout;
-    }
-
     getTileWaterContent(tile: Tile) {
-        return (this.getRiverAtTile(tile) != null || this.rainfallTiles.indexOf(tile.index) !== -1) ? 1 : 0;
+        return (
+            this.getRiverAtTile(tile) != null || 
+            Object.keys(this.clouds).map(key => this.clouds[key].tileIndex).indexOf(tile.index) !== -1
+        ) ? 1 : 0;
     }
 }

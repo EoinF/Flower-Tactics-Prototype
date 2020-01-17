@@ -10,17 +10,19 @@ import { StringMap } from "./types";
 import { Player } from "./objects/Player";
 import { SeedStatus } from "./objects/SeedStatus";
 import { FlowerAugmentation } from "./objects/FlowerAugmentation";
+import { Cloud } from "./objects/Cloud";
 
 export interface ObjectData {
     players: StringMap<Player>;
     flowersMap: StringMap<Flower>;
+    seedStatus: StringMap<SeedStatus>;
+    clouds: StringMap<Cloud>;
+
     mountains: Mountain[];
     rivers: River[];
     flowerTypes: StringMap<FlowerType>;
-    seedStatus: StringMap<SeedStatus>;
     flowerAugmentations: StringMap<FlowerAugmentation[]>;
     randomNumberGeneratorSeed: string;
-    cloudLayoutSeed: number | null;
     rainfallTiles: number[];
 }
 

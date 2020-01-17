@@ -18,16 +18,13 @@ export class CloudUIView {
             .setBorder(1, COLOURS.BLACK)
             .onClick(() => guiController.clickCloudPlacementButton());
 
-        combineLatest(
-            guiController.onClickCloudPlacementButtonObservable(), 
-            gameStateController.gameStateObservable().pipe(distinctUntilChanged())
-        ).pipe(
-            withLatestFrom(heldObjectController.heldCloudObservable())
-        ).subscribe(([[_, state], heldObject]) => {
-            if (heldObject != null) {
+        guiController.onClickCloudPlacementButtonObservable().pipe(
+            withLatestFrom(heldObjectController.isHoldingCloudObservable())
+        ).subscribe(([_, isHoldingCloud]) => {
+            if (isHoldingCloud) {
                 heldObjectController.dropObject();
             } else {
-                heldObjectController.pickUpClouds(state.getCloudLayout())
+                heldObjectController.pickUpClouds()
             }
         });
    } 

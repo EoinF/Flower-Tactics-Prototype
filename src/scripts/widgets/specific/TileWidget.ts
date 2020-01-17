@@ -37,7 +37,7 @@ export class TileWidget extends ClickableWidget {
         this.container.setDepth(this.container.depth, "auto");
         this.soilImage =  scene.add.image(0, 0, "blank-tile");
         this.waterImage = scene.add.image(0, 0, "droplet")
-            .setDepth(6);
+            .setDepth(7);
 
         this.viableSprite = scene.add.image(x, y, "tile-viable")
             .setTint(COLOURS.LIGHT_YELLOW.color)

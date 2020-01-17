@@ -34,8 +34,7 @@ export class MapGenerator {
             seedStatus: {},
             flowerAugmentations: {},
             randomNumberGeneratorSeed: "0",
-            cloudLayoutSeed: null,
-            rainfallTiles: []
+            clouds: {}
         };
     }
     

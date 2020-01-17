@@ -8,6 +8,7 @@ import { combineLatest } from "rxjs";
 import { calculateSeedPlacementDelta } from "../deltaCalculators/calculateSeedPlacementDelta";
 import { calculateCloudDelta } from "../deltaCalculators/calculateCloudDelta";
 import { calculateAugmentationDelta } from "../deltaCalculators/calculateAugmentationDelta";
+import { StringMap } from "../types";
 
 export function setupGameDeltaManager(
     gameStateController: GameStateController,
@@ -15,15 +16,15 @@ export function setupGameDeltaManager(
     gameActionController: GameActionController
 ) {
     combineLatest(gameStateController.gameStateObservable(), gameActionController.placedSeedsMapObservable(), gameActionController.placedCloudsObservable())
-        .subscribe(([gameState, placedSeedsMap, placedCloudTileIndex]) => {
-            gameDeltaController.setDelta(calculateDelta(gameState, placedSeedsMap, placedCloudTileIndex));
+        .subscribe(([gameState, placedSeedsMap, placedClouds]) => {
+            gameDeltaController.setDelta(calculateDelta(gameState, placedSeedsMap, placedClouds));
         });
 }
 
-function calculateDelta(state: GameState, placedSeeds: PlacedSeedsMap, placedCloudTileIndex: number | null) {
+function calculateDelta(state: GameState, placedSeeds: PlacedSeedsMap, placedClouds: StringMap<number>) {
     const delta = new GameStateDelta();
     calculateFlowerDelta(state, delta);
-    calculateCloudDelta(state, delta, placedCloudTileIndex);
+    calculateCloudDelta(state, delta, placedClouds);
     calculateSeedPlacementDelta(state, delta, placedSeeds);
     calculateAugmentationDelta(state, delta);
     return delta;

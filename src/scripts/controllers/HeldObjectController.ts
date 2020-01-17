@@ -3,10 +3,8 @@ import { map, startWith } from "rxjs/operators";
 
 interface HeldObject {
     type: 'SEED' | 'CLOUD',
-    data: HeldSeedData | CloudLayout
+    data: HeldSeedData | null
 }
-
-export type CloudLayout = Array<boolean>;
 
 export interface HeldSeedData {
     type: string;
@@ -24,10 +22,10 @@ export class HeldObjectController {
         this.heldObject$.next(null);
     }
 
-    pickUpClouds(layout: CloudLayout) {
+    pickUpClouds() {
         this.heldObject$.next({
             type: 'CLOUD',
-            data: layout
+            data: null
         });
     }
 
@@ -46,17 +44,17 @@ export class HeldObjectController {
 
     heldSeedObservable(): Observable<HeldSeedData | null> {
         return this.heldObject$
-        .pipe(
-            map(heldObject => (heldObject != null && heldObject.type === 'SEED') ? heldObject.data as HeldSeedData : null),
-            startWith(null)
-        );
+            .pipe(
+                map(heldObject => (heldObject != null && heldObject.type === 'SEED') ? heldObject.data as HeldSeedData : null),
+                startWith(null)
+            );
     }
     
-    heldCloudObservable(): Observable<CloudLayout | null> {
+    isHoldingCloudObservable(): Observable<boolean> {
         return this.heldObject$
-        .pipe(
-            map(heldObject => (heldObject != null && heldObject.type === 'CLOUD') ? heldObject.data as CloudLayout : null),
-            startWith(null)
-        );
+            .pipe(
+                map(heldObject => (heldObject != null && heldObject.type === 'CLOUD')),
+                startWith(false)
+            );
     }
 }
