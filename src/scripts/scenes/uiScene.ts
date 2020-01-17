@@ -16,6 +16,8 @@ export default class UIScene extends Phaser.Scene {
     }
     
   create() {
+	guiController.setInputManager(this.input.keyboard.createCursorKeys());
+
 	new SelectedTileView(this, gameStateController, selectedObjectController, mapController, heldObjectController);
 	
 	const flowerSelectionWidth = 300;

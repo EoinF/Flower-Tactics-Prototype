@@ -7,7 +7,7 @@ import { VerticalAlignment, HorizontalAlignment } from "../../types";
 type PointerAction = "pointerUp" | "pointerDown" | "pointerUpOverButton"
 interface PointerState {
     actionType: PointerAction,
-    pointer: { x: number, y: number }
+    pointer: Phaser.Input.Pointer
 }
 
 export class ClickableWidget extends BaseUIObject {
@@ -93,15 +93,15 @@ export class ClickableWidget extends BaseUIObject {
         return this;
     }
 
-    onClick(callback: (pointer: {x: number, y: number}) => void) {
+    onClick(callback: (pointer: Phaser.Input.Pointer) => void) {
         this.pointerState$.pipe(
             distinctUntilChanged(),
             pairwise(),
             filter(([previousState, currentState]) => 
                 previousState.actionType === "pointerDown"
                 && currentState.actionType == "pointerUpOverButton"),
-            map(([_, currentState]) => ({x: currentState.pointer.x, y: currentState.pointer.y}))
-        ).subscribe(pointerLocation => callback(pointerLocation));
+            map(([_, currentState]) => currentState)
+        ).subscribe(pointerLocation => callback(pointerLocation.pointer));
     
         return this;
     }

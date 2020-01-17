@@ -18,13 +18,12 @@ export function setupGameInputConnectors(
     const placedSeedsMap$ = gameActionController.placedSeedsMapObservable();
     const heldSeed$ = heldObjectController.heldSeedObservable();
     const isHoldingCloud$ = heldObjectController.isHoldingCloudObservable();
-    const isHoldingShiftKey$ = guiController.isHoldingShiftKeyObservable();
     const endTurn$ = guiController.endTurnObservable();
     const clickTile$ = mapController.clickTileObservable();
+
+    const inputManager$ = guiController.inputManagerObservable();
     
-    endTurn$.pipe(
-        withLatestFrom(placedSeedsMap$)
-    ).subscribe(([_, placedSeedsMap]) => {
+    endTurn$.subscribe(() => {
         gameActionController.resetSeeds();
         gameActionController.resetClouds();
     })
@@ -35,9 +34,9 @@ export function setupGameInputConnectors(
                 gameState$,
                 placedSeedsMap$,
                 heldSeed$,
-                isHoldingShiftKey$
+                inputManager$
             )
-        ).subscribe(([clickedTile, gameState, placedSeedsMap, heldSeed, isHoldingShiftKey]) => {
+        ).subscribe(([clickedTile, gameState, placedSeedsMap, heldSeed, inputManager]) => {
             if (heldSeed != null) {
                 const existingSeed = placedSeedsMap.get(clickedTile) || {type: null, amount: 0};
                 const isOtherSeedTypeBlockingTile = existingSeed.amount > 0 && existingSeed.type != heldSeed.type;
@@ -54,6 +53,7 @@ export function setupGameInputConnectors(
                 );
 
                 const hasSufficientSeeds = (gameState.seedStatus[heldSeed.type].quantity - existingSeed.amount) > 0;
+                const tileHasSeeds = existingSeed.amount > 0;
 
                 if (isOtherSeedTypeBlockingTile) {
                     guiController.createAlertMessage("Another type of seed is already placed on this tile.");
@@ -63,13 +63,17 @@ export function setupGameInputConnectors(
                     guiController.createAlertMessage("A mountain is blocking seed placement.");
                 } else if (!isFlowerAdjacent) {
                     guiController.createAlertMessage("You can only place seeds near your existing flowers.");
-                } else if (!hasSufficientSeeds) {
-                    guiController.createAlertMessage("You don't have any seeds remaining.");
                 } else {
-                    if (isHoldingShiftKey) {
-                        gameActionController.removeSeed(heldSeed.type, clickedTile);
+                    if (inputManager.shift!.isDown) {
+                        if (tileHasSeeds) {
+                            gameActionController.removeSeed(heldSeed.type, clickedTile);
+                        }
                     } else {
-                        gameActionController.placeSeed(heldSeed.type, clickedTile);
+                        if (!hasSufficientSeeds) {
+                            guiController.createAlertMessage("You don't have any seeds remaining.");
+                        } else {
+                            gameActionController.placeSeed(heldSeed.type, clickedTile);
+                        }
                     }
                 }
             }

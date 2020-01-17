@@ -67,7 +67,6 @@ export class TileWidget extends ClickableWidget {
         this.viabilityState = viabilityState;
         this.updateDisplay();
     }
-    
 
     setIsHovering(isHovering: boolean) {
         this.isHovering = isHovering;

@@ -22,7 +22,7 @@ export class GuiController {
     private mousePosition$: Subject<MapLocation>;
     private mouseOverSeedContainer$: Subject<boolean>;
     private mouseOverFlowerSelection$: Subject<boolean>;
-    private isHoldingShiftKey$: ReplaySubject<boolean>;
+    private inputManager$: Subject<Phaser.Types.Input.Keyboard.CursorKeys>;
 
     constructor() {
         this.endTurn$ = new ReplaySubject(1);
@@ -39,7 +39,7 @@ export class GuiController {
         this.mousePosition$ = new Subject();
         this.mouseOverSeedContainer$ = new ReplaySubject(1);
         this.mouseOverFlowerSelection$ = new ReplaySubject(1);
-        this.isHoldingShiftKey$ = new ReplaySubject(1);
+        this.inputManager$ = new Subject();
     }
 
     setMouseOverFlowerSelector(isMouseOver: boolean) {
@@ -110,8 +110,8 @@ export class GuiController {
         this.mousePosition$.next({x, y});
     }
 
-    setIsHoldingShiftKey(isHoldingShiftKey: boolean) {
-        this.isHoldingShiftKey$.next(isHoldingShiftKey);
+    setInputManager(inputManager: Phaser.Types.Input.Keyboard.CursorKeys) {
+        this.inputManager$.next(inputManager);
     }
 
     onClickInfoButtonObservable(): Observable<void> {
@@ -158,9 +158,7 @@ export class GuiController {
         return this.mousePosition$;
     }
 
-    isHoldingShiftKeyObservable(): Observable<boolean> {
-        return this.isHoldingShiftKey$.pipe(
-            startWith(false)
-        );
+    inputManagerObservable(): Observable<Phaser.Types.Input.Keyboard.CursorKeys> {
+        return this.inputManager$;
     }
 }

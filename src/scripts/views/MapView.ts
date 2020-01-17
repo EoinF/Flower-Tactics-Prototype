@@ -108,7 +108,7 @@ export class MapView {
 		mapController: MapController, heldObjectController: HeldObjectController
 	) {
         this.tileButtons.forEach(button => {
-            button.onClick(() => {
+            button.onClick((event) => {
 				mapController.clickTile(button.tileIndex);
             });
         });
@@ -211,9 +211,6 @@ export class MapView {
 	addNewSeed(tileIndex: number, seedType: string, seedAmount: number, newState: GameState, mapController: MapController) {
 		const location = indexToMapCoordinates(tileIndex, newState.numTilesX);
 		const placedSeedWidget = new PlacedSeedWidget(this.scene, (location.x * 48) - 24, (location.y * 48) - 24, 48, 48, seedAmount);
-		placedSeedWidget.onClick(() => {
-			mapController.clickTile(tileIndex);
-		});
 		
 		this.placedSeedSprites.set(tileIndex, placedSeedWidget);
 	}

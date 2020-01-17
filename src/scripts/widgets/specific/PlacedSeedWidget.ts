@@ -1,10 +1,8 @@
 import { TextLabel } from "../generic/TextLabel";
-import { ImageButton } from "../generic/ImageButton";
-import { pairwise, filter, delay, map } from "rxjs/operators";
-import { merge } from "rxjs";
 import { COLOURS } from "../../constants";
+import { BaseUIObject } from "../generic/UIObject";
 
-export class PlacedSeedWidget extends ImageButton {
+export class PlacedSeedWidget extends BaseUIObject {
     private amount: number;
     private amountText: TextLabel;
 
@@ -13,11 +11,14 @@ export class PlacedSeedWidget extends ImageButton {
         width: number, height: number,
         seedAmount: number
     ) {
-        super(scene, x, y, "seed2", width, height, COLOURS.TRANSPARENT, COLOURS.TRANSPARENT);
+        super(scene, x, y, width, height);
         this.amount = seedAmount;
         this.amountText = new TextLabel(scene, 4, 4, seedAmount.toString(), COLOURS.WHITE, { fontSize: 14, strokeThickness: 2 })
              .setOrigin(1, 0);
+
+        const seedSprite = scene.add.image(0, 0, 'seed2');
         
+        this.container.addChild(seedSprite, "Middle", "Middle");
         this.container.addChild(this.amountText, "Bottom", "Right");
 
         if (this.amount < 2) {
@@ -35,26 +36,5 @@ export class PlacedSeedWidget extends ImageButton {
         if (this.amount > 1) {
             this.amountText.setVisible(true);
         }
-    }
-
-    onHold(callback:  (location: {x: number, y: number}) => void) {
-        const delayReachedAfterPointerDown$ = this.pointerState$.pipe(
-            filter(pointerState => pointerState.actionType == "pointerDown"),
-            map(state => ({actionType: "delayReachedAfterPointerDown", pointer: {x: state.pointer.x, y: state.pointer.y} })),
-            delay(250)
-        );
-        merge(delayReachedAfterPointerDown$, this.pointerState$).pipe(
-            pairwise(),
-            filter(([previousState, currentState]) =>
-                previousState.actionType === "pointerDown" 
-                && currentState.actionType == "delayReachedAfterPointerDown"),
-            map(([_, currentState]) => ({x: currentState.pointer.x, y: currentState.pointer.y}))
-        ).subscribe(pointerLocation => callback(pointerLocation));
-        return this;
-    }
-
-    destroy() {
-        super.destroy();
-        this.amountText.destroy();
     }
 }
