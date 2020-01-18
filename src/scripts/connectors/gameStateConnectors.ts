@@ -133,7 +133,8 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): G
 function nextState(gameState: GameState, gameDelta: GameStateDelta) {
     const copiedData = getCopiedState(gameState);
     const finalDelta = calculateFinalDelta(gameState, gameDelta);
-
+    const updatedState = applyDeltas(copiedData, finalDelta);
+    
     Object.keys(copiedData.seedStatus).forEach(key => {
         const addedSeeds = Math.floor(copiedData.seedStatus[key].progress / 100);
         copiedData.seedStatus[key].quantity += addedSeeds;
@@ -145,8 +146,6 @@ function nextState(gameState: GameState, gameDelta: GameStateDelta) {
             .filter(augmentation => augmentation != null);
     })
 
-    const updatedState = applyDeltas(copiedData, finalDelta);
-    console.log(updatedState.players);
     return new GameState(updatedState);
 }
 
