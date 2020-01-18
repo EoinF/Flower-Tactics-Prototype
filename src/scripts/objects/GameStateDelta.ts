@@ -4,11 +4,11 @@ type GameStateKey = number | string;
 
 interface GameStateDeltaInstance {
     keys: GameStateKey[];
-    deltaValue: number | null | object;
+    deltaValue: number | null | object | string;
     deltaType: DeltaType;
 }
 
-type DeltaType = "DELTA_ADD" | "DELTA_REMOVE" | "DELTA_REPLACE";
+type DeltaType = "DELTA_ADD" | "DELTA_REMOVE" | "DELTA_REPLACE" | "DELTA_APPEND";
 
 export class GameStateDelta {
     private deltas: StringMap<GameStateDeltaInstance>;
@@ -18,7 +18,7 @@ export class GameStateDelta {
         this.intermediateDeltas = {};
     }
 
-    addDelta(keys: GameStateKey[], deltaValue: number | null | object, deltaType: DeltaType = "DELTA_ADD") {
+    addDelta(keys: GameStateKey[], deltaValue: number | null | object | string, deltaType: DeltaType = "DELTA_ADD") {
         const combinedKey = `${keys.join(".")}:${deltaType}`;
         const existingValue = this.deltas[combinedKey];
         if (existingValue != null) {
@@ -27,11 +27,20 @@ export class GameStateDelta {
                     ...existingValue, 
                     deltaValue: (existingValue.deltaValue as number) + (deltaValue as number)
                 };
+            } else if (deltaType === 'DELTA_APPEND') {
+                this.deltas[combinedKey] = {
+                    ...existingValue,
+                    deltaValue: [...(existingValue.deltaValue as Array<any>), deltaValue]
+                };
             } else {
                 console.log(`Warning: Can't apply ${deltaType} twice`);
             }
         } else {
-            this.deltas[combinedKey] = { keys, deltaValue, deltaType};
+            if (deltaType === 'DELTA_APPEND') {
+                this.deltas[combinedKey] = { keys, deltaValue: [deltaValue], deltaType};
+            } else {
+                this.deltas[combinedKey] = { keys, deltaValue, deltaType};
+            }
         }
         return this;
     }

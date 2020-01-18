@@ -108,7 +108,7 @@ export class MapView {
 		mapController: MapController, heldObjectController: HeldObjectController
 	) {
         this.tileButtons.forEach(button => {
-            button.onClick((event) => {
+            button.onClick(() => {
 				mapController.clickTile(button.tileIndex);
             });
         });
@@ -149,18 +149,22 @@ export class MapView {
 			}
 		});
 		
-		combineLatest(heldObjectController.heldSeedObservable(), gameStateController.gameStateObservable())
-		.subscribe(([pickedUpSeed, gameState]) => {
+		combineLatest(heldObjectController.heldSeedObservable(), gameStateController.gameStateObservable(), gameStateController.currentPlayerObservable())
+		.subscribe(([pickedUpSeed, gameState, currentPlayerId]) => {
 			if (pickedUpSeed != null) {
 				for (let i = 0; i < gameState.tiles.length; i++) {
 					const tile = gameState.tiles[i];
 
 					const x = tile.index % gameState.numTilesX;
 					const y = Math.floor(tile.index / gameState.numTilesX);
-					const isPlaceable = (gameState.getMountainAtTile(tile) == null
-						&& gameState.getFlowerAtTile(tile) == null)
-						&& gameState.getTilesAdjacent(x, y).some(
-							adjacentTile => gameState.getFlowerAtTile(adjacentTile) != null
+					
+					const playerFlowers = gameState.players[currentPlayerId].flowers;
+					const isPlaceable = gameState.getMountainAtTile(tile) == null
+						&& gameState.getFlowerIndexAtTile(tile) == null
+						&& gameState.getTilesAdjacent(x, y).some(adjacentTile => {
+								const flowerAtTile = gameState.getFlowerIndexAtTile(adjacentTile);
+								return flowerAtTile != null && playerFlowers.indexOf(flowerAtTile) !== -1
+							}
 						);
 						
 					const isViable = isRequirementsSatisfied(tile.soil, gameState.flowerTypes[pickedUpSeed.type]);

@@ -1,11 +1,11 @@
-import { Subject, Observable, merge, BehaviorSubject } from "rxjs";
-import { scan, map, shareReplay, distinctUntilChanged, startWith, mapTo } from "rxjs/operators";
+import { Subject, Observable, merge } from "rxjs";
+import { scan, map, shareReplay, startWith, mapTo } from "rxjs/operators";
 import { StringMap } from "../types";
-import { Cloud } from "../objects/Cloud";
 
 interface PlacedSeedInstance {
     type: string;
     tileIndex: number;
+    ownerId: string;
 }
 
 interface PlacedCloud {
@@ -63,12 +63,12 @@ export class GameActionController {
             );
     }
 
-    placeSeed(type: string, tileIndex: number) {
-        this.placeSeed$.next({ type, tileIndex });
+    placeSeed(type: string, tileIndex: number, ownerId: string) {
+        this.placeSeed$.next({ type, tileIndex, ownerId });
     }
 
-    removeSeed(type: string, tileIndex: number) {
-        this.removeSeed$.next({ type, tileIndex });
+    removeSeed(type: string, tileIndex: number, ownerId: string) {
+        this.removeSeed$.next({ type, tileIndex, ownerId });
     }
 
     resetSeeds() {

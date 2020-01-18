@@ -39,7 +39,7 @@ export class GameState implements GameStateData {
     seedStatus: StringMap<SeedStatus>;
     flowerAugmentations: StringMap<FlowerAugmentation[]>;
 
-    tileToFlowerMap: Map<Tile, Flower>;
+    tileToFlowerIndexMap: Map<Tile, string>;
     tileToRiverMap: Map<Tile, River>;
     tileToMountainMap: Map<Tile, Mountain>;
     flowers: Flower[];
@@ -48,21 +48,21 @@ export class GameState implements GameStateData {
         Object.keys(data).forEach(key => {
             this[key] = data[key];
         });
-        this.tileToFlowerMap = new Map<Tile, Flower>();
+        this.tileToFlowerIndexMap = new Map<Tile, string>();
         this.tileToRiverMap = new Map<Tile, River>();
         this.tileToMountainMap = new Map<Tile, Mountain>();
         this.randomNumberGenerator = new Phaser.Math.RandomDataGenerator(data.randomNumberGeneratorSeed);
         
         this.flowers = Object.keys(data.flowersMap).map(key => data.flowersMap[key]);
 
-        this.mapTilesToFlowers(data.flowersMap, this.tileToFlowerMap);
+        this.mapTilesToFlowers(data.flowersMap, this.tileToFlowerIndexMap);
         this.mapTilesToRivers(data.rivers, this.tileToRiverMap);
         this.mapTilesToMountains(data.mountains, this.tileToMountainMap);
     }
 
-    private mapTilesToFlowers(flowers: StringMap<Flower>, map: Map<Tile, Flower>) {
-        Object.keys(flowers).forEach(type => {
-            const flower = flowers[type];
+    private mapTilesToFlowers(flowers: StringMap<Flower>, map: Map<Tile, string>) {
+        Object.keys(flowers).forEach(key => {
+            const flower = flowers[key];
             const tile = this.getTileAt(flower.x, flower.y)!;
             const existingFlower = map.get(tile);
             if (existingFlower != null) {
@@ -70,7 +70,7 @@ export class GameState implements GameStateData {
                     + JSON.stringify(existingFlower)
                     + JSON.stringify(flower));
             } else {
-                map.set(tile, flower);
+                map.set(tile, key);
             }
         });
     }
@@ -96,14 +96,19 @@ export class GameState implements GameStateData {
         return this.tileToMountainMap.get(tile);
     }
     
+    getFlowerIndexAtTile(tile: Tile): string | null {
+        return this.tileToFlowerIndexMap.get(tile) || null;
+    }
+    
     getFlowerAtTile(tile: Tile): Flower | null {
-        return this.tileToFlowerMap.get(tile) || null;
+        const key = this.getFlowerIndexAtTile(tile);
+        return key != null ? this.flowersMap[key]: null;
     }
 
     getFlowerAt(x: number, y: number) {
         const tile = this.getTileAt(x, y);
         if (tile != null) {
-            return this.getFlowerAtTile(tile);
+            return this.flowersMap[this.getFlowerIndexAtTile(tile)!];
         } else {
             throw Error(`No tile exists at [${x},${y}] - getFlowerAt`)
         }

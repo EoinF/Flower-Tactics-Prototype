@@ -34,23 +34,23 @@ export function setupGameInputConnectors(
                 gameState$,
                 placedSeedsMap$,
                 heldSeed$,
-                inputManager$
+                inputManager$,
+                currentPlayerId$
             )
-        ).subscribe(([clickedTile, gameState, placedSeedsMap, heldSeed, inputManager]) => {
+        ).subscribe(([clickedTile, gameState, placedSeedsMap, heldSeed, inputManager, currentPlayerId]) => {
             if (heldSeed != null) {
                 const existingSeed = placedSeedsMap.get(clickedTile) || {type: null, amount: 0};
                 const isOtherSeedTypeBlockingTile = existingSeed.amount > 0 && existingSeed.type != heldSeed.type;
 
                 const tile = gameState.tiles[clickedTile];
-                const location = indexToMapCoordinates(clickedTile, gameState.numTilesX);
-                const isFlowerBlockingTile = (gameState.getFlowerAtTile(tile) != null);
+                const playerFlowers = gameState.players[currentPlayerId].flowers;
+                const { x, y } = indexToMapCoordinates(clickedTile, gameState.numTilesX);
+                const isFlowerBlockingTile = (gameState.getFlowerIndexAtTile(tile) != null);
                 const isMountainBlockingTile = (gameState.getMountainAtTile(tile) != null);
-
-                const isFlowerAdjacent = gameState.getTilesAdjacent(location.x, location.y).some(
-                    adjacentTile => {
-                        return gameState.getFlowerAtTile(adjacentTile) != null
-                    }
-                );
+                const isFlowerAdjacent = gameState.getTilesAdjacent(x, y).some(adjacentTile => {
+                    const flowerAtTile = gameState.getFlowerIndexAtTile(adjacentTile);
+                    return flowerAtTile != null && playerFlowers.indexOf(flowerAtTile) !== -1
+                });
 
                 let placedSeedsAmount = 0;
                 placedSeedsMap.forEach(placedSeed => {
@@ -72,13 +72,13 @@ export function setupGameInputConnectors(
                 } else {
                     if (inputManager.shift!.isDown) {
                         if (tileHasSeeds) {
-                            gameActionController.removeSeed(heldSeed.type, clickedTile);
+                            gameActionController.removeSeed(heldSeed.type, clickedTile, currentPlayerId);
                         }
                     } else {
                         if (!hasSufficientSeeds) {
                             guiController.createAlertMessage("You don't have any seeds remaining.");
                         } else {
-                            gameActionController.placeSeed(heldSeed.type, clickedTile);
+                            gameActionController.placeSeed(heldSeed.type, clickedTile, currentPlayerId);
                         }
                     }
                 }

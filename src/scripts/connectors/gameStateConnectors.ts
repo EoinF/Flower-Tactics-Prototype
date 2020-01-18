@@ -122,7 +122,8 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): G
                     type: placedSeed.type,
                     growth: 0
                 } as Flower;
-                finalDelta.addDelta(["flowersMap", newIndex], newFlower, "DELTA_REPLACE");
+                finalDelta.addDelta(["flowersMap", newIndex.toString()], newFlower, "DELTA_REPLACE");
+                finalDelta.addDelta(["players", placedSeed.ownerId, "flowers"], newIndex.toString(), "DELTA_APPEND");
                 newIndex++;
             }
         });
@@ -144,7 +145,9 @@ function nextState(gameState: GameState, gameDelta: GameStateDelta) {
             .filter(augmentation => augmentation != null);
     })
 
-    return new GameState(applyDeltas(copiedData, finalDelta));
+    const updatedState = applyDeltas(copiedData, finalDelta);
+    console.log(updatedState.players);
+    return new GameState(updatedState);
 }
 
 function applyDeltas<T>(gameData: T, deltas: GameStateDelta): T {
@@ -154,15 +157,17 @@ function applyDeltas<T>(gameData: T, deltas: GameStateDelta): T {
         }, gameData);
         const lastKey = delta.keys[delta.keys.length - 1];
 
-        if (delta.deltaType == "DELTA_ADD") {
+        if (delta.deltaType === "DELTA_ADD") {
             if (!(lastKey in currentEntry)) {
                 throw Error(`Tried to apply DELTA_ADD to non existent key ${delta.keys} for ${currentEntry}`);
             }
             currentEntry[lastKey] += delta.deltaValue as number;
-        } else if (delta.deltaType == "DELTA_REMOVE") {
+        } else if (delta.deltaType === "DELTA_REMOVE") {
             delete currentEntry[lastKey];
-        } else if (delta.deltaType == "DELTA_REPLACE") {
+        } else if (delta.deltaType === "DELTA_REPLACE") {
             currentEntry[lastKey] = delta.deltaValue;
+        } else if (delta.deltaType === "DELTA_APPEND") {
+            currentEntry[lastKey] = [ ...currentEntry[lastKey], ...(delta.deltaValue as Array<any>) ];
         }
     });
     return gameData;
