@@ -7,11 +7,12 @@ import { TextLabel } from "../widgets/generic/TextLabel";
 import { FlexUIContainer } from "../widgets/generic/FlexUIContainer";
 import { COLOURS } from "../constants";
 import { GuiController } from "../controllers/GuiController";
+import { ContainerButton } from "../widgets/generic/ContainerButton";
 
 export class FlowerSelectionView {
     scene: Phaser.Scene;
     gameStateController: GameStateController;
-    flowerSelector: UIContainer;
+    flowerSelector: ContainerButton;
     flowerSelectLeft: ImageButton;
     flowerSelectRight: ImageButton;
     flowerText: TextLabel;
@@ -25,13 +26,6 @@ export class FlowerSelectionView {
     ) {
         this.gameStateController = gameStateController;
         this.scene = scene;
-
-        this.flowerSelector = new FlexUIContainer(scene, x, y, width, "auto", "Bottom", "Right")
-            .setBackground(COLOURS.PURPLE_100)
-            .setBorder(1, COLOURS.BLACK)
-            .setAlpha(0.9)
-            .setInteractive()
-            .setDepth(3);
         
         this.flowerSelectLeft = new ImageButton(scene, 0, 0, "gui-arrow-left", "auto", "auto", COLOURS.TRANSPARENT, COLOURS.TRANSPARENT, COLOURS.WHITE, COLOURS.GRAY);
         this.flowerSelectRight = new ImageButton(scene, 0, 0, "gui-arrow-left", "auto", "auto", COLOURS.TRANSPARENT, COLOURS.TRANSPARENT, COLOURS.WHITE, COLOURS.GRAY);
@@ -39,9 +33,19 @@ export class FlowerSelectionView {
         this.flowerText = new TextLabel(scene, 0, 0, "Selected flower name", COLOURS.BLACK, {isBold: true})
             .setOrigin(0.5, 0.5);
 
+        this.flowerSelector = new ContainerButton(scene, x, y, width, this.flowerSelectLeft.height, COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW, "Bottom", "Right")
+            .setBorder(1, COLOURS.BLACK)
+            .setAlpha(0.9)
+            .setDepth(3);
+
         this.flowerSelector.addChild(this.flowerSelectLeft, "Middle", "Left");
         this.flowerSelector.addChild(this.flowerText, "Middle", "Middle");
         this.flowerSelector.addChild(this.flowerSelectRight, "Middle", "Right");
+
+        this.flowerSelector.onClick(() => {
+            guiController.clickInfoButton();
+            guiController.setScreenState('Evolve');
+        })
 
         this.flowerSelectLeft.onClick(() => {
             flowerSelectionController.selectPreviousFlower();

@@ -1,6 +1,5 @@
 import { guiController, gameStateController, selectedObjectController, flowerSelectionController, heldObjectController, mapController, gameDeltaController } from "../game";
 import { SelectedTileView } from "../views/SelectedTileView/SelectedTileView";
-import { SelectedFlowerTypeView } from "../views/SelectedFlowerTypeView";
 import { AlertMessageView } from "../views/AlertMessageView";
 import { COLOURS } from "../constants";
 import { TextButton } from "../widgets/generic/TextButton";
@@ -35,7 +34,6 @@ export default class UIScene extends Phaser.Scene {
 	const flowerSelectionView = new FlowerSelectionView(this, gameStateController, guiController, flowerSelectionController, offsetX, 12 + seedView.height, flowerSelectionWidth);
 	new CloudUIView(this, heldObjectController, guiController, gameStateController, offsetX, 16 + seedView.height + flowerSelectionView.flowerSelector.height);
 
-	new SelectedFlowerTypeView(this, gameStateController, selectedObjectController);
 	new AlertMessageView(this, guiController);
 
 	new HeldObjectView(this, heldObjectController, guiController, mapController);

@@ -52,22 +52,9 @@ export function setupConnectors(
     const selectedFlowerIndex$ = flowerSelectionController.selectedFlowerIndexObservable();
     const flowerSelection_selectedFlowerType$ = flowerSelectionController.selectedFlowerTypeObservable();
 
-    const evolveSeed_selectedFlowerType$ = evolveSeedController.selectedFlowerTypeObservable();
-
     setupGameStateManager(gameStateController, gameDeltaController, guiController, evolveSeedController);
     setupGameDeltaManager(gameStateController, gameDeltaController, gameActionController);
     setupGameInputConnectors(gameStateController, gameDeltaController, heldObjectController, guiController, mapController, gameActionController);
-
-    const flowerTypeOnClickingInfoButton$ = onClickInfoButton$.pipe(
-        flatMap(() => flowerSelection_selectedFlowerType$),
-        filter(selectedFlowerType => selectedFlowerType != null)
-    );
-
-    merge(flowerTypeOnClickingInfoButton$, flowerSelection_selectedFlowerType$, evolveSeed_selectedFlowerType$).pipe(
-        filter((flowerType) => flowerType != null)
-    ).subscribe((flowerType) => {
-        selectedObjectController.setSelectedFlowerType(flowerType);
-    })
 
     const flowerTypesArray$ = combineLatest(gameState$, currentPlayer$).pipe(
         map(([state, currentPlayerId]) => state.players[currentPlayerId as string].seedsOwned)

@@ -23,8 +23,6 @@ export class SeedContainerView {
     scene: Phaser.Scene;
     gameStateController: GameStateController;
     mainContainer: UIContainer;
-    infoButton: ImageButton;
-    evolveButton: TextButton;
 
     constructor(
         scene: Phaser.Scene,
@@ -60,29 +58,22 @@ export class SeedContainerView {
         this.mainContainer.addChild(seedAmountLabel, "Middle");
         this.mainContainer.addChild(seedProgressBar, "Middle");
         
-        this.infoButton = new ImageButton(scene, 4, 0, 'button-info', "auto", "auto", COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW, COLOURS.RED, COLOURS.RED)
-            .setBorder(1, COLOURS.BLACK)
-            .onClick(() => {
-                guiController.clickInfoButton();
-            });
-
-        this.evolveButton = new TextButton(scene, 8 + this.infoButton.width, 0, 24, 24, "^", COLOURS.RED, COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW)
-            .setBorder(1, COLOURS.BLACK)
-            .onClick(() => {
-                guiController.setScreenState("Evolve");
-            });
-        
-        const seedPlacementButton = new TextButton(scene, 12 + this.infoButton.width + this.evolveButton.width, 0,
+        const seedPlacementButton = new TextButton(scene, 8, 0,
             24, 24, "+",
             COLOURS.RED, COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW
         ).setBorder(1, COLOURS.BLACK)
             .onClick(() => {
                 guiController.clickSeedPlacementButton();
             });
+            
+        const evolveButton = new TextButton(scene, 12 + seedPlacementButton.width, 0, 24, 24, "^", COLOURS.RED, COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW)
+            .setBorder(1, COLOURS.BLACK)
+            .onClick(() => {
+                guiController.setScreenState("Evolve");
+            });
 
-        this.mainContainer.addChild(this.infoButton, "Middle", "Right");
-        this.mainContainer.addChild(this.evolveButton, "Middle", "Right");
         this.mainContainer.addChild(seedPlacementButton, "Middle", "Right");
+        this.mainContainer.addChild(evolveButton, "Middle", "Right");
 
         this.width = this.mainContainer.width;
         this.height = this.mainContainer.height;

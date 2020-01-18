@@ -14,6 +14,7 @@ import { BaseButton } from "../../widgets/generic/BaseButton";
 import { GameDeltaController } from "../../controllers/GameDeltaController";
 import { PlacedSeed } from "../../controllers/GameActionController";
 import { GameStateDelta } from "../../objects/GameStateDelta";
+import { FlowerSelectionController } from "../../controllers/FlowerSelectionController";
 
 interface SeedInventoryItem {
     type: string;
@@ -35,7 +36,7 @@ export class SeedInventoryView extends BaseUIObject {
     constructor(scene: Phaser.Scene, x: number, y: number,
         width: number, height: number,
         gameStateController: GameStateController, gameDeltaController: GameDeltaController,
-        evolveSeedController: EvolveSeedController
+        evolveSeedController: EvolveSeedController, flowerSelectionController: FlowerSelectionController
     ) {
         super(scene, x, y, width, height);
         this.scene = scene;
@@ -61,14 +62,13 @@ export class SeedInventoryView extends BaseUIObject {
 
         this.radioGroup = new RadioButtonGroup([], COLOURS.LIGHT_YELLOW, COLOURS.YELLOW, COLOURS.GRAY, 1)
             .onChange((button) => {
-                evolveSeedController.setSelectedFlowerType(button.getData("type"));
+                flowerSelectionController.selectFlower(button.getData("type"));
             });
 
         merge(
             seedState$.pipe(first()),
             seedState$.pipe(
                 pairwise(),
-                //tap(([previous, current]) => console.log("!==", Object.keys(previous[0][0].flowerTypes).length, Object.keys(current[0][0].flowerTypes).length)),
                 filter(([previous, current]) => Object.keys(previous[0][0].flowerTypes).length !== Object.keys(current[0][0].flowerTypes).length),
                 map(([_, current]) => current)
             )
@@ -81,7 +81,6 @@ export class SeedInventoryView extends BaseUIObject {
         
         seedState$.pipe(
             pairwise(),
-            //tap(([previous, current]) => console.log("===", Object.keys(previous[0][0].flowerTypes).length, Object.keys(current[0][0].flowerTypes).length)),
             filter(([previous, current]) => Object.keys(previous[0][0].flowerTypes).length === Object.keys(current[0][0].flowerTypes).length),
             map(([_, current]) => current)
         ).pipe(
@@ -89,24 +88,20 @@ export class SeedInventoryView extends BaseUIObject {
         ).subscribe(({seedInventoryItems, isAnyStaged}) => {
             seedInventoryItems.forEach(item => {
                 if (item.amountStagedIndex > 0) {
-                    evolveSeedController.setSelectedFlowerType(item.type);
+                    flowerSelectionController.selectFlower(item.type);
                 }
                 this.inventoryMap[item.type].setAmount(item.amount, item.amountStagedIndex, isAnyStaged);
             })
         });
 
-        evolveSeedController.selectedFlowerTypeObservable().subscribe((type) => {
-            if (type != null) {
-                this.radioGroup.setSelected(this.inventoryMap[type])
+        flowerSelectionController.selectedFlowerTypeObservable().pipe(
+            withLatestFrom(evolveSeedController.stagedSeedsObservable())
+        ).subscribe(([type, stagedSeeds]) => {
+            if (stagedSeeds !== null && stagedSeeds.type !== type) {
+                evolveSeedController.unstageAllSeeds();
             }
+            this.radioGroup.setSelected(this.inventoryMap[type]);
         })
-
-        evolveSeedController.stagedSeedsObservable().pipe(
-            map(stagedSeed => stagedSeed != null)
-        ).subscribe((isAnyStaged) => {
-            this.radioGroup.setIsActive(!isAnyStaged);
-        });
-
     }
 
     createGrid(seedInventoryItems: SeedInventoryItem[], evolveSeedController: EvolveSeedController, isAnyStaged: boolean) {

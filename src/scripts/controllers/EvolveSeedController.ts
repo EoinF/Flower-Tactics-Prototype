@@ -17,7 +17,6 @@ export interface EvolutionChoice {
 
 export class EvolveSeedController {
     private stagedSeed$: BehaviorSubject<StagedSeed | null>;
-    private selectedFlowerType$: Subject<string>;
     private evolveStatus$: Subject<EvolutionOutcome>;
     private flowerNames$: Subject<string[]>;
     private evolveChoices$: Subject<EvolutionChoice[]>;
@@ -26,7 +25,6 @@ export class EvolveSeedController {
     constructor() {
         this.flowerNames$ = new Subject();
         this.stagedSeed$ = new BehaviorSubject<StagedSeed | null>(null);
-        this.selectedFlowerType$ = new Subject();
         this.evolveStatus$ = new Subject();
         this.evolveChoices$ = new Subject();
         this.selectedEvolveChoice$ = new Subject();
@@ -34,10 +32,6 @@ export class EvolveSeedController {
 
     setFlowerNames(names: string[]) {
         this.flowerNames$.next(names);
-    }
-
-    setSelectedFlowerType(type: string) {
-        this.selectedFlowerType$.next(type);
     }
 
     stageSeedForEvolution(type: string) {
@@ -86,10 +80,6 @@ export class EvolveSeedController {
 
     stagedSeedsObservable(): Observable<StagedSeed | null> {
         return this.stagedSeed$;
-    }
-
-    selectedFlowerTypeObservable(): Observable<string> {
-        return this.selectedFlowerType$;
     }
 
     evolveStatusObservable(): Observable<EvolutionOutcome> {

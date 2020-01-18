@@ -52,7 +52,13 @@ export function setupGameInputConnectors(
                     }
                 );
 
-                const hasSufficientSeeds = (gameState.seedStatus[heldSeed.type].quantity - existingSeed.amount) > 0;
+                let placedSeedsAmount = 0;
+                placedSeedsMap.forEach(placedSeed => {
+                    if (placedSeed.type === heldSeed.type) {
+                        placedSeedsAmount += placedSeed.amount;
+                    } 
+                })
+                const hasSufficientSeeds = (gameState.seedStatus[heldSeed.type].quantity - placedSeedsAmount) > 0;
                 const tileHasSeeds = existingSeed.amount > 0;
 
                 if (isOtherSeedTypeBlockingTile) {
