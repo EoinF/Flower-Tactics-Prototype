@@ -15,10 +15,11 @@ export function calculateSeedPlacementDelta(state: GameState, delta: GameStateDe
                     }]
                 }
             } else {
+                const existingPlacedSeedOfType = existingValue[placedSeed.type] || [];
                 return {
                     ...existingValue,
                     [placedSeed.type]: [
-                        ...existingValue[placedSeed.type],
+                        ...existingPlacedSeedOfType,
                         {
                             ...placedSeed, 
                             amount: placedSeed.amount
