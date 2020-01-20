@@ -48,6 +48,11 @@ export class GameStateDelta {
     getDeltas(): Array<GameStateDeltaInstance> {
         return Object.keys(this.deltas).map(key => this.deltas[key]);
     }
+
+    getDelta(keys: GameStateKey[], deltaType: DeltaType = "DELTA_ADD") {
+        const combinedKey = `${keys.join(".")}:${deltaType}`;
+        return this.deltas[combinedKey];
+    }
     
     addIntermediateDelta<T>(key: string, updateFunction: (existingValue: T | null) => T) {
         this.intermediateDeltas[key] = updateFunction(this.intermediateDeltas[key]);

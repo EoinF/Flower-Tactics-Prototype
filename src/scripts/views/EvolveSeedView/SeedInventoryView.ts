@@ -55,10 +55,9 @@ export class SeedInventoryView extends BaseUIObject {
         const seedState$ = combineLatest(
             gameStateController.gameStateObservable(),
             evolveSeedController.stagedSeedsObservable(),
-            gameStateController.currentPlayerObservable()
-        ).pipe(withLatestFrom(
+            gameStateController.currentPlayerObservable(),
             gameDeltaController.gameDeltaObservable()
-        ));
+        );
 
         this.radioGroup = new RadioButtonGroup([], COLOURS.LIGHT_YELLOW, COLOURS.YELLOW, COLOURS.GRAY, 1)
             .onChange((button) => {
@@ -69,11 +68,11 @@ export class SeedInventoryView extends BaseUIObject {
             seedState$.pipe(first()),
             seedState$.pipe(
                 pairwise(),
-                filter(([previous, current]) => Object.keys(previous[0][0].flowerTypes).length !== Object.keys(current[0][0].flowerTypes).length),
+                filter(([previous, current]) => Object.keys(previous[0].flowerTypes).length !== Object.keys(current[0].flowerTypes).length),
                 map(([_, current]) => current)
             )
         ).pipe(
-            map(([[gameState, stagedSeeds, currentPlayerId], gameDelta]) => this.simplifySeedStates(gameState, gameDelta, stagedSeeds, currentPlayerId))
+            map(([gameState, stagedSeeds, currentPlayerId, gameDelta]) => this.simplifySeedStates(gameState, gameDelta, stagedSeeds, currentPlayerId))
         ).subscribe(({seedInventoryItems, isAnyStaged}) => {
             this.seedSelectionGrid.clear();
             this.createGrid(seedInventoryItems, evolveSeedController, isAnyStaged);
@@ -81,12 +80,12 @@ export class SeedInventoryView extends BaseUIObject {
         
         seedState$.pipe(
             pairwise(),
-            filter(([previous, current]) => Object.keys(previous[0][0].flowerTypes).length === Object.keys(current[0][0].flowerTypes).length),
+            filter(([previous, current]) => Object.keys(previous[0].flowerTypes).length === Object.keys(current[0].flowerTypes).length),
             map(([_, current]) => current)
         ).pipe(
-            map(([[gameState, stagedSeeds, currentPlayerId], gameDelta]) => this.simplifySeedStates(gameState, gameDelta, stagedSeeds, currentPlayerId))
+            map(([gameState, stagedSeeds, currentPlayerId, gameDelta]) => this.simplifySeedStates(gameState, gameDelta, stagedSeeds, currentPlayerId))
         ).subscribe(({seedInventoryItems, isAnyStaged}) => {
-            seedInventoryItems.forEach((item, index) => {
+            seedInventoryItems.forEach((item) => {
                 if (item.amountStagedIndex > 0) {
                     flowerSelectionController.selectFlowerByType(item.type);
                 }
