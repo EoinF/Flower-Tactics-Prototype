@@ -39,7 +39,6 @@ export function setupConnectors(
     evolveSeedController: EvolveSeedController,
     heldObjectController: HeldObjectController
 ) {
-    const onClickInfoButton$ = guiController.onClickInfoButtonObservable();
     const isMouseOverSeedContainer$ = guiController.mouseOverSeedContainerObservable();
     const isMouseOverFlowerSelection$ = guiController.mouseOverFlowerSelectionObservable();
     const mousePosition$ = guiController.mousePositionObservable();

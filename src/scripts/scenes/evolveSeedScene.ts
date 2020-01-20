@@ -17,13 +17,19 @@ export default class EvolveSeedScene extends Phaser.Scene {
                 .split('\n')
                 .map(name => name.replace(/[\n|\r]/g, ''))
             );
+
+        guiController.screenStateObservable().subscribe((screenState) => {
+            if (screenState === 'Evolve') {
+                evolveSeedController.unstageAllSeeds();
+            }
+        })
         
         combineLatest(
             guiController.messagePromptObservable(),
             guiController.screenStateObservable(),
             evolveSeedController.isEvolveChoiceShownObservable()
         ).subscribe(([messagePrompt, screenState, isEvolveChoiceShown]) => {
-            if (messagePrompt != null || screenState != "Evolve" || isEvolveChoiceShown) {
+            if (messagePrompt != null || screenState !== "Evolve" || isEvolveChoiceShown) {
                 this.scene.pause();
             } else {
                 this.scene.resume();
