@@ -62,7 +62,7 @@ export class SeedInventoryView extends BaseUIObject {
 
         this.radioGroup = new RadioButtonGroup([], COLOURS.LIGHT_YELLOW, COLOURS.YELLOW, COLOURS.GRAY, 1)
             .onChange((button) => {
-                flowerSelectionController.selectFlower(button.getData("type"));
+                flowerSelectionController.selectFlowerByType(button.getData("type"));
             });
 
         merge(
@@ -86,9 +86,9 @@ export class SeedInventoryView extends BaseUIObject {
         ).pipe(
             map(([[gameState, stagedSeeds, currentPlayerId], gameDelta]) => this.simplifySeedStates(gameState, gameDelta, stagedSeeds, currentPlayerId))
         ).subscribe(({seedInventoryItems, isAnyStaged}) => {
-            seedInventoryItems.forEach(item => {
+            seedInventoryItems.forEach((item, index) => {
                 if (item.amountStagedIndex > 0) {
-                    flowerSelectionController.selectFlower(item.type);
+                    flowerSelectionController.selectFlowerByType(item.type);
                 }
                 this.inventoryMap[item.type].setAmount(item.amount, item.amountStagedIndex, isAnyStaged);
             })

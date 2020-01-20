@@ -1,5 +1,5 @@
-import { withLatestFrom, map, filter, flatMap, first } from 'rxjs/operators';
-import { combineLatest, merge } from 'rxjs';
+import { withLatestFrom, map, filter, flatMap, first, distinctUntilChanged, mapTo, scan, tap, startWith } from 'rxjs/operators';
+import { combineLatest, merge, of, Subject } from 'rxjs';
 import { GuiController } from '../controllers/GuiController';
 import { GameStateController } from '../controllers/GameStateController';
 import { MapController } from '../controllers/MapController';
@@ -49,27 +49,16 @@ export function setupConnectors(
 
     const mapCamera$ = mapController.cameraObservable();
 
-    const selectedFlowerIndex$ = flowerSelectionController.selectedFlowerIndexObservable();
-
     setupGameStateManager(gameStateController, gameDeltaController, gameActionController, guiController, evolveSeedController);
     setupGameDeltaManager(gameStateController, gameDeltaController, gameActionController);
     setupGameInputConnectors(gameStateController, gameDeltaController, heldObjectController, guiController, mapController, gameActionController);
 
-    const flowerTypesArray$ = combineLatest(gameState$, currentPlayer$).pipe(
-        map(([state, currentPlayerId]) => state.players[currentPlayerId as string].seedsOwned)
-    );
-    
-    combineLatest(selectedFlowerIndex$, flowerTypesArray$.pipe(first()), (selectedIndex) => selectedIndex)
-        .pipe(withLatestFrom(flowerTypesArray$))
-        .subscribe(([selectedIndex, flowerTypesArray]) => {
-        if (selectedIndex < 0) {
-            flowerSelectionController.selectFlowerByIndex(selectedIndex + flowerTypesArray.length);
-        } else if (selectedIndex >= flowerTypesArray.length) {
-            flowerSelectionController.selectFlowerByIndex(selectedIndex % flowerTypesArray.length);
-        } else {
-            flowerSelectionController.selectFlower(flowerTypesArray[selectedIndex]);
-        }
-    })
+    combineLatest(gameState$, currentPlayer$).pipe(
+        map(([state, currentPlayerId]) => state.players[currentPlayerId as string].seedsOwned),
+        distinctUntilChanged()
+    ).subscribe(flowerTypes => {
+        flowerSelectionController.setFlowerTypes(flowerTypes);
+    });
 
     combineLatest(mousePosition$, mapCamera$, isMouseOverSeedContainer$, isMouseOverFlowerSelection$)
         .pipe(
