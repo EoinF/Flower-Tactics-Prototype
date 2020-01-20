@@ -3,18 +3,20 @@
         "1": {
             "cloudOwned": "2",
             "seedsOwned": ["1"],
-            "flowers": ["0"]
+            "flowers": ["0"],
+            "autoReplantTileMap": {}
         },
         "2": {
             "cloudOwned": "1",
             "seedsOwned": ["2"],
-            "flowers": ["1"]
+            "flowers": ["1"],
+            "autoReplantTileMap": {}
         }
     },
     "seedStatus": {
         "1": {
             "type": "1",
-            "quantity": 1000,
+            "quantity": 100,
             "progress": 0
         },
         "2": {
@@ -187,13 +189,13 @@
             "x": 7,
             "y": 13,
             "type": "1",
-            "growth": 0
+            "growth": 4
         },
         "1": {
             "x": 6,
             "y": 0,
             "type": "2",
-            "growth": 0
+            "growth": 4
         }
     }
 }

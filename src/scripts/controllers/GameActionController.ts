@@ -1,5 +1,5 @@
 import { Subject, Observable, merge } from "rxjs";
-import { scan, map, shareReplay, startWith, mapTo } from "rxjs/operators";
+import { scan, map, shareReplay, startWith, mapTo, debounceTime, throttleTime } from "rxjs/operators";
 import { StringMap } from "../types";
 
 interface PlacedSeedInstance {
@@ -17,13 +17,62 @@ export type PlacedSeed = PlacedSeedInstance & {
     amount: number;
 }
 
-export type PlacedSeedsMap = Map<number, PlacedSeed>;
+interface PlacedSeedEvent {
+    isReset: boolean;
+    data: SeedTypeToPlacedSeedsMap | PlacedSeedInstance | null;
+    delta: number;
+}
+
+export class SeedTypeToPlacedSeedsMap {
+    private map: Map<string, Map<number, PlacedSeed>>;
+    
+    constructor() {
+        this.map = new Map<string, Map<number, PlacedSeed>>();
+    }
+    
+    getSeedsAtTile(tileIndex: number) {
+        const seedsAtTile: Array<PlacedSeed> = [];
+        this.map.forEach(tileIndexMap => {
+            if (tileIndexMap.has(tileIndex)) {
+                seedsAtTile.push(tileIndexMap.get(tileIndex)!);
+            }
+        });
+        return seedsAtTile;
+    }
+
+    getAllSeeds(): PlacedSeed[] {
+        const allSeeds: Array<PlacedSeed> = [];
+        this.map.forEach((tileIndexMap) => {
+            tileIndexMap.forEach((placedSeed) => allSeeds.push(placedSeed))
+        });
+        return allSeeds;
+    }
+
+    addPlacedSeed(type: string, tileIndex: number, ownerId: string, delta: number = +1) {
+        const existingValueOfType = this.map.get(type);
+
+        let tileIndexMap: Map<number, PlacedSeed>;
+        if (existingValueOfType == null) {
+            tileIndexMap = new Map<number, PlacedSeed>();
+            tileIndexMap.set(tileIndex, { type, tileIndex, ownerId, amount: delta });
+        } else {
+            tileIndexMap = existingValueOfType;
+            const existingValueAtTileIndex = tileIndexMap.get(tileIndex);
+            if (existingValueAtTileIndex == null) {
+                tileIndexMap.set(tileIndex, { type, tileIndex, ownerId, amount: delta });
+            } else {
+                tileIndexMap.set(tileIndex, { type, tileIndex, ownerId, amount: existingValueAtTileIndex.amount + delta });
+            }
+        }
+        this.map.set(type, tileIndexMap);
+    }
+}
 
 export class GameActionController {
     private placeSeed$: Subject<PlacedSeedInstance>;
     private removeSeed$: Subject<PlacedSeedInstance>;
-    private resetSeeds$: Subject<void>;
-    private placedSeedsMap$: Observable<PlacedSeedsMap>;
+    private resetSeeds$: Subject<SeedTypeToPlacedSeedsMap>;
+    private placedSeedsMap$: Observable<SeedTypeToPlacedSeedsMap>;
     private onPlaceCloud$: Subject<PlacedCloud>;
     private resetClouds$: Subject<void>;
 
@@ -37,28 +86,27 @@ export class GameActionController {
         this.placedSeedsMap$ =
             merge(
                 this.placeSeed$.pipe(
-                    map(placedSeed => ({ isReset: false, placedSeed, delta: +1}))
+                    map(placedSeed => ({ isReset: false, data: placedSeed, delta: +1}))
                 ),
                 this.removeSeed$.pipe(
-                    map(placedSeed => ({ isReset: false, placedSeed, delta: -1}))
+                    map(placedSeed => ({ isReset: false, data: placedSeed, delta: -1}))
                 ),
-                this.resetSeeds$.pipe(startWith(null), mapTo({ isReset: true, placedSeed: null, delta: 0 }))
+                this.resetSeeds$.pipe(
+                    startWith(new SeedTypeToPlacedSeedsMap()), map(placedSeedsMap => ({ isReset: true, data: placedSeedsMap, delta: 0 }))
+                )
             ).pipe(
-                scan((placedSeeds, nextEvent) => {
+                scan((placedSeeds: SeedTypeToPlacedSeedsMap, nextEvent: PlacedSeedEvent) => {
                     if (nextEvent.isReset) {
-                        return new Map<number, PlacedSeed>();
+                        return nextEvent.data as SeedTypeToPlacedSeedsMap;
                     } else {
-                        const placedSeed = nextEvent.placedSeed!;
+                        const {
+                            type, tileIndex, ownerId
+                        } = nextEvent.data! as PlacedSeedInstance;
                         const delta = nextEvent.delta;
-                        const existingValue = placedSeeds.get(placedSeed.tileIndex);
-                        if (existingValue == null) {
-                            placedSeeds.set(placedSeed.tileIndex, {...placedSeed, amount: 1});
-                        } else {
-                            placedSeeds.set(placedSeed.tileIndex, {...placedSeed, amount: existingValue.amount + delta})
-                        }
+                        placedSeeds.addPlacedSeed(type, tileIndex, ownerId, delta);
                         return placedSeeds;
                     }
-                }, new Map<number, PlacedSeed>()),
+                }, new SeedTypeToPlacedSeedsMap()),
                 shareReplay(1)
             );
     }
@@ -71,8 +119,8 @@ export class GameActionController {
         this.removeSeed$.next({ type, tileIndex, ownerId });
     }
 
-    resetSeeds() {
-        this.resetSeeds$.next();
+    resetSeeds(placedSeedsMap: SeedTypeToPlacedSeedsMap = new SeedTypeToPlacedSeedsMap()) {
+        this.resetSeeds$.next(placedSeedsMap);
     }
 
     placeCloud(cloudKey: string, tileIndex: number) {

@@ -129,9 +129,9 @@ export class MapView {
 			.subscribe(([placedSeeds, gameState]) => {
 				this.placedSeedSprites.forEach(sprite => sprite.destroy());
 				this.placedSeedSprites.clear();
-				placedSeeds.forEach((placedSeed, tileIndex) => {
+				placedSeeds.getAllSeeds().forEach(placedSeed => {
 					if (placedSeed.amount > 0) {
-						this.addNewSeed(tileIndex, placedSeed.type, placedSeed.amount, gameState, mapController);
+						this.addNewSeed(placedSeed.tileIndex, placedSeed.type, placedSeed.amount, gameState, mapController);
 					}
 				});
 			});

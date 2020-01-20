@@ -8,7 +8,7 @@ import { GameDeltaController } from "../controllers/GameDeltaController";
 import { EvolveSeedController, EvolutionChoice } from "../controllers/EvolveSeedController";
 import { GameStateDelta } from "../objects/GameStateDelta";
 import { isRequirementsSatisfied } from "../deltaCalculators/helpers";
-import { PlacedSeed } from "../controllers/GameActionController";
+import { PlacedSeed, GameActionController, SeedTypeToPlacedSeedsMap } from "../controllers/GameActionController";
 import { StringMap } from "../types";
 import { Flower } from "../objects/Flower";
 import { FlowerAugmentation } from "../objects/FlowerAugmentation";
@@ -17,6 +17,7 @@ import { calculateSeedEvolutionOutcome, calculateSeedEvolutionResults } from "..
 export function setupGameStateManager(
     gameStateController: GameStateController,
     gameDeltaController: GameDeltaController,
+    gameActionController: GameActionController,
     guiController: GuiController,
     evolveSeedController: EvolveSeedController
 ) {
@@ -31,7 +32,32 @@ export function setupGameStateManager(
     guiController.endTurnObservable().pipe(
         withLatestFrom(gameState$, gameDelta$)
     ).subscribe(([_, gameState, gameDelta]) => {
-        gameStateController.setState(nextState(gameState, gameDelta));
+        const newState = nextState(gameState, gameDelta);
+        gameStateController.setState(newState);
+
+        const seedsRemainingByType: StringMap<number> = {};
+        Object.keys(newState.seedStatus)
+            .forEach(key => {
+                seedsRemainingByType[key] = newState.seedStatus[key].quantity;
+            });
+
+        const autoPlacedSeedsMap = new SeedTypeToPlacedSeedsMap();
+
+        Object.keys(newState.players).forEach(playerId => {
+            Object.keys(newState.players[playerId].autoReplantTileMap).forEach(tileIndexKey => {
+                const type = newState.players[playerId].autoReplantTileMap[tileIndexKey];
+                const tileIndex = parseInt(tileIndexKey);
+                if (newState.getFlowerIndexAtTile(newState.tiles[tileIndex]) == null) {
+                    if (seedsRemainingByType[type] > 0) {
+                        autoPlacedSeedsMap.addPlacedSeed(type, tileIndex, playerId);
+                        seedsRemainingByType[type]--;
+                    }
+                }
+            });
+        });
+
+        gameActionController.resetClouds();
+        gameActionController.resetSeeds(autoPlacedSeedsMap);
     });
     
     onClickEvolveButton$.pipe(
@@ -124,6 +150,7 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): G
                 } as Flower;
                 finalDelta.addDelta(["flowersMap", newIndex.toString()], newFlower, "DELTA_REPLACE");
                 finalDelta.addDelta(["players", placedSeed.ownerId, "flowers"], newIndex.toString(), "DELTA_APPEND");
+                finalDelta.addDelta(["players", placedSeed.ownerId, "autoReplantTileMap", placedSeed.tileIndex.toString()], placedSeed.type, "DELTA_REPLACE");
                 newIndex++;
             }
         });

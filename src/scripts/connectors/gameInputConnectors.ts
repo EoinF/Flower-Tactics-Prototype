@@ -5,7 +5,7 @@ import { GuiController } from "../controllers/GuiController";
 import { MapController } from "../controllers/MapController";
 import { withLatestFrom } from "rxjs/operators";
 import { indexToMapCoordinates } from "../widgets/utils";
-import { GameActionController } from "../controllers/GameActionController";
+import { GameActionController, PlacedSeed } from "../controllers/GameActionController";
 
 export function setupGameInputConnectors(
     gameStateController: GameStateController, gameDeltaController: GameDeltaController,
@@ -18,15 +18,9 @@ export function setupGameInputConnectors(
     const placedSeedsMap$ = gameActionController.placedSeedsMapObservable();
     const heldSeed$ = heldObjectController.heldSeedObservable();
     const isHoldingCloud$ = heldObjectController.isHoldingCloudObservable();
-    const endTurn$ = guiController.endTurnObservable();
     const clickTile$ = mapController.clickTileObservable();
 
     const inputManager$ = guiController.inputManagerObservable();
-    
-    endTurn$.subscribe(() => {
-        gameActionController.resetSeeds();
-        gameActionController.resetClouds();
-    })
 
     clickTile$
         .pipe(
@@ -39,8 +33,20 @@ export function setupGameInputConnectors(
             )
         ).subscribe(([clickedTile, gameState, placedSeedsMap, heldSeed, inputManager, currentPlayerId]) => {
             if (heldSeed != null) {
-                const existingSeed = placedSeedsMap.get(clickedTile) || {type: null, amount: 0};
-                const isOtherSeedTypeBlockingTile = existingSeed.amount > 0 && existingSeed.type != heldSeed.type;
+                let playerOwnedSeedAmountOnTile = 0;
+                let playerOwnedTypeOnTile: string | null = null;
+                const enemySeedsOnTile: PlacedSeed[] = [];
+                
+                placedSeedsMap.getSeedsAtTile(clickedTile).forEach(placedSeed => {
+                    if (gameState.players[currentPlayerId].seedsOwned.indexOf(placedSeed.type) !== -1) {
+                        playerOwnedSeedAmountOnTile = placedSeed.amount;
+                        playerOwnedTypeOnTile = placedSeed.type;
+                    } else {
+                        enemySeedsOnTile.push(placedSeed);
+                    }
+                });
+
+                const isOtherOwnedSeedTypeBlockingTile = playerOwnedTypeOnTile != null && playerOwnedTypeOnTile !== heldSeed.type;
 
                 const tile = gameState.tiles[clickedTile];
                 const playerFlowers = gameState.players[currentPlayerId].flowers;
@@ -53,17 +59,15 @@ export function setupGameInputConnectors(
                 });
 
                 let placedSeedsAmount = 0;
-                placedSeedsMap.forEach(placedSeed => {
+                placedSeedsMap.getAllSeeds().forEach(placedSeed => {
                     if (placedSeed.type === heldSeed.type) {
                         placedSeedsAmount += placedSeed.amount;
-                    } 
-                })
+                    }
+                });
                 const hasSufficientSeeds = (gameState.seedStatus[heldSeed.type].quantity - placedSeedsAmount) > 0;
-                const tileHasSeeds = existingSeed.amount > 0;
+                const tileHasSeeds = playerOwnedSeedAmountOnTile > 0;
 
-                if (isOtherSeedTypeBlockingTile) {
-                    guiController.createAlertMessage("Another type of seed is already placed on this tile.");
-                } else if (isFlowerBlockingTile) {
+                if (isFlowerBlockingTile) {
                     guiController.createAlertMessage("A flower is blocking seed placement.");
                 } else if (isMountainBlockingTile) {
                     guiController.createAlertMessage("A mountain is blocking seed placement.");
@@ -72,10 +76,12 @@ export function setupGameInputConnectors(
                 } else {
                     if (inputManager.shift!.isDown) {
                         if (tileHasSeeds) {
-                            gameActionController.removeSeed(heldSeed.type, clickedTile, currentPlayerId);
+                            gameActionController.removeSeed(playerOwnedTypeOnTile!, clickedTile, currentPlayerId);
                         }
                     } else {
-                        if (!hasSufficientSeeds) {
+                        if (isOtherOwnedSeedTypeBlockingTile) {
+                        guiController.createAlertMessage("Another type of seed is already placed on this tile.");
+                        } else if (!hasSufficientSeeds) {
                             guiController.createAlertMessage("You don't have any seeds remaining.");
                         } else {
                             gameActionController.placeSeed(heldSeed.type, clickedTile, currentPlayerId);

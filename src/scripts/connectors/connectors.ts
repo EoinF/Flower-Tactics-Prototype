@@ -50,9 +50,8 @@ export function setupConnectors(
     const mapCamera$ = mapController.cameraObservable();
 
     const selectedFlowerIndex$ = flowerSelectionController.selectedFlowerIndexObservable();
-    const flowerSelection_selectedFlowerType$ = flowerSelectionController.selectedFlowerTypeObservable();
 
-    setupGameStateManager(gameStateController, gameDeltaController, guiController, evolveSeedController);
+    setupGameStateManager(gameStateController, gameDeltaController, gameActionController, guiController, evolveSeedController);
     setupGameDeltaManager(gameStateController, gameDeltaController, gameActionController);
     setupGameInputConnectors(gameStateController, gameDeltaController, heldObjectController, guiController, mapController, gameActionController);
 
