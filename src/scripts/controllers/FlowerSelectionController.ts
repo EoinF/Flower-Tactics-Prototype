@@ -1,5 +1,5 @@
 import { ReplaySubject, Observable, Subject, combineLatest, merge, of } from "rxjs";
-import { mapTo, startWith, map, scan, withLatestFrom, shareReplay, tap, distinctUntilChanged } from "rxjs/operators";
+import { mapTo, startWith, map, scan, withLatestFrom, shareReplay, distinctUntilChanged, pairwise, filter } from "rxjs/operators";
 
 interface SelectByIndexAction {
     index: number;
@@ -35,22 +35,27 @@ export class FlowerSelectionController {
                 map(type => ({action: 'type', value: type}))
             )
         );
-            
+
         this.selectedFlowerType$ = combineLatest(
-            this.flowerTypes$,
+            this.flowerTypes$.pipe(
+                startWith<string[]>([]),
+                pairwise(),
+                filter(([previous, current]) => previous.length != current.length),
+                map(([previous, current]) => current)
+            ),
             nextAction$
         ).pipe(
-            scan((currentIndex, [flowerTypes, nextAction]) => {
+            scan((currentIndex, [currentFlowerTypes, nextAction]) => {
                 if (nextAction.action === 'reset') {
-                    return currentIndex;
+                    return 0;
                 } else if (nextAction.action === 'next') {
-                    return currentIndex == 0 ? (flowerTypes.length - 1) : (currentIndex - 1);
+                    return currentIndex == 0 ? (currentFlowerTypes.length - 1) : (currentIndex - 1);
                 } else if (nextAction.action === 'previous') {
-                    return (currentIndex + 1) % flowerTypes.length;
+                    return (currentIndex + 1) % currentFlowerTypes.length;
                 } else if (nextAction.action === 'index') {
                     return nextAction.value as number;
                 } else {
-                    return flowerTypes.indexOf(nextAction.value as string);
+                    return currentFlowerTypes.indexOf(nextAction.value as string);
                 }
             }, 0),
             withLatestFrom(this.flowerTypes$),

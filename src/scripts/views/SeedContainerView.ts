@@ -1,8 +1,8 @@
 import { GameStateController } from "../controllers/GameStateController";
 import { UIContainer } from "../widgets/generic/UIContainer";
 import { GameState } from "../objects/GameState";
-import { combineLatest } from "rxjs";
-import { first, map, withLatestFrom, flatMap, filter } from "rxjs/operators";
+import { combineLatest, merge } from "rxjs";
+import { first, map, withLatestFrom, flatMap, filter, take, mergeMap, mergeMapTo } from "rxjs/operators";
 import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
 import { FlowerType } from "../objects/FlowerType";
 import { ImageButton } from "../widgets/generic/ImageButton";
@@ -85,18 +85,30 @@ export class SeedContainerView {
                 guiController.setMouseOverSeedContainer(false);
             }
         });
-
         guiController.onClickSeedPlacementButtonObservable().pipe(
-            withLatestFrom(heldObjectController.heldSeedObservable(), flowerSelectionController.selectedFlowerTypeObservable())
+            withLatestFrom(
+                heldObjectController.heldSeedObservable(),
+                flowerSelectionController.selectedFlowerTypeObservable()
+            )
         ).subscribe(([_, heldSeed, selectedFlowerType]) => {
             if (heldSeed != null) {
                 heldObjectController.dropObject();
             } else {
                 heldObjectController.pickUpSeed({
-                    type: selectedFlowerType, 
+                    type: selectedFlowerType,
                     tileIndex: null
                 });
             }
+        })
+
+        flowerSelectionController.selectedFlowerTypeObservable().pipe(
+            withLatestFrom(heldObjectController.heldSeedObservable()),
+            filter(([_, heldSeed]) => heldSeed != null),
+        ).subscribe(([selectedFlowerType, heldSeed]) => {
+            heldObjectController.pickUpSeed({
+                type: selectedFlowerType,
+                tileIndex: null
+            });
         })
         
         combineLatest(gameStateController.gameStateObservable(), gameDeltaController.gameDeltaObservable(), flowerSelectionController.selectedFlowerTypeObservable())
