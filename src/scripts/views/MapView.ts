@@ -5,11 +5,13 @@ import { startWith, pairwise, distinctUntilChanged, withLatestFrom, map, filter 
 import { GameState } from "../objects/GameState";
 import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
 import { TileWidget } from "../widgets/specific/TileWidget";
-import { indexToMapCoordinates } from "../widgets/utils";
+import { indexToMapCoordinates, getPlayerColour } from "../widgets/utils";
 import { combineLatest } from "rxjs";
 import { HeldObjectController } from "../controllers/HeldObjectController";
 import { isRequirementsSatisfied } from "../deltaCalculators/helpers";
 import { GameActionController } from "../controllers/GameActionController";
+import { PlacedCloudWidget } from "../widgets/specific/PlacedCloudWidget";
+import { COLOURS } from "../constants";
 
 export class MapView {
     scene: Phaser.Scene;
@@ -20,8 +22,8 @@ export class MapView {
     mountainSprites: Phaser.GameObjects.Image[];
 	riverSprites: Phaser.GameObjects.Image[];
 	placedSeedSprites: Map<number, PlacedSeedWidget>;
-	cloudSprites: Phaser.GameObjects.Image[];
-	placedCloudWidget: Phaser.GameObjects.Image;
+	cloudSprites: PlacedCloudWidget[];
+	placedCloudWidget: PlacedCloudWidget;
 
     constructor(
       scene: Phaser.Scene, 
@@ -64,8 +66,8 @@ export class MapView {
 			this.placedSeedSprites.forEach(s => s.destroy());
 			this.placedSeedSprites.clear();
 
-			this.placedCloudWidget = scene.add.image(0, 0, 'cloud')
-				.setDepth(5)
+			this.placedCloudWidget = new PlacedCloudWidget(scene, 0, 0, COLOURS.BLACK)
+				.setDepth(6)
 				.setAlpha(0.6)
 				.setVisible(false);
 		});
@@ -81,10 +83,16 @@ export class MapView {
 	setupCloudSprites(gameState: GameState) {
 		this.cloudSprites.forEach(s => s.destroy());
 		this.cloudSprites = Object.keys(gameState.clouds)
-			.filter(key => gameState.clouds[key].tileIndex >= 0)
-			.map(key => {
-				const location = indexToMapCoordinates(gameState.clouds[key].tileIndex, gameState.numTilesX);
-				const img = this.scene.add.image(location.x * 48, location.y * 48, 'cloud')
+			.filter(cloudKey => gameState.clouds[cloudKey].tileIndex >= 0)
+			.map(cloudKey => {
+				const location = indexToMapCoordinates(gameState.clouds[cloudKey].tileIndex, gameState.numTilesX);
+
+				const player = Object.keys(gameState.players).find((playerId) => {
+					const player = gameState.players[playerId];
+					return player.cloudOwned.indexOf(cloudKey) !== -1
+				});
+				
+				const img = new PlacedCloudWidget(this.scene, location.x * 48 - 24, location.y * 48 - 24, getPlayerColour(player))
 					.setDepth(6);
 				return img;
 			});
@@ -198,14 +206,15 @@ export class MapView {
 				}
 			});
 			
-			gameActionController.placedCloudsObservable().pipe(
-                withLatestFrom(gameStateController.currentPlayerObservable(), gameStateController.gameStateObservable()),
-            ).subscribe(([placedClouds, playerId, gameState]) => {
+			combineLatest(gameActionController.placedCloudsObservable(), gameStateController.currentPlayerObservable()).pipe(
+                withLatestFrom(gameStateController.gameStateObservable()),
+            ).subscribe(([[placedClouds, playerId], gameState]) => {
 				const playerCloud = gameState.players[playerId].cloudOwned;
 				if (Object.keys(placedClouds).indexOf(playerCloud) !== -1) {
 					const location = indexToMapCoordinates(placedClouds[playerCloud], gameState.numTilesX);
 					this.placedCloudWidget.setVisible(true);
-					this.placedCloudWidget.setPosition(location.x * 48, location.y * 48);
+					this.placedCloudWidget.setPosition(location.x * 48 - 24, location.y * 48 - 24);
+					this.placedCloudWidget.setPlayerColour(getPlayerColour(playerId))
 				} else {
 					this.placedCloudWidget.setVisible(false);
 				}

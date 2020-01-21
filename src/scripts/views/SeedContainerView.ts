@@ -104,7 +104,7 @@ export class SeedContainerView {
         flowerSelectionController.selectedFlowerTypeObservable().pipe(
             withLatestFrom(heldObjectController.heldSeedObservable()),
             filter(([_, heldSeed]) => heldSeed != null),
-        ).subscribe(([selectedFlowerType, heldSeed]) => {
+        ).subscribe(([selectedFlowerType]) => {
             heldObjectController.pickUpSeed({
                 type: selectedFlowerType,
                 tileIndex: null

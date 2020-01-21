@@ -19,7 +19,8 @@ export default class PreloadScene extends Phaser.Scene {
 		this.load.image('river', 'assets/img/river.png');
 		this.load.image('seed', 'assets/img/seed.png');
 		this.load.image('seed2', 'assets/img/seed2.png');
-		this.load.image('cloud', 'assets/img/cloud.png');
+		this.load.image('cloud-outline', 'assets/img/cloud-outline.png');
+		this.load.image('cloud-inner', 'assets/img/cloud-inner.png');
 
 		this.load.image('tile-allowed', 'assets/img/tile-allowed.png');
 		this.load.image('tile-blocked', 'assets/img/tile-blocked.png');

@@ -1,13 +1,13 @@
 {
     "players": {
         "1": {
-            "cloudOwned": "2",
+            "cloudOwned": "1",
             "seedsOwned": ["1"],
             "flowers": ["0"],
             "autoReplantTileMap": {}
         },
         "2": {
-            "cloudOwned": "1",
+            "cloudOwned": "2",
             "seedsOwned": ["2"],
             "flowers": ["1"],
             "autoReplantTileMap": {}
@@ -69,10 +69,10 @@
     },
     "clouds": {
         "1": {
-            "tileIndex": -1
+            "tileIndex": 189
         },
         "2": {
-            "tileIndex": -1
+            "tileIndex": 6
         }
     },
     "rainfallTiles": [],

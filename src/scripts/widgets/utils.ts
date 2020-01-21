@@ -1,4 +1,5 @@
 import { VerticalAlignment, HorizontalAlignment } from "../types";
+import { COLOURS } from "../constants";
 
 export function getAlignedCoordinates(
     x: number,
@@ -37,4 +38,14 @@ export function indexToMapCoordinates(index: number, numTilesX: number) {
       x: (index % numTilesX),
       y: Math.floor(index / numTilesX)
     };
+}
+
+export function getPlayerColour(playerId: string | undefined): Phaser.Display.Color {
+    if (playerId === "1") {
+        return COLOURS.PLAYER_RED;
+    } else if (playerId === "2") {
+        return COLOURS.PLAYER_BLUE;
+    } else {
+        return COLOURS.BLACK;
+    }
 }

@@ -40,6 +40,9 @@ export const COLOURS = {
 
     TRANSPARENT: new Phaser.Display.Color(255, 255, 255, 0),
 
+    PLAYER_RED: new Phaser.Display.Color(140, 10, 10),
+    PLAYER_BLUE: new Phaser.Display.Color(10, 10, 140),
+
     withAlpha: (colour: Phaser.Display.Color, alpha: number) => {
         return new Phaser.Display.Color(colour.red, colour.green, colour.blue, Math.floor(alpha * 255));
     }

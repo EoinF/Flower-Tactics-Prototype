@@ -61,7 +61,7 @@ export class UIContainer implements UIObject {
 
         const {x: ax, y: ay} = getAlignedCoordinates(
             this.originalX, this.originalY, this.width, this.height,
-             w, h, 
+             w, h,
              this.verticalAlignment, this.horizontalAlignment,
              this.originX, this.originY
         );
