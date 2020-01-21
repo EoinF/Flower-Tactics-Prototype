@@ -133,4 +133,9 @@ export class EvolveChanceView implements UIObject {
     hits(x: number, y: number) {
         return this.container.hits(x, y);
     }
+
+    setScale(scaleX: number, scaleY: number | undefined = undefined) {
+        this.container.setScale(scaleX, scaleY);
+        return this;
+    }
 }

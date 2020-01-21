@@ -204,4 +204,10 @@ export class UIContainer implements UIObject {
         }
         return this;
     }
+
+    
+    setScale(scaleX: number, scaleY: number | undefined = undefined): UIObject {
+        this.children.forEach(child => child.setScale(scaleX, scaleY));
+        return this;
+    }
 }

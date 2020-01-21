@@ -23,7 +23,7 @@ export class NumberPointDisplay extends NumberDisplayBase {
             .setFillStyle(colourEnd.color, 1)
             .setStrokeStyle(1, colourStart.color);
 
-        this.mainContainer.addChild(this.rangeValueImage, "Middle");
+        this.container.addChild(this.rangeValueImage, "Middle");
     }
 
     setValue(value: number) {

@@ -142,4 +142,9 @@ export class TextLabel implements UIObject {
         this.textObject.setColor(colour.rgba);
         return this;
     }
+
+    setScale(scaleX: number, scaleY: number | undefined = undefined) {
+        this.textObject.setScale(scaleX, scaleY);
+        return this;
+    }
 }

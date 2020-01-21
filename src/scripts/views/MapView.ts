@@ -12,13 +12,14 @@ import { isRequirementsSatisfied } from "../deltaCalculators/helpers";
 import { GameActionController } from "../controllers/GameActionController";
 import { PlacedCloudWidget } from "../widgets/specific/PlacedCloudWidget";
 import { COLOURS } from "../constants";
+import { PlacedFlowerWidget } from "../widgets/specific/PlacedFlowerWidget";
 
 export class MapView {
     scene: Phaser.Scene;
 	soilColourConverter: SoilColourConverter;
 
     tileButtons: TileWidget[];
-    flowerSprites: Phaser.GameObjects.Image[];
+    flowerSprites: PlacedFlowerWidget[];
     mountainSprites: Phaser.GameObjects.Image[];
 	riverSprites: Phaser.GameObjects.Image[];
 	placedSeedSprites: Map<number, PlacedSeedWidget>;
@@ -100,8 +101,12 @@ export class MapView {
 
 	setupFlowerSprites(gameState: GameState) {
 		this.flowerSprites.forEach(s => s.destroy());
-		this.flowerSprites = gameState.flowers.map((flower) => {
-			const img = this.scene.add.image(flower.x * 48, flower.y * 48, 'flower');
+		this.flowerSprites = Object.keys(gameState.flowersMap).map((flowerKey) => {
+			const flower = gameState.flowersMap[flowerKey];
+			const playerId = Object.keys(gameState.players).find(playerKey => {
+				return gameState.players[playerKey].flowers.indexOf(flowerKey) !== -1
+			});
+			const img = new PlacedFlowerWidget(this.scene, flower.x * 48 - 24, flower.y * 48 - 24, getPlayerColour(playerId));
 			const flowerType = gameState.getFlowerType(flower);
 			img.setScale(Math.min(1, 0.2 + 0.8 * flower.growth / flowerType.turnsUntilGrown));
 			img.setDepth(5);

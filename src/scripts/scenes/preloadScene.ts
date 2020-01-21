@@ -14,7 +14,8 @@ export default class PreloadScene extends Phaser.Scene {
 
 	preload() {
 		this.load.image('blank-tile', 'assets/img/tile.png');
-		this.load.image('flower', 'assets/img/flower.png');
+		this.load.image('flower-outline', 'assets/img/flower-outline.png');
+		this.load.image('flower-inner', 'assets/img/flower-inner.png');
 		this.load.image('mountain', 'assets/img/mountain.png');
 		this.load.image('river', 'assets/img/river.png');
 		this.load.image('seed', 'assets/img/seed.png');

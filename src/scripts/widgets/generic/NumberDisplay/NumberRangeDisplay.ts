@@ -26,8 +26,8 @@ export class NumberRangeDisplay extends NumberDisplayBase {
             .setOrigin(0,0)
             .setFillStyle(colourEnd.color, 1);
 
-        this.mainContainer.addChild(this.rangeValuesImageSides, "Middle");
-        this.mainContainer.addChild(this.rangeValuesImageFront, "Middle");
+        this.container.addChild(this.rangeValuesImageSides, "Middle");
+        this.container.addChild(this.rangeValuesImageFront, "Middle");
     }
 
     setValues(values: NumberRange) {

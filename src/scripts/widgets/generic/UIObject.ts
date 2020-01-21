@@ -17,6 +17,7 @@ export interface UIObject {
     destroy: () => void;
     getData: (key: string) => any;
     setData: (key: string, value: any) => UIObject;
+    setScale: (scaleX: number, scaleY: number | undefined) => UIObject;
 
     removeInteractive: () => UIObject;
 }
@@ -105,5 +106,10 @@ export class BaseUIObject implements UIObject {
 
     hits(x: number, y: number) {
         return this.container.hits(x, y);
+    }
+    
+    setScale(scaleX: number, scaleY: number | undefined = undefined): UIObject {
+        this.container.setScale(scaleX, scaleY);
+        return this;
     }
 }

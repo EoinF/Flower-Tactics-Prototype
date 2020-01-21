@@ -1,27 +1,13 @@
-import { UIObject } from "./UIObject";
+import { UIObject, BaseUIObject } from "./UIObject";
 import { TextLabel } from "./TextLabel";
 import { UIContainer } from "./UIContainer";
 import { RectangleSprite } from "./RectangleSprite";
 import { COLOURS } from "../../constants";
 
-export class ProgressBar implements UIObject {
+export class ProgressBar extends BaseUIObject {
     private value: number;
     private maxValue: number;
-
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-
-    originX: number;
-    originY: number;
-
-    alpha: number;
-    borderThickness: number;
-    borderColour: Phaser.Display.Color;
-    visible: boolean;
     
-    protected container: UIContainer;
     protected progressLabel: TextLabel;
     protected progressRectangle: RectangleSprite;
 
@@ -29,15 +15,21 @@ export class ProgressBar implements UIObject {
         value: number, maxValue: number,
         width: number | "auto" = "auto", height: number | "auto" = "auto"
     ) {
-        this.maxValue = maxValue;
-        this.progressLabel = new TextLabel(scene, 0, 0, `${maxValue}/${maxValue}`, COLOURS.BLACK, {isBold: true, fontSize: 12})
+        const progressLabel = new TextLabel(scene, 0, 0, `${maxValue}/${maxValue}`, COLOURS.BLACK, {isBold: true, fontSize: 12})
             .setOrigin(0.5, 0)
             .setDepthOffset(1);
-        this.container = new UIContainer(scene, x, y, 
-            width === "auto" ? this.progressLabel.width : width, 
-            height === "auto" ? this.progressLabel.height : height)
+
+        super(scene, x, y, 
+            width === "auto" ? progressLabel.width : width, 
+            height === "auto" ? progressLabel.height : height);
+
+        this.container
             .setBackground(COLOURS.LIGHT_GRAY)
             .setBorder(1, COLOURS.BLACK);
+
+        this.progressLabel = progressLabel;
+
+        this.maxValue = maxValue;
 
         this.progressRectangle = new RectangleSprite(scene, 0, 0, this.container.width, this.container.height, 1, undefined, {
             color: COLOURS.WHITE.color,

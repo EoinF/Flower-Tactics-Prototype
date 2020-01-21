@@ -136,6 +136,11 @@ export class FlowerStatsDisplay implements UIObject {
         return this;
     }
 
+    setScale(scaleX: number, scaleY: number | undefined = undefined) {
+        this.container.setScale(scaleX, scaleY);
+        return this;
+    }
+
     hits(x: number, y: number) {
         return this.container.hits(x, y);
     }
