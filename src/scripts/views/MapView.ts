@@ -9,7 +9,7 @@ import { indexToMapCoordinates, getPlayerColour } from "../widgets/utils";
 import { combineLatest } from "rxjs";
 import { HeldObjectController } from "../controllers/HeldObjectController";
 import { isRequirementsSatisfied } from "../deltaCalculators/helpers";
-import { GameActionController } from "../controllers/GameActionController";
+import { GameActionController, PlacedSeed } from "../controllers/GameActionController";
 import { PlacedCloudWidget } from "../widgets/specific/PlacedCloudWidget";
 import { COLOURS } from "../constants";
 import { PlacedFlowerWidget } from "../widgets/specific/PlacedFlowerWidget";
@@ -144,7 +144,7 @@ export class MapView {
 				this.placedSeedSprites.clear();
 				placedSeeds.getAllSeeds().forEach(placedSeed => {
 					if (placedSeed.amount > 0) {
-						this.addNewSeed(placedSeed.tileIndex, placedSeed.type, placedSeed.amount, gameState, mapController);
+						this.addNewSeed(placedSeed, gameState);
 					}
 				});
 			});
@@ -226,10 +226,15 @@ export class MapView {
             })
 	}
 	
-	addNewSeed(tileIndex: number, seedType: string, seedAmount: number, newState: GameState, mapController: MapController) {
-		const location = indexToMapCoordinates(tileIndex, newState.numTilesX);
-		const placedSeedWidget = new PlacedSeedWidget(this.scene, (location.x * 48) - 24, (location.y * 48) - 24, 48, 48, seedAmount);
+	addNewSeed(placedSeed: PlacedSeed, gameState: GameState) {
+		const location = indexToMapCoordinates(placedSeed.tileIndex, gameState.numTilesX);
+		const placedSeedWidget = new PlacedSeedWidget(this.scene, 
+			(location.x * 48) - 24, (location.y * 48) - 24, 
+			48, 48, 
+			placedSeed.amount, 
+			getPlayerColour(placedSeed.ownerId)
+		);
 		
-		this.placedSeedSprites.set(tileIndex, placedSeedWidget);
+		this.placedSeedSprites.set(placedSeed.tileIndex, placedSeedWidget);
 	}
 }

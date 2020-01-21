@@ -73,9 +73,9 @@ export class SeedInventoryView extends BaseUIObject {
             )
         ).pipe(
             map(([gameState, stagedSeeds, currentPlayerId, gameDelta]) => this.simplifySeedStates(gameState, gameDelta, stagedSeeds, currentPlayerId))
-        ).subscribe(({seedInventoryItems, isAnyStaged}) => {
+        ).subscribe(({seedInventoryItems, isAnyStaged, currentPlayerId}) => {
             this.seedSelectionGrid.clear();
-            this.createGrid(seedInventoryItems, evolveSeedController, isAnyStaged);
+            this.createGrid(seedInventoryItems, evolveSeedController, isAnyStaged, currentPlayerId);
         });
         
         seedState$.pipe(
@@ -103,13 +103,13 @@ export class SeedInventoryView extends BaseUIObject {
         })
     }
 
-    createGrid(seedInventoryItems: SeedInventoryItem[], evolveSeedController: EvolveSeedController, isAnyStaged: boolean) {
+    createGrid(seedInventoryItems: SeedInventoryItem[], evolveSeedController: EvolveSeedController, isAnyStaged: boolean, ownerId: string) {
         this.inventoryMap = {};
         seedInventoryItems.map((item, index) => {
             const x = (index % this.cellsPerRow) * this.cellWidth;
             const y = Math.floor(index / this.cellsPerRow) * this.cellHeight;
             const cell = new SeedInventoryTile(this.scene, x, y, this.cellWidth, this.cellHeight,
-                item.name, item.amount);
+                item.name, item.amount, ownerId);
 
             cell.setBackground(COLOURS.PURPLE_300, COLOURS.PURPLE_400)
                 .onAddSeed(() => {
@@ -149,6 +149,7 @@ export class SeedInventoryView extends BaseUIObject {
                 }
             });
         return {
+            currentPlayerId,
             seedInventoryItems,
             isAnyStaged
         }

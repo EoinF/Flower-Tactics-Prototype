@@ -36,6 +36,7 @@ export class HeldObjectView {
 
         gameStateController.currentPlayerObservable().subscribe(playerId => {
             heldCloudsWidget.setPlayerColour(getPlayerColour(playerId));
+            heldSeedWidget.setTint(getPlayerColour(playerId).color);
         });
 
         mapController.mouseOverTileObservable()

@@ -3,23 +3,28 @@ import { COLOURS, SEED_INTERVALS } from "../../constants";
 import { TextLabel } from "../generic/TextLabel";
 import { TextButton } from "../generic/TextButton";
 import { BaseButton } from "../generic/BaseButton";
+import { getPlayerColour } from "../utils";
 
 export class SeedInventoryTile extends BaseButton {
     private seedAmountLabel: TextLabel;
     private addSeedButton: TextButton;
+    private removeSeedButton: TextButton;
+    private seedImage: Phaser.GameObjects.Image;
+
     private addSeedCallbacks: (() => void)[];
-     removeSeedButton: TextButton;
     private removeSeedCallbacks: (() => void)[];
 
     constructor(scene: Phaser.Scene, x: number, y: number, 
         width: number, height: number, 
-        name: string, amount: number
+        name: string, amount: number,
+        currentPlayerId: string
     ) {
         super(scene, x, y, width, height, COLOURS.PURPLE_300, COLOURS.PURPLE_400);
         this.setBorder(1, COLOURS.GRAY);
         const seedName = new TextLabel(scene, 4, 4, name);
-        const seedImage = scene.add.image(4, 4, 'seed2');
-        this.seedAmountLabel = new TextLabel(scene, seedImage.width + 4, 4, ` x ${amount}`)
+        this.seedImage = scene.add.image(4, 4, 'seed2')
+            .setTint(getPlayerColour(currentPlayerId).color);
+        this.seedAmountLabel = new TextLabel(scene, this.seedImage.width + 4, 4, ` x ${amount}`)
         
         this.addSeedButton = new TextButton(scene, 4, 4, 24, 24, ">")
             .setBorder(1, COLOURS.GRAY)
@@ -35,7 +40,7 @@ export class SeedInventoryTile extends BaseButton {
         this.container.addChild(this.removeSeedButton, "Bottom", "Right");
         
         this.container.addChild(seedName);
-        this.container.addChild(seedImage, "Bottom");
+        this.container.addChild(this.seedImage, "Bottom");
         this.container.addChild(this.seedAmountLabel, "Bottom");
 
         this.addSeedCallbacks = [];

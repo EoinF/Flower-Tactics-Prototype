@@ -16,6 +16,7 @@ import { HeldObjectController } from "../controllers/HeldObjectController";
 import { GameDeltaController } from "../controllers/GameDeltaController";
 import { PlacedSeed } from "../controllers/GameActionController";
 import { StringMap } from "../types";
+import { getPlayerColour } from "../widgets/utils";
 
 export class SeedContainerView {
     width: number;
@@ -45,11 +46,7 @@ export class SeedContainerView {
             .setAlpha(0.9)
             .setInteractive();
 
-        const seedSprite = new ImageButton(this.scene, 4, 0,
-            "seed2",
-            "auto", "auto",
-            COLOURS.TRANSPARENT, COLOURS.TRANSPARENT, COLOURS.WHITE, COLOURS.WHITE
-        );
+        const seedSprite = this.scene.add.image(4, 0, "seed2");
 
         const seedAmountLabel = new TextLabel(this.scene, 8 + seedSprite.width, 0, 'x999');
         const seedProgressBar = new ProgressBar(scene, 12 + seedSprite.width + seedAmountLabel.width, 0, 0, 100, "auto", 16);
@@ -127,5 +124,9 @@ export class SeedContainerView {
             .subscribe(([nextState, selectedFlowerType]) => {
                 seedProgressBar.setValue(nextState.seedStatus[selectedFlowerType].progress);
             })
+
+        gameStateController.currentPlayerObservable().subscribe(playerId => {
+            seedSprite.setTint(getPlayerColour(playerId).color);
+        })
     }
 }
