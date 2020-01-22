@@ -109,6 +109,9 @@ export class MapView {
 			const img = new PlacedFlowerWidget(this.scene, flower.x * 48 - 24, flower.y * 48 - 24, getPlayerColour(playerId));
 			const flowerType = gameState.getFlowerType(flower);
 			img.setScale(Math.min(1, 0.2 + 0.8 * flower.growth / flowerType.turnsUntilGrown));
+			if (flower.growth >= flowerType.turnsUntilDead + flowerType.turnsUntilGrown) {
+				img.startDyingAnimation(this.scene);
+			}
 			img.setDepth(5);
 			img.setData("x", flower.x);
 			img.setData("y", flower.y);
