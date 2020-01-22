@@ -38,7 +38,7 @@ export function setupGameInputConnectors(
                 const enemySeedsOnTile: PlacedSeed[] = [];
                 
                 placedSeedsMap.getSeedsAtTile(clickedTile).forEach(placedSeed => {
-                    if (gameState.players[currentPlayerId].seedsOwned.indexOf(placedSeed.type) !== -1) {
+                    if (gameState.players[currentPlayerId].seedsOwned.indexOf(placedSeed.type) !== -1 && placedSeed.amount > 0) {
                         playerOwnedSeedAmountOnTile = placedSeed.amount;
                         playerOwnedTypeOnTile = placedSeed.type;
                     } else {
@@ -80,7 +80,7 @@ export function setupGameInputConnectors(
                         }
                     } else {
                         if (isOtherOwnedSeedTypeBlockingTile) {
-                        guiController.createAlertMessage("Another type of seed is already placed on this tile.");
+                            guiController.createAlertMessage("Another type of seed is already placed on this tile.");
                         } else if (!hasSufficientSeeds) {
                             guiController.createAlertMessage("You don't have any seeds remaining.");
                         } else {
