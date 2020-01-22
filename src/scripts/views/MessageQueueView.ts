@@ -25,6 +25,7 @@ export class MessageQueueView extends BaseUIObject {
 
         const titleLabel = new TextLabel(scene, 16, 16, "Title here", COLOURS.BLACK, {isBold: true, fontSize: 20});
         const contentLabel = new TextLabel(scene, 16, titleLabel.height + 32, "Content goes here...", COLOURS.BLACK, {
+            align: 'left',
             maxWidth: popupContainer.width - 32
         });
         const nextButton = new TextButton(scene, 16, 16, 72, 28, "Next", COLOURS.WHITE)

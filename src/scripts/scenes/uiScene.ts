@@ -40,10 +40,16 @@ export default class UIScene extends Phaser.Scene {
 	
 	combineLatest(guiController.messagePromptObservable(), guiController.screenStateObservable())
 		.subscribe(([messagePrompt, screenState]) => {
-			if (messagePrompt != null || screenState != "In Game") {
+			if (screenState === 'Main Menu') {
+				this.scene.setVisible(false);
 				this.scene.pause();
 			} else {
-				this.scene.resume();
+				this.scene.setVisible(true);
+				if (messagePrompt != null || screenState != "In Game") {
+					this.scene.pause();
+				} else {
+					this.scene.resume();
+				}
 			}
 	});
   }

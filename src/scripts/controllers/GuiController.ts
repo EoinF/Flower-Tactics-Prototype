@@ -8,7 +8,7 @@ interface MessagePromptQueue {
     index: number;
 }
 
-type ScreenState = "In Game" | "Evolve" | "Paused";
+type ScreenState = "Main Menu" | "In Game" | "Evolve" | "Paused";
 
 export class GuiController {
     private endTurn$: Subject<void>;
@@ -30,7 +30,7 @@ export class GuiController {
         this.onClickEvolveButton$ = new Subject();
         this.onClickSeedPlacementButton$ = new Subject();
         this.onClickCloudPlacementButton$ = new Subject();
-        this.screenState$ = new Subject();
+        this.screenState$ = new ReplaySubject(1);
         this.alertMessage$ = new Subject();
         this.messagePromptQueue$ = new BehaviorSubject({
             messagePrompts: [] as MessagePrompt[],

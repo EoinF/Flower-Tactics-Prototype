@@ -17,6 +17,7 @@ import { PlacedFlowerWidget } from "../widgets/specific/PlacedFlowerWidget";
 export class MapView {
     scene: Phaser.Scene;
 	soilColourConverter: SoilColourConverter;
+	mapController: MapController;
 
     tileButtons: TileWidget[];
     flowerSprites: PlacedFlowerWidget[];
@@ -36,6 +37,7 @@ export class MapView {
     ) {
 		this.scene = scene;
 		this.soilColourConverter = soilColourConverter;
+		this.mapController = mapController;
 		this.tileButtons = [];
 		this.flowerSprites = [];
 		this.mountainSprites = [];
@@ -78,7 +80,9 @@ export class MapView {
 		this.tileButtons.forEach(s => s.destroy());
 		this.tileButtons = gameState.tiles.map((tile, index) => {
 			return new TileWidget(this.scene, index, gameState.numTilesX, tile.soil, gameState.getTileWaterContent(tile), this.soilColourConverter);
-		});
+		}).map(tileWidget => tileWidget.onClick(() =>
+			this.mapController.clickTile(tileWidget.tileIndex)
+		));
 	}
 
 	setupCloudSprites(gameState: GameState) {
@@ -123,12 +127,6 @@ export class MapView {
 		gameStateController: GameStateController, gameActionController: GameActionController,
 		mapController: MapController, heldObjectController: HeldObjectController
 	) {
-        this.tileButtons.forEach(button => {
-            button.onClick(() => {
-				mapController.clickTile(button.tileIndex);
-            });
-        });
-
         gameStateController.gameStateObservable().subscribe((newState) => {
 			this.tileButtons.forEach(button => {
 				const tile = newState.getTileAt(button.tileX, button.tileY)!;

@@ -29,15 +29,20 @@ export default class EvolveSeedScene extends Phaser.Scene {
             guiController.screenStateObservable(),
             evolveSeedController.isEvolveChoiceShownObservable()
         ).subscribe(([messagePrompt, screenState, isEvolveChoiceShown]) => {
-            if (messagePrompt != null || screenState !== "Evolve" || isEvolveChoiceShown) {
+            if (screenState === 'Main Menu') {
+                this.scene.setVisible(false);
                 this.scene.pause();
             } else {
-                this.scene.resume();
-            }
-            if (screenState === "Evolve") {
-                this.scene.setVisible(true);
-            } else {
-                this.scene.setVisible(false);
+                if (messagePrompt != null || screenState !== "Evolve" || isEvolveChoiceShown) {
+                    this.scene.pause();
+                } else {
+                    this.scene.resume();
+                }
+                if (screenState === "Evolve") {
+                    this.scene.setVisible(true);
+                } else {
+                    this.scene.setVisible(false);
+                }
             }
         });
     }

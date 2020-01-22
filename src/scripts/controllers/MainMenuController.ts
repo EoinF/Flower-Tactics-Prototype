@@ -1,6 +1,6 @@
 import { Subject, Observable, ReplaySubject } from "rxjs";
 
-export type LoadState = "LOADING_GAME_ASSETS" | "LOADING_MAP_DATA"; 
+export type LoadState = "LOADING_GAME_ASSETS" | "LOADING_MAP_DATA" | "FINISHED"; 
 
 export class MainMenuController {
     private onFinishedLoadingGameAssets$: Subject<void>;

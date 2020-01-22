@@ -44,6 +44,8 @@ export class LevelSelectView {
                 this.loadingMessage.setText("Loading game assets...");
             } else if (loadState === 'LOADING_MAP_DATA') {
                 this.loadingMessage.setText("Loading map data...");
+            } else {
+                this.loadingMessage.setText("");
             }
         });
     }

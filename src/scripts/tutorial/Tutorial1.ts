@@ -31,23 +31,24 @@ export class Tutorial1 extends TutorialBase {
             1,
             (gameState: GameState) => Object.keys(gameState.seedStatus).some(key => gameState.seedStatus[key].quantity > 0),
             (callbacks: TutorialRunnerCallbacks) => {
-                callbacks.showTips([
-                    {
-                        title: this.title,
-                        content: "A seed has been produced by your flower!",
-                        position: { x: 8, y: 326 }
-                    },
-                    {
-                        title: this.title,
-                        content: "Drag the seed onto the map and click 'end turn' to create a new flower. This will produce a flower of the same type with growth set to 0",
-                        position: undefined
-                    },
-                    {
-                        title: this.title,
-                        content: "Note that you can only place the seed on tiles adjacent to flowers you own.",
-                        position: undefined
-                    }
-                ])
+                callbacks.victory();
+                // callbacks.showTips([
+                //     {
+                //         title: this.title,
+                //         content: "A seed has been produced by your flower!",
+                //         position: { x: 8, y: 326 }
+                //     },
+                //     {
+                //         title: this.title,
+                //         content: "Drag the seed onto the map and click 'end turn' to create a new flower. This will produce a flower of the same type with growth set to 0",
+                //         position: undefined
+                //     },
+                //     {
+                //         title: this.title,
+                //         content: "Note that you can only place the seed on tiles adjacent to flowers you own.",
+                //         position: undefined
+                //     }
+                // ])
             }
         );
 

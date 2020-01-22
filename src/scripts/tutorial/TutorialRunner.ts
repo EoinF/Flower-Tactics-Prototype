@@ -1,6 +1,6 @@
 import { GuiController } from "../controllers/GuiController";
 import { GameStateController } from "../controllers/GameStateController";
-import { first, withLatestFrom, skip } from "rxjs/operators";
+import { first, withLatestFrom, skip, filter } from "rxjs/operators";
 import { TutorialBase } from "./TutorialBase";
 import { Subject, combineLatest } from "rxjs";
 import { Tile } from "../objects/Tile";
@@ -17,7 +17,7 @@ export class TutorialRunner {
     private guiController: GuiController;
     private mapController: MapController;
     private gameStateController: GameStateController;
-    private tutorial$: Subject<TutorialBase>;
+    private tutorial$: Subject<TutorialBase | null>;
     
     constructor(guiController: GuiController, mapController: MapController, gameStateController: GameStateController) {
         this.tutorial$ = new Subject();
@@ -37,14 +37,17 @@ export class TutorialRunner {
                 first(),
             ),
             this.tutorial$
-        ).subscribe(([state, tutorial]) => tutorial.startGame(state, callbacks));
+        ).pipe(
+            filter(([_, tutorial]) => tutorial != null)
+        ).subscribe(([state, tutorial]) => tutorial!.startGame(state, callbacks));
 
         gameStateController.gameStateObservable()
             .pipe(
                 skip(1), 
-                withLatestFrom(this.tutorial$)
+                withLatestFrom(this.tutorial$),
+                filter(([_, tutorial]) => tutorial != null)
             )
-            .subscribe(([state, tutorial]) => tutorial.stateChange(state, callbacks));
+            .subscribe(([state, tutorial]) => tutorial!.stateChange(state, callbacks));
     }
 
     private showTips(messages: MessagePrompt[]) {
@@ -68,9 +71,21 @@ export class TutorialRunner {
                 position: {x: 500, y: 300}
             }]
         );
+
+        this.guiController.messagePromptObservable().pipe(
+            filter(prompt => prompt == null),
+            first()
+        ).subscribe(() => {
+            this.guiController.setScreenState("Main Menu");
+            this.stopTutorial();
+        })
     }
 
     runTutorial(tutorial: TutorialBase) {
         this.tutorial$.next(tutorial);
+    }
+
+    stopTutorial() {
+        this.tutorial$.next(null);
     }
 }

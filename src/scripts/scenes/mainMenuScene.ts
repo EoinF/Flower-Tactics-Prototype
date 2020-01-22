@@ -9,16 +9,16 @@ import { MapSaver } from "../MapSaver";
 import { TutorialRunner } from "../tutorial/TutorialRunner";
 import { SoilColourConverter } from "../SoilColourConverter";
 import { Tutorial1 } from "../tutorial/Tutorial1";
-import { flatMap, filter, mapTo, startWith, tap } from "rxjs/operators";
+import { flatMap, filter, mapTo, startWith, tap, first, skip, mergeMap } from "rxjs/operators";
 import { LevelSelectView } from "../views/MainMenu/LevelSelectView";
 
 export default class MainMenuScene extends Phaser.Scene {
-    
     constructor() {
 		super({ key: 'MainMenuScene' })
     }
 
     create() {
+        guiController.setScreenState("Main Menu");
         this.scene.launch("PreloadScene");
         new LevelSelectView(this, mainMenuController);
 
@@ -33,25 +33,39 @@ export default class MainMenuScene extends Phaser.Scene {
                     mainMenuController.setLoadState("LOADING_GAME_ASSETS")
                 }
             }),
-            filter(([levelName, isAssetsLoaded]) => isAssetsLoaded),
-            flatMap(([levelName]) => {
-                mainMenuController.setLoadState("LOADING_MAP_DATA");
-                return this.loadMap(levelName)
-            })
-        ).subscribe((levelData) => {
-		    gameStateController.loadGame(levelData);
+            filter(([levelName, isAssetsLoaded]) => isAssetsLoaded)
+        ).subscribe(([levelName]) => {
+            mainMenuController.setLoadState("LOADING_MAP_DATA");
+            this.loadMap(levelName);
         });
 
-        gameStateController.loadMapObservable().subscribe(() => {
-            this.scene.start('MainScene');
-            this.scene.start('UIScene');
-            this.scene.start('EvolveSeedScene');
-            this.scene.start('OverlayScene');
+        gameStateController.loadMapObservable().pipe(first()).subscribe(() => {
+            this.scene.launch('MainScene');
+            this.scene.launch('UIScene');
+            this.scene.launch('EvolveSeedScene');
+            this.scene.launch('OverlayScene');
+            mainMenuController.setLoadState("FINISHED");
+            guiController.setScreenState("In Game");
+        });
+
+        gameStateController.loadMapObservable().pipe(skip(1)).subscribe(() => {
+            mainMenuController.setLoadState("FINISHED");
+            guiController.setScreenState("In Game");
         })
+
+        guiController.screenStateObservable().subscribe(screenState => {
+            if (screenState === 'Main Menu') {
+                this.scene.setVisible(true);
+                this.scene.resume();
+            } else {
+                this.scene.setVisible(false);
+                this.scene.pause();
+            }
+        });
     }
 
-	getMapImageData() {
-		const frame = this.textures.getFrame('map-soil');
+	getMapImageData(textureKey: string) {
+		const frame = this.textures.getFrame(textureKey);
 		const cnv = this.textures.createCanvas('temp' + Math.random(), frame.width, frame.height);
 		let ctx = cnv.getContext();
 		ctx.clearRect(0, 0, frame.width, frame.height);
@@ -61,38 +75,30 @@ export default class MainMenuScene extends Phaser.Scene {
 		return imageData;
 	}
     
-	loadMap(mapName: string): Observable<GameStateData> {
-        const onLoadMap$ = new Subject<GameStateData>();
-        try {
-            const soilColourConverter = new SoilColourConverter();
-            const tutorialRunner = new TutorialRunner(guiController, mapController, gameStateController)
-            const mapLoader = new MapLoader(soilColourConverter);
-            const mapSaver = new MapSaver();
-            // const mapGenerator = new MapGenerator(1);
+	loadMap(mapName: string) {
+        const soilColourConverter = new SoilColourConverter();
+        const tutorialRunner = new TutorialRunner(guiController, mapController, gameStateController)
+        const mapLoader = new MapLoader(soilColourConverter);
+        const mapSaver = new MapSaver();
+        // const mapGenerator = new MapGenerator(1);
 
-            this.load.on('complete', () => {
-                try {
-                    const imageData = this.getMapImageData();
-                    const objectData = this.cache.json.get('object-data') as ObjectData;
-                    const initialState = mapLoader.loadMap(imageData, objectData);
-                    
-                    if (mapName === "tutorial1") {
-                        tutorialRunner.runTutorial(new Tutorial1());
-                    }
+        this.load.on('complete', () => {
+            const imageData = this.getMapImageData(`map-soil-${mapName}`);
+            const objectData = this.cache.json.get(`object-data-${mapName}`) as ObjectData;
 
-                    // mapSaver.saveMap(initialState);
-                    onLoadMap$.next(initialState);
-                } catch(err) {
-                    onLoadMap$.error(err);
-                }
-            }, this)
+            const initialState = mapLoader.loadMap(imageData, objectData);
+            
+            if (mapName === "tutorial1") {
+                tutorialRunner.runTutorial(new Tutorial1());
+            }
 
-            this.load.image('map-soil', `assets/maps/parts/${mapName}/soil.bmp`);
-            this.load.json('object-data', `assets/maps/parts/${mapName}/objects.json`);
-            this.load.start();
-        } catch (err) {
-            onLoadMap$.error(err);
-        }
-		return onLoadMap$;
+            // mapSaver.saveMap(initialState);
+            gameStateController.loadGame(initialState);
+            this.load.removeAllListeners();
+        }, this)
+
+        this.load.image(`map-soil-${mapName}`, `assets/maps/parts/${mapName}/soil.bmp`);
+        this.load.json(`object-data-${mapName}`, `assets/maps/parts/${mapName}/objects.json`);
+        this.load.start();
 	}
 }
