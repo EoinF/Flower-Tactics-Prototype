@@ -14,6 +14,8 @@ import { GameStateController } from './controllers/GameStateController'
 import { GameDeltaController } from './controllers/GameDeltaController'
 import { setupConnectors } from './connectors/connectors'
 import { GameActionController } from './controllers/GameActionController'
+import MainMenuScene from './scenes/mainMenuScene'
+import { MainMenuController } from './controllers/MainMenuController'
 
 const DEFAULT_WIDTH = 1280
 const DEFAULT_HEIGHT = 720
@@ -29,7 +31,7 @@ const config: GameConfig = {
     width: DEFAULT_WIDTH,
     height: DEFAULT_HEIGHT
   },
-  scene: [PreloadScene, MainScene, UIScene, EvolveSeedScene, OverlayScene]
+  scene: [MainMenuScene, PreloadScene, MainScene, UIScene, EvolveSeedScene, OverlayScene]
   // physics: {
   //   default: 'arcade',
   //   arcade: {
@@ -52,6 +54,7 @@ export const mapController = new MapController();
 export const flowerSelectionController = new FlowerSelectionController();
 export const evolveSeedController = new EvolveSeedController();
 export const heldObjectController = new HeldObjectController();
+export const mainMenuController = new MainMenuController();
 setupConnectors(
   guiController,
   gameStateController,

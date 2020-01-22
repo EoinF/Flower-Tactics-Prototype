@@ -23,7 +23,6 @@ export interface ObjectData {
     flowerTypes: StringMap<FlowerType>;
     flowerAugmentations: StringMap<FlowerAugmentation[]>;
     randomNumberGeneratorSeed: string;
-    rainfallTiles: number[];
 }
 
 export class MapLoader {

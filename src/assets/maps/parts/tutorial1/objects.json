@@ -1,8 +1,10 @@
 {
     "players": {
         "1": {
+            "cloudOwned": null,
             "seedsOwned": ["1"],
-            "flowers": ["1"]
+            "flowers": ["0"],
+            "autoReplantTileMap": {}
         }
     },
     "seedStatus": {
@@ -12,6 +14,7 @@
             "progress": 0
         }
     },
+    "flowerAugmentations": {},
     "flowerTypes": {
         "1": {
             "type": "1",
@@ -28,6 +31,7 @@
             "potassiumMax": 1500
         }
     },
+    "clouds": {},
     "rivers": [],
     "mountains": [
         {
