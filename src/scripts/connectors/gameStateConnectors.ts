@@ -150,7 +150,10 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): G
                 } as Flower;
                 finalDelta.addDelta(["flowersMap", newIndex.toString()], newFlower, "DELTA_REPLACE");
                 finalDelta.addDelta(["players", placedSeed.ownerId, "flowers"], newIndex.toString(), "DELTA_APPEND");
-                finalDelta.addDelta(["players", placedSeed.ownerId, "autoReplantTileMap", placedSeed.tileIndex.toString()], placedSeed.type, "DELTA_REPLACE");
+
+                if (isRequirementsSatisfied(gameState.tiles[placedSeed.tileIndex].soil, gameState.flowerTypes[placedSeed.type])) {
+                    finalDelta.addDelta(["players", placedSeed.ownerId, "autoReplantTileMap", placedSeed.tileIndex.toString()], placedSeed.type, "DELTA_REPLACE");
+                }
                 newIndex++;
             }
         });
