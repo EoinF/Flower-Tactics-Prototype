@@ -1,15 +1,12 @@
-import { TextButton } from "../widgets/generic/TextButton"
-import { COLOURS } from "../constants";
-import { GameStateData } from "../objects/GameState";
 import { gameStateController, guiController, mapController, mainMenuController } from "../game";
-import { TextLabel } from "../widgets/generic/TextLabel";
-import { Observable, Subject, of, forkJoin, combineLatest } from "rxjs";
+import { combineLatest } from "rxjs";
 import { MapLoader, ObjectData } from "../MapLoader";
 import { MapSaver } from "../MapSaver";
 import { TutorialRunner } from "../tutorial/TutorialRunner";
 import { SoilColourConverter } from "../SoilColourConverter";
 import { Tutorial1 } from "../tutorial/Tutorial1";
-import { flatMap, filter, mapTo, startWith, tap, first, skip, mergeMap } from "rxjs/operators";
+import { Tutorial2 } from "../tutorial/Tutorial2";
+import { filter, mapTo, startWith, tap, first, skip } from "rxjs/operators";
 import { LevelSelectView } from "../views/MainMenu/LevelSelectView";
 
 export default class MainMenuScene extends Phaser.Scene {
@@ -79,20 +76,20 @@ export default class MainMenuScene extends Phaser.Scene {
         const soilColourConverter = new SoilColourConverter();
         const tutorialRunner = new TutorialRunner(guiController, mapController, gameStateController)
         const mapLoader = new MapLoader(soilColourConverter);
-        const mapSaver = new MapSaver();
-        // const mapGenerator = new MapGenerator(1);
 
         this.load.on('complete', () => {
             const imageData = this.getMapImageData(`map-soil-${mapName}`);
             const objectData = this.cache.json.get(`object-data-${mapName}`) as ObjectData;
 
             const initialState = mapLoader.loadMap(imageData, objectData);
-            
+
             if (mapName === "tutorial1") {
                 tutorialRunner.runTutorial(new Tutorial1());
             }
+            if (mapName === "tutorial2") {
+                tutorialRunner.runTutorial(new Tutorial2());
+            }
 
-            // mapSaver.saveMap(initialState);
             gameStateController.loadGame(initialState);
             this.load.removeAllListeners();
         }, this)

@@ -1,14 +1,17 @@
 import { GuiController } from "../controllers/GuiController";
 import { GameStateController } from "../controllers/GameStateController";
-import { first, withLatestFrom, skip, filter } from "rxjs/operators";
+import { first, withLatestFrom, skip, filter, startWith, map, distinctUntilChanged } from "rxjs/operators";
 import { TutorialBase } from "./TutorialBase";
 import { Subject, combineLatest } from "rxjs";
 import { Tile } from "../objects/Tile";
 import { MapController } from "../controllers/MapController";
 import { MessagePrompt } from "../views/MessageQueueView";
+import { evolveSeedController } from "../game";
+import { GameStateData, GameState } from "../objects/GameState";
 
 export interface TutorialRunnerCallbacks {
     showTips: (messages: MessagePrompt[]) => void;
+    giftCloudToPlayer: () => void;
     focusTile: (tile: Tile) => void;
     victory: () => void;
 }
@@ -25,29 +28,42 @@ export class TutorialRunner {
         this.mapController = mapController;
         this.gameStateController = gameStateController;
 
-        const callbacks = {
+        const callbacks: TutorialRunnerCallbacks = {
             showTips: (messages: MessagePrompt[]) => this.showTips(messages),
             focusTile: (tile: Tile) => this.focusTile(tile),
-            victory: () => this.victory()
-        } as TutorialRunnerCallbacks;
+            victory: () => this.victory(),
+            giftCloudToPlayer: () => this.giftCloudToPlayer()
+        };
+        
+        const isEvolveScreenOpen$ = guiController.screenStateObservable().pipe(
+            map(screenState => screenState === 'Evolve'),
+            distinctUntilChanged(),
+            startWith(false)
+        )
 
         combineLatest(
             gameStateController.gameStateObservable()
-            .pipe(
-                first(),
-            ),
+                .pipe(
+                    first()
+                ),
             this.tutorial$
         ).pipe(
             filter(([_, tutorial]) => tutorial != null)
         ).subscribe(([state, tutorial]) => tutorial!.startGame(state, callbacks));
 
-        gameStateController.gameStateObservable()
-            .pipe(
-                skip(1), 
-                withLatestFrom(this.tutorial$),
-                filter(([_, tutorial]) => tutorial != null)
-            )
-            .subscribe(([state, tutorial]) => tutorial!.stateChange(state, callbacks));
+        combineLatest(
+            gameStateController.gameStateObservable(),
+            evolveSeedController.stagedSeedsObservable(),
+            isEvolveScreenOpen$,
+            gameStateController.currentPlayerObservable()
+        ).pipe(
+            skip(1), 
+            withLatestFrom(this.tutorial$),
+            filter(([_, tutorial]) => tutorial != null)
+        )
+        .subscribe(([[state, stagedSeeds, isEvolveScreenOpen, playerId], tutorial]) => {
+            tutorial!.stateChange(state, playerId, isEvolveScreenOpen, stagedSeeds, callbacks);
+        });
     }
 
     private showTips(messages: MessagePrompt[]) {
@@ -78,6 +94,22 @@ export class TutorialRunner {
         ).subscribe(() => {
             this.guiController.setScreenState("Main Menu");
             this.stopTutorial();
+        })
+    }
+
+    private giftCloudToPlayer() {
+        this.gameStateController.gameStateObservable().pipe(
+            first(),
+            withLatestFrom(this.gameStateController.currentPlayerObservable())
+        ).subscribe(([gameState, playerId]) => {
+            console.log("Gifting cloud to player");
+            const gameStateData = JSON.parse(JSON.stringify(gameState)) as GameStateData;
+
+            gameStateData.players[playerId].cloudOwned = "1";
+            gameStateData.clouds["1"] = {
+                tileIndex: -1
+            };
+            this.gameStateController.setState(new GameState(gameStateData));
         })
     }
 
