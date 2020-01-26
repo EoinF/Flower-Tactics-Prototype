@@ -3,7 +3,7 @@ import { FlowerType } from "../objects/FlowerType";
 import { SEED_INTERVALS } from "../constants";
 import { GuiController } from "../controllers/GuiController";
 import { GameStateController } from "../controllers/GameStateController";
-import { withLatestFrom, map } from "rxjs/operators";
+import { withLatestFrom, map, mergeMap, skip, first, flatMap, take, switchMap } from "rxjs/operators";
 import { GameDeltaController } from "../controllers/GameDeltaController";
 import { EvolveSeedController, EvolutionChoice } from "../controllers/EvolveSeedController";
 import { GameStateDelta } from "../objects/GameStateDelta";
@@ -13,6 +13,7 @@ import { StringMap } from "../types";
 import { Flower } from "../objects/Flower";
 import { FlowerAugmentation } from "../objects/FlowerAugmentation";
 import { calculateSeedEvolutionOutcome, calculateSeedEvolutionResults } from "../deltaCalculators/calculateSeedEvolve";
+import { gameStateController } from "../game";
 
 export function setupGameStateManager(
     gameStateController: GameStateController,
@@ -29,12 +30,17 @@ export function setupGameStateManager(
     const onClickEvolveButton$ = guiController.onClickEvolveButtonObservable();
     const evolveChoices$ = evolveSeedController.evolveChoicesObservable();
 
+    // Apply the end of turn delta
     guiController.endTurnObservable().pipe(
         withLatestFrom(gameState$, gameDelta$)
     ).subscribe(([_, gameState, gameDelta]) => {
-        const newState = nextState(gameState, gameDelta);
-        gameStateController.setState(newState);
+        nextState(gameState, gameDelta);
+    });
 
+    // Get the new state applied after ending turn
+    guiController.endTurnObservable().pipe(
+        withLatestFrom(gameState$.pipe(skip(1))),
+    ).subscribe(([_, newState]) => {
         const seedsRemainingByType: StringMap<number> = {};
         Object.keys(newState.seedStatus)
             .forEach(key => {
@@ -74,21 +80,22 @@ export function setupGameStateManager(
             withLatestFrom(gameState$, flowerNames$, stagedSeeds$)
         ).subscribe(([evolveStatus, gameState, flowerNames, _stagedSeeds]) => {
             const stagedSeeds = _stagedSeeds!;
-            const seedsToDelete = [{
-                type: stagedSeeds.type,
-                amount: SEED_INTERVALS[stagedSeeds.stagedAmount]
-            }];
-            gameStateController.setState(deleteSeeds(gameState, seedsToDelete));
+            const seedsRequired = SEED_INTERVALS[stagedSeeds.stagedAmount];
 
             if (evolveStatus != 'FAILURE') {
                 const evolutionResults = calculateSeedEvolutionResults(evolveStatus, stagedSeeds, gameState);
                 
-                const choices = evolutionResults.map(result => ({
+                const choices: EvolutionChoice[] = evolutionResults.map(result => ({
                     baseFlowerType: stagedSeeds.type,
                     newFlowerDelta: result,
-                    newFlowerName: flowerNames[gameState.getNextRandomNumber(0, flowerNames.length - 1)]
+                    newFlowerName: flowerNames[gameState.getNextRandomNumber(0, flowerNames.length - 1)],
+                    seedsRequired
                 }));
                 evolveSeedController.setEvolveChoices(choices);
+            } else {
+                const failureDelta = new GameStateDelta();
+                failureDelta.addDelta(["seedStatus", stagedSeeds.type, "quantity"], -seedsRequired);
+                gameStateController.applyDelta(failureDelta);
             }
         });
 
@@ -99,16 +106,8 @@ export function setupGameStateManager(
             withLatestFrom(gameState$, currentPlayerId$)
         )
         .subscribe(([evolveChoice, gameState, currentPlayerId]) => {
-            gameStateController.setState(applyEvolveResult(gameState, evolveChoice, currentPlayerId));
+            applyEvolveResult(gameState, evolveChoice, currentPlayerId);
         });
-}
-
-function getCopiedState(gameState: GameState): GameStateData {
-    const nextRandomNumberSeed = gameState!.getRandomNumberSeed();
-    const copiedData = JSON.parse(JSON.stringify(gameState)) as GameStateData;
-    return {
-        ...copiedData, randomNumberGeneratorSeed: nextRandomNumberSeed
-    };
 }
 
 function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): GameStateDelta {
@@ -130,13 +129,13 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): G
             const growthNeeded = Math.max(0, turnsUntilGrown - flower.growth);
             let survivalChance = tenacity - growthNeeded * 5;
             if (gameState.getNextRandomNumber(0, 99) >= survivalChance) {
-                finalDelta.addDelta(["flowersMap", key], null, "DELTA_REMOVE")
+                finalDelta.addDelta(["flowersMap", key], null, "DELTA_DELETE");
             }
         }
     });
 
     const placedSeeds = gameDelta.getIntermediateDelta<StringMap<PlacedSeed[]>>("placedSeeds") || {};
-    let newIndex = Math.max(...Object.keys(gameState.flowersMap).map(type => parseInt(type))) + 1;
+    let newIndex = Math.max(0, ...Object.keys(gameState.flowersMap).map(type => parseInt(type))) + 1;
     Object.keys(placedSeeds)
         .map(key => placedSeeds[key])
         .reduce((flatArray, nextArray) => [...flatArray, ...nextArray], []) // flatten
@@ -161,29 +160,14 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): G
 }
 
 function nextState(gameState: GameState, gameDelta: GameStateDelta) {
-    const copiedData = getCopiedState(gameState);
-    const finalDelta = calculateFinalDelta(gameState, gameDelta);
-    const updatedState = applyDeltas(copiedData, finalDelta);
-    
-    Object.keys(copiedData.seedStatus).forEach(key => {
-        const addedSeeds = Math.floor(copiedData.seedStatus[key].progress / 100);
-        copiedData.seedStatus[key].quantity += addedSeeds;
-        copiedData.seedStatus[key].progress %= 100
-    })
-
-    Object.keys(copiedData.flowerAugmentations).forEach(flowerKey => {
-        copiedData.flowerAugmentations[flowerKey] = copiedData.flowerAugmentations[flowerKey]
-            .filter(augmentation => augmentation != null);
-    })
-
-    return new GameState(updatedState);
+    gameStateController.applyDelta(calculateFinalDelta(gameState, gameDelta));
 }
 
-function applyDeltas<T>(gameData: T, deltas: GameStateDelta): T {
+export function applyDeltas<T>(gameData: T, deltas: GameStateDelta): T {
     deltas.getDeltas().forEach(delta => {
         const currentEntry = delta.keys.slice(0, delta.keys.length - 1).reduce((currentEntry, key) => {
             return currentEntry[key];
-        }, gameData);
+        }, gameData) as any;
         const lastKey = delta.keys[delta.keys.length - 1];
 
         if (delta.deltaType === "DELTA_ADD") {
@@ -192,6 +176,9 @@ function applyDeltas<T>(gameData: T, deltas: GameStateDelta): T {
             }
             currentEntry[lastKey] += delta.deltaValue as number;
         } else if (delta.deltaType === "DELTA_REMOVE") {
+            const entriesToRemove = delta.deltaValue as Array<any>;
+            currentEntry[lastKey] = currentEntry[lastKey].filter((_, index) => entriesToRemove.indexOf(index) === -1);
+        } else if (delta.deltaType === "DELTA_DELETE") {
             delete currentEntry[lastKey];
         } else if (delta.deltaType === "DELTA_REPLACE") {
             currentEntry[lastKey] = delta.deltaValue;
@@ -203,23 +190,26 @@ function applyDeltas<T>(gameData: T, deltas: GameStateDelta): T {
 }
 
 function applyEvolveResult(gameState: GameState, evolveChoice: EvolutionChoice, currentPlayerId: string) {
-    const copiedData = getCopiedState(gameState);
     const existingFlowerCopy = JSON.parse(JSON.stringify(gameState.flowerTypes[evolveChoice.baseFlowerType])) as FlowerType;
     const existingTypes = Object.keys(gameState.flowerTypes).map(type => parseInt(type));
     const nextType = (Math.max(...existingTypes) + 1).toString();
+
+    const evolveDelta = new GameStateDelta();
+
     const newFlower = {
         ...applyDeltas(existingFlowerCopy, evolveChoice.newFlowerDelta),
         name: evolveChoice.newFlowerName,
         type: nextType
     }
-    copiedData.flowerTypes[nextType] = newFlower;
-    copiedData.seedStatus[nextType] = {
+    evolveDelta.addDelta(["flowerTypes", nextType], newFlower, "DELTA_REPLACE");
+    evolveDelta.addDelta(["seedStatus", nextType], {
         type: newFlower.type,
         quantity: 1,
         progress: 0
-    };
-    copiedData.players[currentPlayerId].seedsOwned.push(newFlower.type);
-    return new GameState(copiedData);
+    }, "DELTA_REPLACE");
+    evolveDelta.addDelta(["seedStatus", evolveChoice.baseFlowerType, "quantity"], - evolveChoice.seedsRequired);
+    evolveDelta.addDelta(["players", currentPlayerId, "seedsOwned"], newFlower.type, "DELTA_APPEND");
+    gameStateController.applyDelta(evolveDelta);
 }
 
 function applyAugmentations(flowerType: FlowerType, flowerAugmentations: FlowerAugmentation[]): FlowerType {
@@ -235,11 +225,4 @@ function applyAugmentations(flowerType: FlowerType, flowerAugmentations: FlowerA
         }
     }, flowerType);
     return augmentedFlowerStats;
-}
-
-function deleteSeeds(gameState: GameState, seeds: Array<{type: string, amount: number}>) {
-    seeds.forEach((seed) => {
-        gameState.seedStatus[seed.type].quantity -= seed.amount;
-    });
-    return gameState;
 }

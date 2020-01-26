@@ -1,6 +1,6 @@
 import { GuiController } from "../controllers/GuiController";
 import { GameStateController } from "../controllers/GameStateController";
-import { first, withLatestFrom, skip, filter, startWith, map, distinctUntilChanged } from "rxjs/operators";
+import { first, withLatestFrom, skip, filter, startWith, map, distinctUntilChanged, mergeMap, tap, flatMap } from "rxjs/operators";
 import { TutorialBase } from "./TutorialBase";
 import { Subject, combineLatest } from "rxjs";
 import { Tile } from "../objects/Tile";
@@ -8,6 +8,7 @@ import { MapController } from "../controllers/MapController";
 import { MessagePrompt } from "../views/MessageQueueView";
 import { evolveSeedController } from "../game";
 import { GameStateData, GameState } from "../objects/GameState";
+import { GameStateDelta } from "../objects/GameStateDelta";
 
 export interface TutorialRunnerCallbacks {
     showTips: (messages: MessagePrompt[]) => void;
@@ -20,10 +21,13 @@ export class TutorialRunner {
     private guiController: GuiController;
     private mapController: MapController;
     private gameStateController: GameStateController;
+
     private tutorial$: Subject<TutorialBase | null>;
     
     constructor(guiController: GuiController, mapController: MapController, gameStateController: GameStateController) {
         this.tutorial$ = new Subject();
+        const victory$ = new Subject();
+        const giftCloudToPlayer$ = new Subject();
         this.guiController = guiController;
         this.mapController = mapController;
         this.gameStateController = gameStateController;
@@ -31,8 +35,8 @@ export class TutorialRunner {
         const callbacks: TutorialRunnerCallbacks = {
             showTips: (messages: MessagePrompt[]) => this.showTips(messages),
             focusTile: (tile: Tile) => this.focusTile(tile),
-            victory: () => this.victory(),
-            giftCloudToPlayer: () => this.giftCloudToPlayer()
+            victory: () => victory$.next(),
+            giftCloudToPlayer: () => giftCloudToPlayer$.next()
         };
         
         const isEvolveScreenOpen$ = guiController.screenStateObservable().pipe(
@@ -40,6 +44,23 @@ export class TutorialRunner {
             distinctUntilChanged(),
             startWith(false)
         )
+
+        victory$.pipe(
+            tap(() => {
+                this.guiController.createMessagePromptQueue([{
+                    title: "Victory",
+                    content: "Tutorial complete!",
+                    position: {x: 500, y: 300}
+                }]);
+            }),
+            flatMap(() => this.guiController.messagePromptObservable().pipe(
+                filter(prompt => prompt == null),
+                first()
+            ))
+        ).subscribe(() => {
+            this.guiController.setScreenState("Main Menu");
+            this.stopTutorial();
+        });
 
         combineLatest(
             gameStateController.gameStateObservable()
@@ -64,6 +85,19 @@ export class TutorialRunner {
         .subscribe(([[state, stagedSeeds, isEvolveScreenOpen, playerId], tutorial]) => {
             tutorial!.stateChange(state, playerId, isEvolveScreenOpen, stagedSeeds, callbacks);
         });
+
+        giftCloudToPlayer$.pipe(
+            withLatestFrom(this.gameStateController.currentPlayerObservable())
+        ).subscribe(([_, playerId]) => {
+            console.log("Gifting cloud to player");
+            const delta = new GameStateDelta();
+
+            delta.addDelta(["players", playerId, "cloudOwned"], "1", "DELTA_REPLACE");
+            delta.addDelta(["clouds", "1"], {
+                tileIndex: -1
+            }, "DELTA_REPLACE");
+            this.gameStateController.applyDelta(delta);
+        })
     }
 
     private showTips(messages: MessagePrompt[]) {
@@ -78,39 +112,6 @@ export class TutorialRunner {
                 const mapY = 48 * Math.floor(tile.index / nextState.numTilesX);
                 mapCamera.setScroll(mapX - mapCamera.width / 2, mapY - mapCamera.height / 2);
             });
-    }
-
-    private victory() {
-        this.guiController.createMessagePromptQueue([{
-                title: "Victory",
-                content: "Tutorial complete!",
-                position: {x: 500, y: 300}
-            }]
-        );
-
-        this.guiController.messagePromptObservable().pipe(
-            filter(prompt => prompt == null),
-            first()
-        ).subscribe(() => {
-            this.guiController.setScreenState("Main Menu");
-            this.stopTutorial();
-        })
-    }
-
-    private giftCloudToPlayer() {
-        this.gameStateController.gameStateObservable().pipe(
-            first(),
-            withLatestFrom(this.gameStateController.currentPlayerObservable())
-        ).subscribe(([gameState, playerId]) => {
-            console.log("Gifting cloud to player");
-            const gameStateData = JSON.parse(JSON.stringify(gameState)) as GameStateData;
-
-            gameStateData.players[playerId].cloudOwned = "1";
-            gameStateData.clouds["1"] = {
-                tileIndex: -1
-            };
-            this.gameStateController.setState(new GameState(gameStateData));
-        })
     }
 
     runTutorial(tutorial: TutorialBase) {

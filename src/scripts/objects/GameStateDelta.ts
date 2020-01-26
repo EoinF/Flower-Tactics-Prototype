@@ -4,11 +4,11 @@ type GameStateKey = number | string;
 
 interface GameStateDeltaInstance {
     keys: GameStateKey[];
-    deltaValue: number | null | object | string;
+    deltaValue: number | null | object | string| Array<any>;
     deltaType: DeltaType;
 }
 
-type DeltaType = "DELTA_ADD" | "DELTA_REMOVE" | "DELTA_REPLACE" | "DELTA_APPEND";
+type DeltaType = "DELTA_ADD" | "DELTA_REMOVE" | "DELTA_REPLACE" | "DELTA_APPEND" | "DELTA_DELETE";
 
 export class GameStateDelta {
     private deltas: StringMap<GameStateDeltaInstance>;
@@ -27,16 +27,16 @@ export class GameStateDelta {
                     ...existingValue, 
                     deltaValue: (existingValue.deltaValue as number) + (deltaValue as number)
                 };
-            } else if (deltaType === 'DELTA_APPEND') {
+            } else if (deltaType === 'DELTA_APPEND' || deltaType === 'DELTA_REMOVE') {
                 this.deltas[combinedKey] = {
                     ...existingValue,
                     deltaValue: [...(existingValue.deltaValue as Array<any>), deltaValue]
                 };
             } else {
-                console.log(`Warning: Can't apply ${deltaType} twice`);
+                console.log(`Warning: Can't apply ${deltaType} twice: ${keys} := ${deltaValue}`);
             }
         } else {
-            if (deltaType === 'DELTA_APPEND') {
+            if (deltaType === 'DELTA_APPEND' || deltaType === 'DELTA_REMOVE') {
                 this.deltas[combinedKey] = { keys, deltaValue: [deltaValue], deltaType};
             } else {
                 this.deltas[combinedKey] = { keys, deltaValue, deltaType};

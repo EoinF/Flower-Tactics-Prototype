@@ -42,19 +42,19 @@ export class GameState implements GameStateData {
     tileToFlowerIndexMap: Map<Tile, string>;
     tileToRiverMap: Map<Tile, River>;
     tileToMountainMap: Map<Tile, Mountain>;
-    flowers: Flower[];
 
-    constructor(data: GameStateData) {
+    turnCounter: number;
+
+    constructor(data: GameStateData, turnCounter: number = 0) {
         Object.keys(data).forEach(key => {
             this[key] = data[key];
         });
+        this.turnCounter = turnCounter;
         this.tileToFlowerIndexMap = new Map<Tile, string>();
         this.tileToRiverMap = new Map<Tile, River>();
         this.tileToMountainMap = new Map<Tile, Mountain>();
         this.randomNumberGenerator = new Phaser.Math.RandomDataGenerator(data.randomNumberGeneratorSeed);
         
-        this.flowers = Object.keys(data.flowersMap).map(key => data.flowersMap[key]);
-
         this.mapTilesToFlowers(data.flowersMap, this.tileToFlowerIndexMap);
         this.mapTilesToRivers(data.rivers, this.tileToRiverMap);
         this.mapTilesToMountains(data.mountains, this.tileToMountainMap);

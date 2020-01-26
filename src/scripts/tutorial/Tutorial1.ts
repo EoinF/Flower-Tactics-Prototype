@@ -17,7 +17,7 @@ export class Tutorial1 extends TutorialBase {
                 position: { x: 860, y: 516 }
             }
         ]);
-        callbacks.focusTile(gameState.getTileAt(gameState.flowers[0].x, gameState.flowers[0].y)!);
+        callbacks.focusTile(gameState.getTileAt(gameState.flowersMap["0"].x, gameState.flowersMap["0"].y)!);
     }
 
     constructor() {
@@ -25,9 +25,11 @@ export class Tutorial1 extends TutorialBase {
 
         this.addEvent(
             1, 
-            (gameState: GameState) => gameState.flowers.some(
-                flower => flower.growth >= gameState.getFlowerType(flower).turnsUntilGrown
-            ),
+            (gameState: GameState) => Object.keys(gameState.flowersMap)
+                .map(flowerKey => gameState.flowersMap[flowerKey])
+                .some(
+                    flower => flower.growth >= gameState.getFlowerType(flower).turnsUntilGrown
+                ),
             (callbacks: TutorialRunnerCallbacks) => {
                 callbacks.showTips([
                     {
@@ -70,7 +72,7 @@ export class Tutorial1 extends TutorialBase {
 
         this.addEvent(
             1,
-            (gameState: GameState) => gameState.flowers.length == 5,
+            (gameState: GameState) => Object.keys(gameState.flowersMap).length == 5,
             (callbacks: TutorialRunnerCallbacks) => {
                 callbacks.showTips([
                     {
@@ -94,7 +96,7 @@ export class Tutorial1 extends TutorialBase {
 
         this.addEvent(
             1,
-            (gameState: GameState) => gameState.flowers.some(flower => flower.y == 0),
+            (gameState: GameState) => Object.keys(gameState.flowersMap).some(flowerKey => gameState.flowersMap[flowerKey].y == 0),
             (callbacks: TutorialRunnerCallbacks) => {
                 callbacks.victory();
             }

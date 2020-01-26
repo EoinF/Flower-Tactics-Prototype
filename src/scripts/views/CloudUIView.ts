@@ -2,7 +2,7 @@ import { ImageButton } from "../widgets/generic/ImageButton";
 import { COLOURS } from "../constants";
 import { HeldObjectController } from "../controllers/HeldObjectController";
 import { GuiController } from "../controllers/GuiController";
-import { withLatestFrom, distinctUntilChanged } from "rxjs/operators";
+import { withLatestFrom } from "rxjs/operators";
 import { combineLatest } from "rxjs";
 import { GameStateController } from "../controllers/GameStateController";
 
@@ -17,6 +17,13 @@ export class CloudUIView {
         )
             .setBorder(1, COLOURS.BLACK)
             .onClick(() => guiController.clickCloudPlacementButton());
+        
+        combineLatest(
+            gameStateController.gameStateObservable(),
+            gameStateController.currentPlayerObservable()
+        ).subscribe(([gameState, currentPlayerId]) => {
+            cloudPlacementButton.setVisible(gameState.players[currentPlayerId].cloudOwned != null);
+        })
 
         guiController.onClickCloudPlacementButtonObservable().pipe(
             withLatestFrom(heldObjectController.isHoldingCloudObservable())

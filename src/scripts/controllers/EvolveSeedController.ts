@@ -13,6 +13,7 @@ export interface EvolutionChoice {
     baseFlowerType: string;
     newFlowerDelta: GameStateDelta;
     newFlowerName: string;
+    seedsRequired: number;
 }
 
 export class EvolveSeedController {

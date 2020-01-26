@@ -41,7 +41,8 @@ export class SeedInventoryView extends BaseUIObject {
         super(scene, x, y, width, height);
         this.scene = scene;
         this.container.setBackground(COLOURS.PURPLE_200)
-            .setBorder(1, COLOURS.BLACK)
+            .setBorder(1, COLOURS.BLACK);
+        this.inventoryMap = {};
 
         const seedSelectionTitle = new TextLabel(scene, 0, 8, "My Seeds", COLOURS.BLACK, { isBold: true, fontSize: 16 });
         this.seedSelectionGrid = new UIContainer(scene, 2, 16 + seedSelectionTitle.height, this.container.width - 4, this.container.height - 4);
@@ -93,9 +94,9 @@ export class SeedInventoryView extends BaseUIObject {
             })
         });
 
-        flowerSelectionController.selectedFlowerTypeObservable().pipe(
+        combineLatest(gameStateController.loadMapObservable(), flowerSelectionController.selectedFlowerTypeObservable()).pipe(
             withLatestFrom(evolveSeedController.stagedSeedsObservable())
-        ).subscribe(([type, stagedSeeds]) => {
+        ).subscribe(([[_, type], stagedSeeds]) => {
             if (stagedSeeds !== null && stagedSeeds.type !== type) {
                 evolveSeedController.unstageAllSeeds();
             }

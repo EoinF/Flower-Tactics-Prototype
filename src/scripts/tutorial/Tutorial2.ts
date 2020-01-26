@@ -17,7 +17,7 @@ export class Tutorial2 extends TutorialBase {
                 position: undefined
             }
         ]);
-        callbacks.focusTile(gameState.getTileAt(gameState.flowers[0].x, gameState.flowers[0].y)!);
+        callbacks.focusTile(gameState.getTileAt(gameState.flowersMap["0"].x, gameState.flowersMap["0"].y)!);
     }
 
     constructor() {

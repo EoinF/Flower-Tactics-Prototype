@@ -12,26 +12,37 @@ export function calculateFlowerDelta(gameState: GameState, gameStateDelta: GameS
         const tile = gameState.getTileAt(flower.x, flower.y)!;
         const bonusFromWater = 1 + gameState.getTileWaterContent(tile);
         
-        const deltas = getFlowerEffect(tile, flower, key, gameState.flowerTypes, bonusFromWater);
-        gameStateDelta.combineDeltas(deltas);
+        getFlowerEffect(gameStateDelta, tile, flower, key, gameState, bonusFromWater);
     });
 }
 
-function getFlowerEffect(tile: Tile, flower: Flower, flowerKey: string, flowerTypes: StringMap<FlowerType>, bonusMultiplier: number): GameStateDelta {
+function getFlowerEffect(deltas: GameStateDelta, tile: Tile, flower: Flower, flowerKey: string, gameState: GameState, bonusMultiplier: number): GameStateDelta {
     const {
         turnsUntilGrown,
         seedProductionRate
-    } = flowerTypes[flower.type];
-    
-    const deltas = new GameStateDelta();
+    } = gameState.flowerTypes[flower.type];
+
+    const {
+        progress
+    } = gameState.seedStatus[flower.type];
+
     
     if (flower.growth < turnsUntilGrown) {
-        if (isRequirementsSatisfied(tile.soil, flowerTypes[flower.type])) {
+        if (isRequirementsSatisfied(tile.soil, gameState.flowerTypes[flower.type])) {
             const growthDelta = Math.min(Math.floor(+1 * bonusMultiplier), turnsUntilGrown - flower.growth);
             deltas.addDelta(["flowersMap", flowerKey, "growth"], growthDelta);
         }
     } else {
-        deltas.addDelta(["seedStatus", flower.type, "progress"], Math.floor(seedProductionRate * bonusMultiplier));
+        const savedDeltaProgress = deltas.getDelta(["seedStatus", flower.type, "progress"]);
+        const previousDeltaProgress = (savedDeltaProgress ? savedDeltaProgress.deltaValue as number : 0);
+        const additionalProgress = seedProductionRate * bonusMultiplier;
+        const currentProgress = progress + previousDeltaProgress;
+        const newProgress = currentProgress + additionalProgress;
+        const newDeltaQuantity = Math.floor(newProgress / 100);
+        const newDeltaProgress = (newProgress % 100) - progress;
+
+        deltas.addDelta(["seedStatus", flower.type, "progress"], newDeltaProgress - previousDeltaProgress);
+        deltas.addDelta(["seedStatus", flower.type, "quantity"], newDeltaQuantity);
         deltas.addDelta(["flowersMap", flowerKey, "growth"], +1);
     }
 
