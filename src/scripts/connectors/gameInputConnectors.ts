@@ -49,10 +49,11 @@ export function setupGameInputConnectors(
                 const isOtherOwnedSeedTypeBlockingTile = playerOwnedTypeOnTile != null && playerOwnedTypeOnTile !== heldSeed.type;
 
                 const tile = gameState.tiles[clickedTile];
+                const isMountainBlockingTile = (gameState.getMountainAtTile(tile) != null);
+
                 const playerFlowers = gameState.players[currentPlayerId].flowers;
                 const { x, y } = indexToMapCoordinates(clickedTile, gameState.numTilesX);
                 const isFlowerBlockingTile = (gameState.getFlowerIndexAtTile(tile) != null);
-                const isMountainBlockingTile = (gameState.getMountainAtTile(tile) != null);
                 const isFlowerAdjacent = gameState.getTilesAdjacent(x, y).some(adjacentTile => {
                     const flowerAtTile = gameState.getFlowerIndexAtTile(adjacentTile);
                     return flowerAtTile != null && playerFlowers.indexOf(flowerAtTile) !== -1
