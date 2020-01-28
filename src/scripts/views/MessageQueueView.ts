@@ -29,13 +29,13 @@ export class MessageQueueView extends BaseUIObject {
             maxWidth: popupContainer.width - 32
         });
         const nextButton = new TextButton(scene, 16, 16, 72, 28, "Next", COLOURS.WHITE)
-            .setBackground(COLOURS.BLUE_100, COLOURS.BLUE_700)
+            .setBackground(COLOURS.BLUE_500, COLOURS.BLUE_700)
             .setBorder(1, COLOURS.BLACK)
             .onClick(() => {
                 guiController.nextMessagePrompt();
             });
         const doneButton = new TextButton(scene, 16, 16, 72, 28, "Ok", COLOURS.WHITE)
-            .setBackground(COLOURS.BLUE_100, COLOURS.BLUE_700)
+            .setBackground(COLOURS.BLUE_500, COLOURS.BLUE_700)
             .setBorder(1, COLOURS.BLACK)
             .onClick(() => {
                 guiController.nextMessagePrompt();

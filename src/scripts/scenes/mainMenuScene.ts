@@ -8,6 +8,7 @@ import { Tutorial1 } from "../tutorial/Tutorial1";
 import { Tutorial2 } from "../tutorial/Tutorial2";
 import { filter, mapTo, startWith, tap, first, skip } from "rxjs/operators";
 import { LevelSelectView } from "../views/MainMenu/LevelSelectView";
+import { MainMenuView } from "../views/MainMenu/MainMenuView";
 
 export default class MainMenuScene extends Phaser.Scene {
     constructor() {
@@ -16,8 +17,10 @@ export default class MainMenuScene extends Phaser.Scene {
 
     create() {
         guiController.setScreenState("Main Menu");
+        mainMenuController.setActiveMenuScreen("MAIN_MENU");
         this.scene.launch("PreloadScene");
         new LevelSelectView(this, mainMenuController);
+        new MainMenuView(this, mainMenuController);
 
         const onLoadedGameAssets$ = mainMenuController.onFinishedLoadingGameAssetsObservable();
         const onSelectLevel$ = mainMenuController.loadLevelObservable();

@@ -27,7 +27,7 @@ export class EvolveControlsView extends BaseUIObject {
             });
             
         const evolveButton = new TextButton(scene, 8, 8, 112, 32, "Evolve", COLOURS.WHITE)
-            .setBackground(COLOURS.BLUE_100, COLOURS.BLUE_700)
+            .setBackground(COLOURS.BLUE_500, COLOURS.BLUE_700)
             .setBorder(1, COLOURS.BLACK)
             .onClick(() => {
                 guiController.clickEvolveButton();

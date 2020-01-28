@@ -23,6 +23,7 @@ export class FlowerStatsDisplay implements UIObject {
     borderThickness: number;
     borderColour: Phaser.Display.Color;
     visible: boolean;
+    active: boolean;
 
     protected container: UIContainer;
 
@@ -138,6 +139,12 @@ export class FlowerStatsDisplay implements UIObject {
 
     setScale(scaleX: number, scaleY: number | undefined = undefined) {
         this.container.setScale(scaleX, scaleY);
+        return this;
+    }
+
+    setActive(isActive: boolean) {
+        this.active = isActive;
+        this.container.setActive(isActive);
         return this;
     }
 

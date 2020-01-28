@@ -10,6 +10,8 @@ export interface UIObject {
     originY: number;
     alpha: number;
     visible: boolean;
+    active: boolean;
+    setActive: (isActive: boolean) => UIObject;
     setAlpha: (alpha: number) => UIObject;
     setPosition: (x: number, y: number) => UIObject;
     setVisible: (isVisible: boolean) => UIObject;
@@ -31,6 +33,7 @@ export class BaseUIObject implements UIObject {
     originX: number;
     originY: number;
 
+    active: boolean;
     alpha: number;
     borderThickness: number;
     borderColour: Phaser.Display.Color;
@@ -55,6 +58,7 @@ export class BaseUIObject implements UIObject {
         this.alpha = 1;
         this.borderThickness = 0;
         this.visible = true;
+        this.active = true;
     }
     
     setPosition (x: number, y: number) {
@@ -71,6 +75,11 @@ export class BaseUIObject implements UIObject {
     }
     setDepth (depth: number) {
         this.container.setDepth(depth);
+        return this;
+    }
+    setActive(isActive: boolean) {
+        this.active = isActive;
+        this.container.setActive(isActive);
         return this;
     }
 
@@ -100,6 +109,7 @@ export class BaseUIObject implements UIObject {
     }
 
     setAlpha(alpha: number) {
+        this.alpha = alpha;
         this.container.setAlpha(alpha);
         return this;
     }

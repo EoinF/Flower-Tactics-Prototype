@@ -25,6 +25,7 @@ export class TextLabel implements UIObject {
     alpha: number;
     depth: number;
     visible: boolean;
+    active: boolean;
 
     constructor(scene: Phaser.Scene,
         x: number, y: number, text: string | string[],
@@ -61,6 +62,7 @@ export class TextLabel implements UIObject {
         this.x = x;
         this.y = y;
         
+        this.active = true;
         this.depth = 0;
         this.depthOffset = 0;
         this.visible = true;
@@ -99,6 +101,12 @@ export class TextLabel implements UIObject {
     setVisible(isVisible: boolean) {
         this.visible = isVisible;
         this.textObject.setVisible(isVisible);
+        return this;
+    }
+
+    setActive(isActive: boolean) {
+        this.active = isActive;
+        this.textObject.setActive(isActive);
         return this;
     }
 

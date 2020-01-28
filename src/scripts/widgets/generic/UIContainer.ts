@@ -1,7 +1,6 @@
 import { getAlignedCoordinates } from "../utils";
 import { UIObject } from "./UIObject";
 import { VerticalAlignment, HorizontalAlignment } from "../../types";
-import { COLOURS } from "../../constants";
 
 export class UIContainer implements UIObject {
     private scene: Phaser.Scene;
@@ -23,6 +22,7 @@ export class UIContainer implements UIObject {
     strokeThickness: number;
     protected isInteractive: boolean;
     visible: boolean;
+    active: boolean;
 
     children: Array<UIObject | UIContainer>;
 
@@ -41,6 +41,7 @@ export class UIContainer implements UIObject {
         this.originX = this.originY = 0;
 
         this.alpha = 1;
+        this.active = true;
         this.alphaMode = "auto";
         this.depthMode = "inherit";
         this.depth = 0;
@@ -110,6 +111,7 @@ export class UIContainer implements UIObject {
         if (!this.visible) {
             child.setVisible(false);
         }
+        child.setActive(this.active);
         return this;
     }
     
@@ -195,6 +197,12 @@ export class UIContainer implements UIObject {
         );
     }
 
+    setActive(isActive: boolean) {
+        this.active = isActive;
+        this.children.forEach(child => child.setActive(isActive));
+        return this;
+    }
+
     setAlpha(alpha: number, alphaMode: "auto" | "inherit" = "auto") {
         this.alpha = alpha;
         this.alphaMode = alphaMode;
@@ -204,7 +212,6 @@ export class UIContainer implements UIObject {
         }
         return this;
     }
-
     
     setScale(scaleX: number, scaleY: number | undefined = undefined): UIObject {
         this.children.forEach(child => child.setScale(scaleX, scaleY));

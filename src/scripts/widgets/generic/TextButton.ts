@@ -12,12 +12,13 @@ export class TextButton extends BaseButton {
         textColour: Phaser.Display.Color = COLOURS.BLACK,
         colourUp: Phaser.Display.Color = COLOURS.WHITE,
         colourDown: Phaser.Display.Color = COLOURS.LIGHT_GRAY,
+        fontSize: number = 16,
         verticalAlignment: VerticalAlignment = "Top",
         horizontalAlignment: HorizontalAlignment = "Left") {
 
         super(scene, x, y, width, height, colourUp, colourDown, verticalAlignment, horizontalAlignment);
         
-        const buttonText = new TextLabel(scene, 0, 0, text, textColour, {isBold: true});
+        const buttonText = new TextLabel(scene, 0, 0, text, textColour, {isBold: true, fontSize});
         this.container.addChild(buttonText, "Middle", "Middle");
     }
 }

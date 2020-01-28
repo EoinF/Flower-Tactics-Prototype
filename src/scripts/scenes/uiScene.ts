@@ -23,7 +23,7 @@ export default class UIScene extends Phaser.Scene {
 	const endTurnButtonPadding = 10;
 
 	const endTurnButton = new TextButton(this, endTurnButtonPadding, 8, 98, 24, "End Turn", COLOURS.BLACK,
-		COLOURS.WHITE, COLOURS.LIGHT_GRAY, "Bottom", "Right"
+		COLOURS.WHITE, COLOURS.LIGHT_GRAY, undefined, "Bottom", "Right"
 	)
 		.setBorder(1, COLOURS.PURPLE_500)
 		.onClick(() => guiController.endTurn());

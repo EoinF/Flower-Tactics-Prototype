@@ -17,12 +17,15 @@ export class EvolveChanceView implements UIObject {
     borderThickness: number;
     borderColour: Phaser.Display.Color;
     visible: boolean;
+    active: boolean;
 
     protected container: FlexUIContainer;
 
     constructor(scene: Phaser.Scene,
         x: number, y: number,
         width: number, evolveSeedController: EvolveSeedController) {
+
+        this.active = true;
         
         this.container = new FlexUIContainer(scene, x, y, width, "grow")
             .setBackground(COLOURS.PURPLE_600)
@@ -111,6 +114,12 @@ export class EvolveChanceView implements UIObject {
 
     removeInteractive() {
         this.container.removeInteractive();
+        return this;
+    }
+
+    setActive(isActive: boolean) {
+        this.active = isActive;
+        this.container.setActive(isActive);
         return this;
     }
 
