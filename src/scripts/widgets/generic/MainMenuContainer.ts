@@ -23,7 +23,7 @@ export class MainMenuContainer extends FlexUIContainer {
 
     addButton(scene: Phaser.Scene, label: string, onClick: (pointer: Phaser.Input.Pointer) => void) {
         return this.addChild(
-            new TextButton(scene, 0, 8, 200, 40, label).onClick(onClick)
+            new TextButton(scene, 0, 8, 250, 40, label).onClick(onClick)
         );
     }
 

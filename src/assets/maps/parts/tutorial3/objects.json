@@ -1,0 +1,66 @@
+{
+    "players": {
+        "1": {
+            "cloudOwned": null,
+            "seedsOwned": ["1"],
+            "flowers": ["0"],
+            "autoReplantTileMap": {}
+        }
+    },
+    "seedStatus": {
+        "1": {
+            "type": "1",
+            "quantity": 0,
+            "progress": 0
+        }
+    },
+    "flowerAugmentations": {},
+    "flowerTypes": {
+        "1": {
+            "type": "1",
+            "name": "Daisy",
+            "turnsUntilGrown": 2,
+            "turnsUntilDead": 9999,
+            "seedProductionRate": 95,
+            "tenacity": 0,
+            "nitrogenMin": 1800,
+            "nitrogenMax": 2300,
+            "phosphorousMin": 2000,
+            "phosphorousMax": 2500,
+            "potassiumMin": 1100,
+            "potassiumMax": 1500
+        }
+    },
+    "clouds": {},
+    "rivers": [],
+    "mountains": [
+        {
+            "x": 2,
+            "y": 1
+        },
+        {
+            "x": 3,
+            "y": 1
+        },
+        {
+            "x": 2,
+            "y": 2
+        },
+        {
+            "x": 3,
+            "y": 2
+        },
+        {
+            "x": 3,
+            "y": 3
+        }
+    ],
+    "flowersMap": {
+        "0": {
+            "x": 0,
+            "y": 6,
+            "type": "1",
+            "growth": 0
+        }
+    }
+}

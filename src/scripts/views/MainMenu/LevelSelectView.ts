@@ -11,10 +11,9 @@ export class LevelSelectView {
         const container = new MainMenuContainer(scene, "Select a Level to Play");
 
         const maps = [
-            { label: "Tutorial 1", mapName: "tutorial1" },
-            { label: "Tutorial 2", mapName: "tutorial2" },
-            { label: "Tutorial 3", mapName: "tutorial3" },
-            { label: "Test", mapName: "test" },
+            { label: "Growth & Expansion", mapName: "tutorial1" },
+            { label: "Evolve & Adapt", mapName: "tutorial2" },
+            { label: "Compete & Conquer", mapName: "tutorial3" }
         ];
 
         maps.forEach(level => {
