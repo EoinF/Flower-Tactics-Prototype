@@ -21,7 +21,7 @@ export class Tutorial2 extends TutorialBase {
     }
 
     constructor() {
-        super("Evolve & Enhance");
+        super("Evolve & Adapt");
 
         this.addEvent(
             1,

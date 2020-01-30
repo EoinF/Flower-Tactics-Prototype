@@ -3,11 +3,12 @@ import { TutorialRunnerCallbacks } from "./TutorialRunner";
 import { StagedSeed } from "../controllers/EvolveSeedController";
 
 type TutorialEventPredicate = (gameState: GameState, playerId: string, isEvolveScreenOpen: boolean, stagedSeed: StagedSeed | null) => boolean;
+type GameEffect = (callback: TutorialRunnerCallbacks, gameState: GameState) => void;
 
 interface TutorialEvent {
     occurrencesRemaining: number;
     predicate: TutorialEventPredicate;
-    effect: (callback: TutorialRunnerCallbacks) => void;
+    effect: GameEffect;
 }
 
 export abstract class TutorialBase {
@@ -26,13 +27,13 @@ export abstract class TutorialBase {
             if (event.occurrencesRemaining > 0) {
                 if (event.predicate(gameState, playerId, isEvolveScreenOpen, stagedSeed)) {
                     event.occurrencesRemaining--;
-                    event.effect(callbacks);
+                    event.effect(callbacks, gameState);
                 }
             }
         })
     }
 
-    addEvent(numOccurrences: number, predicate: TutorialEventPredicate, effect: (callbacks: TutorialRunnerCallbacks) => void) {
+    addEvent(numOccurrences: number, predicate: TutorialEventPredicate, effect: GameEffect) {
         this.events.push({
             occurrencesRemaining: numOccurrences,
             predicate,

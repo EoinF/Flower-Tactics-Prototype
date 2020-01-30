@@ -40,8 +40,8 @@ export function setupGameStateManager(
 
     // Get the new state applied after ending turn
     guiController.endTurnObservable().pipe(
-        withLatestFrom(gameState$.pipe(skip(1)), currentPlayerId$),
-    ).subscribe(([_, newState, currentPlayerId]) => {
+        withLatestFrom(gameState$.pipe(skip(1))),
+    ).subscribe(([_, newState]) => {
         const seedsRemainingByType: StringMap<number> = {};
         Object.keys(newState.seedStatus)
             .forEach(key => {
@@ -55,7 +55,7 @@ export function setupGameStateManager(
                 const type = newState.players[playerId].autoReplantTileMap[tileIndexKey];
                 const tileIndex = parseInt(tileIndexKey);
 
-                const playerFlowers = newState.players[currentPlayerId].flowers;
+                const playerFlowers = newState.players[playerId].flowers;
                 const { x, y } = indexToMapCoordinates(tileIndex, newState.numTilesX);
                 const isFlowerBlockingTile = (newState.getFlowerIndexAtTile(newState.tiles[tileIndex]) != null);
                 const isFlowerAdjacent = newState.getTilesAdjacent(x, y).some(adjacentTile => {

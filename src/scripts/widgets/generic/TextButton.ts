@@ -18,7 +18,7 @@ export class TextButton extends BaseButton {
 
         super(scene, x, y, width, height, colourUp, colourDown, verticalAlignment, horizontalAlignment);
         
-        const buttonText = new TextLabel(scene, 0, 0, text, textColour, {isBold: true, fontSize});
+        const buttonText = new TextLabel(scene, 0, 0, text, textColour, {isBold: false, fontSize});
         this.container.addChild(buttonText, "Middle", "Middle");
     }
 }

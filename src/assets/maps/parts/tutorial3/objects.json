@@ -5,12 +5,27 @@
             "seedsOwned": ["1"],
             "flowers": ["0"],
             "autoReplantTileMap": {}
+        },
+        "2": {
+            "cloudOwned": null,
+            "seedsOwned": ["2"],
+            "flowers": ["1","2","3"],
+            "autoReplantTileMap": {
+                "27": "2",
+                "31": "2",
+                "32": "2"
+            }
         }
     },
     "seedStatus": {
         "1": {
             "type": "1",
-            "quantity": 0,
+            "quantity": 400,
+            "progress": 0
+        },
+        "2": {
+            "type": "2",
+            "quantity": 99999,
             "progress": 0
         }
     },
@@ -21,7 +36,21 @@
             "name": "Daisy",
             "turnsUntilGrown": 2,
             "turnsUntilDead": 9999,
-            "seedProductionRate": 95,
+            "seedProductionRate": 1,
+            "tenacity": 0,
+            "nitrogenMin": 1800,
+            "nitrogenMax": 2300,
+            "phosphorousMin": 2000,
+            "phosphorousMax": 2500,
+            "potassiumMin": 1100,
+            "potassiumMax": 1500
+        },
+        "2": {
+            "type": "2",
+            "name": "Rotweed",
+            "turnsUntilGrown": 3,
+            "turnsUntilDead": 2,
+            "seedProductionRate": 0,
             "tenacity": 0,
             "nitrogenMin": 1800,
             "nitrogenMax": 2300,
@@ -35,24 +64,28 @@
     "rivers": [],
     "mountains": [
         {
+            "x": 0,
+            "y": 5
+        },
+        {
+            "x": 1,
+            "y": 5
+        },
+        {
+            "x": 0,
+            "y": 4
+        },
+        {
+            "x": 1,
+            "y": 4
+        },
+        {
             "x": 2,
-            "y": 1
+            "y": 4
         },
         {
             "x": 3,
-            "y": 1
-        },
-        {
-            "x": 2,
-            "y": 2
-        },
-        {
-            "x": 3,
-            "y": 2
-        },
-        {
-            "x": 3,
-            "y": 3
+            "y": 4
         }
     ],
     "flowersMap": {
@@ -60,6 +93,24 @@
             "x": 0,
             "y": 6,
             "type": "1",
+            "growth": 0
+        },
+        "1": {
+            "x": 1,
+            "y": 6,
+            "type": "2",
+            "growth": 2
+        },
+        "2": {
+            "x": 2,
+            "y": 6,
+            "type": "2",
+            "growth": 1
+        },
+        "3": {
+            "x": 2,
+            "y": 5,
+            "type": "2",
             "growth": 0
         }
     }

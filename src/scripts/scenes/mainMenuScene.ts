@@ -9,6 +9,7 @@ import { Tutorial2 } from "../tutorial/Tutorial2";
 import { filter, mapTo, startWith, tap, first, skip } from "rxjs/operators";
 import { LevelSelectView } from "../views/MainMenu/LevelSelectView";
 import { MainMenuView } from "../views/MainMenu/MainMenuView";
+import { Tutorial3 } from "../tutorial/Tutorial3";
 
 export default class MainMenuScene extends Phaser.Scene {
     constructor() {
@@ -91,6 +92,9 @@ export default class MainMenuScene extends Phaser.Scene {
             }
             if (mapName === "tutorial2") {
                 tutorialRunner.runTutorial(new Tutorial2());
+            }
+            if (mapName === "tutorial3") {
+                tutorialRunner.runTutorial(new Tutorial3());
             }
 
             gameStateController.loadGame(initialState);

@@ -8,7 +8,7 @@ export class LevelSelectView {
     private loadingMessage: TextLabel;
 
     constructor(scene: Phaser.Scene, mainMenuController: MainMenuController) {
-        const container = new MainMenuContainer(scene, "Select a Level to Play");
+        const container = new MainMenuContainer(scene, "Select a Tutorial");
 
         const maps = [
             { label: "Growth & Expansion", mapName: "tutorial1" },

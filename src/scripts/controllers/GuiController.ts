@@ -1,6 +1,6 @@
-import { Observable, Subject, ReplaySubject, BehaviorSubject } from 'rxjs';
-import { map, distinctUntilChanged, startWith } from 'rxjs/operators';
-import { MessagePrompt } from '../views/MessageQueueView';
+import { Observable, Subject, ReplaySubject, BehaviorSubject, timer } from 'rxjs';
+import { map, distinctUntilChanged, startWith, delay, delayWhen } from 'rxjs/operators';
+import { MessagePrompt, MessagePromptWithDelay } from '../views/MessageQueueView';
 import { MapLocation } from './MapController';
 
 interface MessagePromptQueue {
@@ -143,6 +143,10 @@ export class GuiController {
         return this.messagePromptQueue$
             .pipe(
                 map(({index, messagePrompts}) => messagePrompts != null && index < messagePrompts.length ? messagePrompts[index] : null),
+                delayWhen((messagePrompt) => timer(
+                    messagePrompt != null && (messagePrompt.hasOwnProperty('delay')) 
+                    ? (messagePrompt as MessagePromptWithDelay).delay
+                    : 0)),
                 distinctUntilChanged(),
             )
     }

@@ -6,11 +6,19 @@ import { TextButton } from "../widgets/generic/TextButton";
 import { withLatestFrom } from "rxjs/operators";
 import { BaseUIObject } from "../widgets/generic/UIObject";
 
-export interface MessagePrompt {
+export interface MessagePromptWithDelay {
+    position: {x: number, y: number} | undefined;
+    title: string;
+    content: string;
+    delay: number;
+}
+export interface MessagePromptWithoutDelay {
     position: {x: number, y: number} | undefined;
     title: string;
     content: string;
 }
+
+export type MessagePrompt = MessagePromptWithDelay | MessagePromptWithoutDelay;
 
 export class MessageQueueView extends BaseUIObject {
     constructor(scene: Phaser.Scene, guiController: GuiController) {
