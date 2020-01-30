@@ -138,12 +138,14 @@ export class MapView {
 		
 		gameActionController.placedSeedsMapObservable()
 			.pipe(
-				withLatestFrom(gameStateController.gameStateObservable())
+				withLatestFrom(gameStateController.gameStateObservable(), gameStateController.currentPlayerObservable())
 			)
-			.subscribe(([placedSeeds, gameState]) => {
+			.subscribe(([placedSeeds, gameState, currentPlayerId]) => {
 				this.placedSeedSprites.forEach(sprite => sprite.destroy());
 				this.placedSeedSprites.clear();
-				placedSeeds.getAllSeeds().forEach(placedSeed => {
+				placedSeeds.getAllSeeds().filter(seed =>
+					seed.ownerId === currentPlayerId
+				).forEach(placedSeed => {
 					if (placedSeed.amount > 0) {
 						this.addNewSeed(placedSeed, gameState);
 					}
@@ -230,9 +232,9 @@ export class MapView {
 	addNewSeed(placedSeed: PlacedSeed, gameState: GameState) {
 		const location = indexToMapCoordinates(placedSeed.tileIndex, gameState.numTilesX);
 		const placedSeedWidget = new PlacedSeedWidget(this.scene, 
-			(location.x * 48) - 24, (location.y * 48) - 24, 
-			48, 48, 
-			placedSeed.amount, 
+			(location.x * 48) - 24, (location.y * 48) - 24,
+			48, 48,
+			placedSeed.amount,
 			getPlayerColour(placedSeed.ownerId)
 		);
 		
