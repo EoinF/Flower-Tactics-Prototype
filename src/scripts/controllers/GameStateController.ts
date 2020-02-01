@@ -89,7 +89,7 @@ export class GameStateController {
                         delayedBy: ACTION_RESOLUTION_DURATION
                     });
                     nextPhases.push({
-                        nextPhase: 'ACTION', 
+                        nextPhase: 'ACTION',
                         delayedBy: ACTION_RESOLUTION_DURATION + APPLYING_DELTAS_DURATION
                     });
                 } else {

@@ -155,4 +155,8 @@ export class TextLabel implements UIObject {
         this.textObject.setScale(scaleX, scaleY);
         return this;
     }
+
+    getTextObject() {
+        return this.textObject;
+    }
 }

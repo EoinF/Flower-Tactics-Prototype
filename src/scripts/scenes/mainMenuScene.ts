@@ -63,6 +63,7 @@ export default class MainMenuScene extends Phaser.Scene {
                 this.scene.pause();
             }
         });
+        mainMenuController.loadLevel("tutorial3"); // TODO: Remove this
     }
 
 	getMapImageData(textureKey: string) {
@@ -87,15 +88,15 @@ export default class MainMenuScene extends Phaser.Scene {
 
             const initialState = mapLoader.loadMap(imageData, objectData);
 
-            if (mapName === "tutorial1") {
-                tutorialRunner.runTutorial(new Tutorial1());
-            }
-            if (mapName === "tutorial2") {
-                tutorialRunner.runTutorial(new Tutorial2());
-            }
-            if (mapName === "tutorial3") {
-                tutorialRunner.runTutorial(new Tutorial3());
-            }
+            // if (mapName === "tutorial1") {
+            //     tutorialRunner.runTutorial(new Tutorial1());
+            // }
+            // if (mapName === "tutorial2") {
+            //     tutorialRunner.runTutorial(new Tutorial2());
+            // }
+            // if (mapName === "tutorial3") {
+            //     tutorialRunner.runTutorial(new Tutorial3());
+            // }
 
             gameStateController.loadGame(initialState);
             this.load.removeAllListeners();

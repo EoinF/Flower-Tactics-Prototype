@@ -34,7 +34,8 @@ export class TileWidget extends ClickableWidget {
         this.tileIndex = tileIndex;
         this.soilColourConverter = soilColourConverter;
 
-        this.container.setDepth(this.container.depth, "auto");
+        this.container.setDepth(this.container.depth, "auto")
+            .setBorder(1, COLOURS.withAlpha(COLOURS.LIGHT_GRAY, 0.2));
         this.soilImage =  scene.add.image(0, 0, "blank-tile");
         this.waterImage = scene.add.image(0, 0, "droplet")
             .setDepth(7);
