@@ -3,7 +3,7 @@ import { FlowerType } from "../objects/FlowerType";
 import { SEED_INTERVALS } from "../constants";
 import { GuiController } from "../controllers/GuiController";
 import { GameStateController } from "../controllers/GameStateController";
-import { withLatestFrom, map, mergeMap, skip, first, flatMap, take, switchMap } from "rxjs/operators";
+import { withLatestFrom, map, mergeMap, skip, first, flatMap, take, switchMap, filter } from "rxjs/operators";
 import { GameDeltaController } from "../controllers/GameDeltaController";
 import { EvolveSeedController, EvolutionChoice } from "../controllers/EvolveSeedController";
 import { GameStateDelta } from "../objects/GameStateDelta";
@@ -31,16 +31,22 @@ export function setupGameStateManager(
     const onClickEvolveButton$ = guiController.onClickEvolveButtonObservable();
     const evolveChoices$ = evolveSeedController.evolveChoicesObservable();
 
+    guiController.endTurnObservable().subscribe(() => {
+        gameStateController.setGamePhase("ACTION_RESOLUTION");
+    })
+
     // Apply the end of turn delta
-    guiController.endTurnObservable().pipe(
+    gameStateController.gamePhaseObservable().pipe(
+        filter(gamePhase => gamePhase === "APPLYING_DELTAS"),
         withLatestFrom(gameState$, gameDelta$)
     ).subscribe(([_, gameState, gameDelta]) => {
-        nextState(gameState, gameDelta);
+        gameStateController.applyDelta(calculateFinalDelta(gameState, gameDelta));
     });
 
     // Get the new state applied after ending turn
-    guiController.endTurnObservable().pipe(
-        withLatestFrom(gameState$.pipe(skip(1))),
+    gameStateController.gamePhaseObservable().pipe(
+        filter(gamePhase => gamePhase === "ACTION"),
+        withLatestFrom(gameState$),
     ).subscribe(([_, newState]) => {
         const seedsRemainingByType: StringMap<number> = {};
         Object.keys(newState.seedStatus)
@@ -167,10 +173,6 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): G
             }
         });
     return finalDelta;
-}
-
-function nextState(gameState: GameState, gameDelta: GameStateDelta) {
-    gameStateController.applyDelta(calculateFinalDelta(gameState, gameDelta));
 }
 
 export function applyDeltas<T>(gameData: T, deltas: GameStateDelta): T {

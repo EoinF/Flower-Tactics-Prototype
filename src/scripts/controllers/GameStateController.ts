@@ -1,11 +1,20 @@
 import { GameState, GameStateData } from "../objects/GameState";
-import { Subject, Observable, ReplaySubject, merge } from "rxjs";
+import { Subject, Observable, ReplaySubject, merge, timer } from "rxjs";
 import { GameStateDelta } from "../objects/GameStateDelta";
-import { scan, filter, map, shareReplay } from "rxjs/operators";
+import { scan, filter, map, distinctUntilChanged, flatMap, delayWhen, tap } from "rxjs/operators";
 import { applyDeltas } from "../connectors/gameStateConnectors";
+import { APPLYING_DELTAS_DURATION, ACTION_RESOLUTION_DURATION } from "../constants";
+
+export type GamePhase = "ACTION" | "ACTION_RESOLUTION" | "APPLYING_DELTAS";
+
+interface GamePhaseWithDelay {
+    nextPhase: GamePhase;
+    delayedBy: number;
+}
 
 export class GameStateController {
     private gameState$: Subject<GameState>;
+    private gamePhase$: Subject<GamePhase>;
     private currentPlayer$: ReplaySubject<string>;
     private loadMap$: Subject<GameState>;
     private applyDelta$: Subject<GameStateDelta>;
@@ -13,6 +22,7 @@ export class GameStateController {
 
     constructor() {
         this.gameState$ = new ReplaySubject(1);
+        this.gamePhase$ = new ReplaySubject(1);
         this.currentPlayer$ = new ReplaySubject(1);
         this.loadMap$ = new ReplaySubject(1);
         this.currentGameState$ = new ReplaySubject(1);
@@ -32,6 +42,10 @@ export class GameStateController {
                 }
             }, null)
         )
+    }
+
+    setGamePhase(gamePhase: GamePhase) {
+        this.gamePhase$.next(gamePhase);
     }
 
     setState(state: GameState) {
@@ -59,6 +73,38 @@ export class GameStateController {
         return this.currentGameState$.pipe(
             filter(state => state != null),
             map(state => state!)
+        );
+    }
+
+    gamePhaseObservable(): Observable<GamePhase> {
+        return this.gamePhase$.pipe(
+            flatMap<GamePhase, GamePhaseWithDelay[]>(phase => {
+                const nextPhases = [{
+                    nextPhase: phase,
+                    delayedBy: 0
+                }];
+                if (phase === 'ACTION_RESOLUTION') {
+                    nextPhases.push({
+                        nextPhase: 'APPLYING_DELTAS',
+                        delayedBy: ACTION_RESOLUTION_DURATION
+                    });
+                    nextPhases.push({
+                        nextPhase: 'ACTION', 
+                        delayedBy: ACTION_RESOLUTION_DURATION + APPLYING_DELTAS_DURATION
+                    });
+                } else {
+                    nextPhases.push({
+                        nextPhase: 'ACTION',
+                        delayedBy: APPLYING_DELTAS_DURATION
+                    });
+                }
+                return nextPhases;
+            }),
+            delayWhen((phaseWithDelay) =>
+                timer(phaseWithDelay.delayedBy)
+            ),
+            map(phaseWithDelay => phaseWithDelay.nextPhase),
+            distinctUntilChanged(),
         );
     }
     

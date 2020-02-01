@@ -144,11 +144,9 @@ export class MapView {
 				this.placedSeedSprites.forEach(sprite => sprite.destroy());
 				this.placedSeedSprites.clear();
 				placedSeeds.getAllSeeds().filter(seed =>
-					seed.ownerId === currentPlayerId
+					seed.ownerId === currentPlayerId && seed.amount > 0
 				).forEach(placedSeed => {
-					if (placedSeed.amount > 0) {
-						this.addNewSeed(placedSeed, gameState);
-					}
+					this.addNewSeed(placedSeed, gameState);
 				});
 			});
 

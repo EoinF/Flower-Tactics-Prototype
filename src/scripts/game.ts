@@ -16,6 +16,8 @@ import { setupConnectors } from './connectors/connectors'
 import { GameActionController } from './controllers/GameActionController'
 import MainMenuScene from './scenes/mainMenuScene'
 import { MainMenuController } from './controllers/MainMenuController'
+import { of } from 'rxjs'
+import { flatMap } from 'rxjs/operators'
 
 const DEFAULT_WIDTH = 1280
 const DEFAULT_HEIGHT = 720
