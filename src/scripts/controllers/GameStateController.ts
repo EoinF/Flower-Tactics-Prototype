@@ -1,7 +1,7 @@
 import { GameState, GameStateData } from "../objects/GameState";
 import { Subject, Observable, ReplaySubject, merge, timer } from "rxjs";
 import { GameStateDelta } from "../objects/GameStateDelta";
-import { scan, filter, map, distinctUntilChanged, flatMap, delayWhen, tap } from "rxjs/operators";
+import { scan, filter, map, distinctUntilChanged, flatMap, delayWhen, tap, startWith } from "rxjs/operators";
 import { applyDeltas } from "../connectors/gameStateConnectors";
 import { APPLYING_DELTAS_DURATION, ACTION_RESOLUTION_DURATION } from "../constants";
 

@@ -47,6 +47,7 @@ export default class MainMenuScene extends Phaser.Scene {
             this.scene.launch('OverlayScene');
             mainMenuController.setLoadState("FINISHED");
             guiController.setScreenState("In Game");
+            gameStateController.setGamePhase("ACTION");
         });
 
         gameStateController.loadMapObservable().pipe(skip(1)).subscribe(() => {

@@ -140,44 +140,53 @@ export class MapView {
 
 		combineLatest(
 			gameActionController.placedSeedsMapObservable(),
-			gameStateController.gamePhaseObservable().pipe(filter(phase => phase === 'ACTION' || phase === 'ACTION_RESOLUTION'))
+			gameStateController.gamePhaseObservable().pipe(filter(phase => phase === 'ACTION'))
 		).pipe(
 			withLatestFrom(gameStateController.gameStateObservable(), gameStateController.currentPlayerObservable())
-		).subscribe(([[placedSeeds, currentPhase], gameState, currentPlayerId]) => {
+		).subscribe(([[placedSeeds, _], gameState, currentPlayerId]) => {
 			this.placedSeedSprites.forEach(sprite => sprite.destroy());
 			this.placedSeedSprites.clear();
 
-			if (currentPhase === 'ACTION') {
 				placedSeeds.getAllSeeds().filter(seed =>
 					seed.ownerId === currentPlayerId && seed.amount > 0
 				).forEach(placedSeed => {
 					this.addSingleSeed(placedSeed, gameState);
 				});
-			} else if (currentPhase === 'ACTION_RESOLUTION') {
-				placedSeeds.getAllSeeds()
-					.filter(seed => seed.amount > 0)
-					.reduce<PlacedSeed[][]>((groupings, nextSeed) => {
-						const matchingSeedIndex = groupings.findIndex(
-							group => {
-								console.log(group);
-								return (group.length === 1) && (group[0].tileIndex === nextSeed.tileIndex)}
-						);
-						if (matchingSeedIndex !== -1) {
-							groupings[matchingSeedIndex].push(nextSeed);
-							return groupings;
-						} else {
-							return [...groupings, [nextSeed]];
-						}
-					}, [])
-					.forEach(placedSeedGroup => {
-						console.log(placedSeedGroup);
-						if (placedSeedGroup.length === 1) {
-							this.addSingleSeed(placedSeedGroup[0], gameState);
-						} else {
-							this.addDoubleSeed(placedSeedGroup[0], placedSeedGroup[1], gameState);
-						}
-					});
-			}
+
+		});
+
+		gameStateController.gamePhaseObservable().pipe(
+			filter(phase => phase === 'ACTION_RESOLUTION'),
+			withLatestFrom(
+				gameActionController.placedSeedsMapObservable(),
+				gameStateController.gameStateObservable()
+			)
+		).subscribe(([_, placedSeeds, gameState]) => {
+			this.placedSeedSprites.forEach(sprite => sprite.destroy());
+			this.placedSeedSprites.clear();
+
+			placedSeeds.getAllSeeds()
+				.filter(seed => seed.amount > 0)
+				.reduce<PlacedSeed[][]>((groupings, nextSeed) => {
+					const matchingSeedIndex = groupings.findIndex(
+						group => {
+							console.log(group);
+							return (group.length === 1) && (group[0].tileIndex === nextSeed.tileIndex)}
+					);
+					if (matchingSeedIndex !== -1) {
+						groupings[matchingSeedIndex].push(nextSeed);
+						return groupings;
+					} else {
+						return [...groupings, [nextSeed]];
+					}
+				}, [])
+				.forEach(placedSeedGroup => {
+					if (placedSeedGroup.length === 1) {
+						this.addSingleSeed(placedSeedGroup[0], gameState);
+					} else {
+						this.addDoubleSeed(placedSeedGroup[0], placedSeedGroup[1], gameState);
+					}
+				});
 		});
 
 		combineLatest(
