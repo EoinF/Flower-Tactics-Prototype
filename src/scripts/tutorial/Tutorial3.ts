@@ -34,8 +34,8 @@ export class Tutorial3 extends TutorialBase {
                 callbacks.showTips([
                     {
                         title: this.title,
-                        content: "Notice the enemy flower has begun flashing. This means it's dying",
-                        position: { x: 300, y: 250 },
+                        content: "Notice the enemy flower has begun flashing. It has reached its growth limit and now has a chance to die every turn.",
+                        position: { x: 348, y: 250 },
                         delay: 1000
                     }
                 ])
@@ -53,31 +53,55 @@ export class Tutorial3 extends TutorialBase {
                 callbacks.showTips([
                     {
                         title: this.title,
-                        content: "The enemy flower is now dead. Now's your chance!",
-                        position: { x: 300, y: 250 }
+                        content: "The enemy flower died. Now's your chance to claim that spot!",
+                        position: { x: 348, y: 250 }
                     },
                     {
                         title: this.title,
-                        content: "You can now plant a seed on this tile, but beware, the opponent can also place a seed.",
-                        position: { x: 300, y: 250 }
+                        content: "You can now plant a seed on this tile, but beware, the opponent can also plant seeds of their own.",
+                        position: undefined
                     },
                     {
                         title: this.title,
-                        content: "Whoever has more seeds on a tile gets a flower on that tile. The other players seeds are wasted.",
-                        position: { x: 300, y: 250 }
+                        content: "Whoever has more seeds on a tile gets a flower on that tile. The other player's seeds are lost.",
+                        position: undefined
                     },
                     {
                         title: this.title,
-                        content: "Place 2 seeds on the tile to challenge your opponent on that tile.",
-                        position: { x: 300, y: 250 }
+                        content: "Plant 2 seeds on the tile to challenge your opponent on that tile.",
+                        position: undefined
                     }
                 ])
+            }
+        );
+        
+        this.addEvent(
+            1,
+            (gameState, playerId) => (
+                gameState.players[playerId].flowers.length > 1
+            ),
+            (callbacks, gameState) => {
+                callbacks.showTips([
+                    {
+                        title: this.title,
+                        content: "Good job! Now expand your flowers onto the river tile to finish the tutorial.",
+                        position: { x: 348, y: 250 }
+                    }
+                ]);
+                const river = gameState.rivers[0];
+                callbacks.focusTile(gameState.getTileAt(river.x, river.y)!);
             }
         );
 
         this.addEvent(
             1,
-            (gameState: GameState) => Object.keys(gameState.flowersMap).some(flowerKey => gameState.flowersMap[flowerKey].y == 0),
+            (gameState, playerId) => (Object.keys(gameState.flowersMap)
+                .some(flowerKey => 
+                    gameState.players[playerId].seedsOwned.indexOf(gameState.flowersMap[flowerKey].type) !== -1 &&
+                    gameState.rivers[0].x === gameState.flowersMap[flowerKey].x &&
+                    gameState.rivers[0].y === gameState.flowersMap[flowerKey].y
+                )
+            ),
             (callbacks: TutorialRunnerCallbacks) => {
                 callbacks.victory();
             }

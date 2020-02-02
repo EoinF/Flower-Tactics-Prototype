@@ -63,7 +63,7 @@ export class Tutorial1 extends TutorialBase {
                     },
                     {
                         title: this.title,
-                        content: "Note that you can only place the seed on tiles adjacent to flowers you own.",
+                        content: "You can only plant seeds on tiles adjacent to flowers you own.",
                         position: undefined
                     }
                 ])

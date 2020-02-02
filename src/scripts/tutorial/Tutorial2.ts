@@ -89,7 +89,7 @@ export class Tutorial2 extends TutorialBase {
                 callbacks.showTips([
                     {
                         title: this.title,
-                        content: "The odds of success are displayed on the right. Click the > again to stage more seeds. This will improve the chances of a successful evolution.",
+                        content: "The odds of success are shown on the right. Click on > again to stage more seeds. This will improve the chances of a successful evolution.",
                         position: { x: 470, y: 320 }
                     }
                 ]);
@@ -165,23 +165,23 @@ export class Tutorial2 extends TutorialBase {
                     {
                         title: this.title,
                         content: "You have the ability to place a cloud anywhere on the map. This will provide a water source to that tile.",
-                        position: { x: 470, y: 320 }
+                        position: { x: 670, y: 420 }
                     },
                     {
                         title: this.title,
                         content: "Tiles with a water source grow flowers twice as fast and produce seeds twice as fast.",
-                        position: { x: 470, y: 320 }
+                        position: undefined
                     },
                     {
                         title: this.title,
                         content: "There are other water sources to be found as well, like rivers. However, the effect"
-                            + " doesn't stack, so don't even try it!",
-                        position: { x: 470, y: 320 }
+                            + " doesn't stack!",
+                        position: undefined
                     },
                     {
                         title: this.title,
                         content: "Place the cloud on one of your flowers to complete the tutorial",
-                        position: { x: 470, y: 320 }
+                        position: undefined
                     }
                 ]);
                 callbacks.giftCloudToPlayer();

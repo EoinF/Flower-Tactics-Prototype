@@ -155,19 +155,42 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): G
     Object.keys(placedSeeds)
         .map(key => placedSeeds[key])
         .reduce((flatArray, nextArray) => [...flatArray, ...nextArray], []) // flatten
-        .forEach((placedSeed) => {
-            if (placedSeed.amount > 0) {
+        .reduce<PlacedSeed[][]>((groupings, nextSeed) => {
+            const matchingSeedIndex = groupings.findIndex(
+                group => {
+                    return (group.length === 1) && (group[0].tileIndex === nextSeed.tileIndex)}
+            );
+            if (matchingSeedIndex !== -1) {
+                groupings[matchingSeedIndex].push(nextSeed);
+                return groupings;
+            } else {
+                return [...groupings, [nextSeed]];
+            }
+        }, [])
+        .forEach(placedSeedGroup => {
+            let winningSeed: PlacedSeed | null = placedSeedGroup[0];
+            if (placedSeedGroup.length > 1) {
+                if (placedSeedGroup[0].amount > placedSeedGroup[1].amount) {
+                    winningSeed = placedSeedGroup[0];
+                } else if (placedSeedGroup[1].amount > placedSeedGroup[0].amount) {
+                    winningSeed = placedSeedGroup[1];
+                } else {
+                    winningSeed = null
+                }
+            }
+
+            if (winningSeed != null) {
                 const newFlower = {
-                    x: placedSeed.tileIndex % gameState.numTilesX,
-                    y: Math.floor(placedSeed.tileIndex / gameState.numTilesX),
-                    type: placedSeed.type,
+                    x: winningSeed.tileIndex % gameState.numTilesX,
+                    y: Math.floor(winningSeed.tileIndex / gameState.numTilesX),
+                    type: winningSeed.type,
                     growth: 0
                 } as Flower;
                 finalDelta.addDelta(["flowersMap", newIndex.toString()], newFlower, "DELTA_REPLACE");
-                finalDelta.addDelta(["players", placedSeed.ownerId, "flowers"], newIndex.toString(), "DELTA_APPEND");
+                finalDelta.addDelta(["players", winningSeed.ownerId, "flowers"], newIndex.toString(), "DELTA_APPEND");
 
-                if (isRequirementsSatisfied(gameState.tiles[placedSeed.tileIndex].soil, gameState.flowerTypes[placedSeed.type])) {
-                    finalDelta.addDelta(["players", placedSeed.ownerId, "autoReplantTileMap", placedSeed.tileIndex.toString()], placedSeed.type, "DELTA_REPLACE");
+                if (isRequirementsSatisfied(gameState.tiles[winningSeed.tileIndex].soil, gameState.flowerTypes[winningSeed.type])) {
+                    finalDelta.addDelta(["players", winningSeed.ownerId, "autoReplantTileMap", winningSeed.tileIndex.toString()], winningSeed.type, "DELTA_REPLACE");
                 }
                 newIndex++;
             }

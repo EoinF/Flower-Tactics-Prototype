@@ -20,7 +20,7 @@
             "type": "1",
             "name": "Daisy",
             "turnsUntilGrown": 2,
-            "turnsUntilDead": 9999,
+            "turnsUntilDead": 7,
             "seedProductionRate": 95,
             "tenacity": 0,
             "nitrogenMin": 1800,
@@ -107,13 +107,13 @@
             "x": 1,
             "y": 6,
             "type": "1",
-            "growth": 2
+            "growth": 4
         },
         "2": {
             "x": 2,
             "y": 6,
             "type": "1",
-            "growth": 2
+            "growth": 6
         }
     }
 }

@@ -140,7 +140,7 @@ export class MapView {
 
 		combineLatest(
 			gameActionController.placedSeedsMapObservable(),
-			gameStateController.gamePhaseObservable()
+			gameStateController.gamePhaseObservable().pipe(filter(phase => phase === 'ACTION' || phase === 'ACTION_RESOLUTION'))
 		).pipe(
 			withLatestFrom(gameStateController.gameStateObservable(), gameStateController.currentPlayerObservable())
 		).subscribe(([[placedSeeds, currentPhase], gameState, currentPlayerId]) => {
@@ -264,7 +264,7 @@ export class MapView {
 			48, 48,
 			placedSeed.amount,
 			getPlayerColour(placedSeed.ownerId)
-		);
+		).setDepth(7);
 		
 		this.placedSeedSprites.set(placedSeed.tileIndex, placedSeedWidget);
 	}
@@ -278,7 +278,7 @@ export class MapView {
 			getPlayerColour(seed1.ownerId),
 			seed2.amount,
 			getPlayerColour(seed2.ownerId)
-		);
+		).setDepth(7);
 		
 		this.placedSeedSprites.set(seed1.tileIndex, seedsWidget);
 	}

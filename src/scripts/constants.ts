@@ -57,4 +57,4 @@ export const SUCCESS_PLUS_2_INTERVALS =     [0, 0,   0,  0, 10, 50, 70,     80];
 export const SUCCESS_PLUS_3_INTERVALS =     [0, 0,   0,  0, 0,   0, 30,     60]; // % chance
 
 export const ACTION_RESOLUTION_DURATION = 500;
-export const APPLYING_DELTAS_DURATION = 0;
+export const APPLYING_DELTAS_DURATION = 50;
