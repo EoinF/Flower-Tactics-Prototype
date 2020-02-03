@@ -1,7 +1,6 @@
 import { GameStateController } from "../controllers/GameStateController";
 import { GameActionController, PlacedSeed, SeedTypeToPlacedSeedsMap } from "../controllers/GameActionController";
-import { merge } from "rxjs";
-import { withLatestFrom, filter, mergeMap, tap, skip, switchMap } from "rxjs/operators";
+import { withLatestFrom, filter, skip, switchMap } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { getPlacementStatus } from "./utils";
 import { isRequirementsSatisfied } from "../deltaCalculators/helpers";

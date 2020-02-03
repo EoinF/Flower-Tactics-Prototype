@@ -1,12 +1,14 @@
 {
     "players": {
         "1": {
+            "controlledBy": "Human",
             "cloudOwned": null,
             "seedsOwned": ["1", "2", "3"],
             "flowers": ["0", "1", "2", "3", "4", "5", "6", "7", "8"],
             "autoReplantTileMap": {}
         },
         "2": {
+            "controlledBy": "AI",
             "cloudOwned": null,
             "seedsOwned": [],
             "flowers": [],

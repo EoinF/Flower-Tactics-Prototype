@@ -1,6 +1,7 @@
 {
     "players": {
         "1": {
+            "controlledBy": "Human",
             "cloudOwned": null,
             "seedsOwned": ["1"],
             "flowers": ["0"],
