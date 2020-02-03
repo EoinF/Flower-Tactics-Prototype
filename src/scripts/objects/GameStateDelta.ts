@@ -33,7 +33,7 @@ export class GameStateDelta {
                     deltaValue: [...(existingValue.deltaValue as Array<any>), deltaValue]
                 };
             } else {
-                console.log(`Warning: Can't apply ${deltaType} twice: ${keys} := ${deltaValue}`);
+                console.warn(`Warning: Can't apply ${deltaType} twice: ${keys} := ${deltaValue}`);
             }
         } else {
             if (deltaType === 'DELTA_APPEND' || deltaType === 'DELTA_REMOVE') {

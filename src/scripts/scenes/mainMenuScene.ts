@@ -1,4 +1,4 @@
-import { gameStateController, guiController, mapController, mainMenuController } from "../game";
+import { gameStateController, guiController, mapController, mainMenuController, gameActionController } from "../game";
 import { combineLatest } from "rxjs";
 import { MapLoader, ObjectData } from "../MapLoader";
 import { MapSaver } from "../MapSaver";
@@ -40,19 +40,20 @@ export default class MainMenuScene extends Phaser.Scene {
             this.loadMap(levelName);
         });
 
-        gameStateController.loadMapObservable().pipe(first()).subscribe(() => {
+        gameStateController.loadMapObservable().pipe(first()).subscribe((gameState) => {
             this.scene.launch('MainScene');
             this.scene.launch('UIScene');
             this.scene.launch('EvolveSeedScene');
             this.scene.launch('OverlayScene');
             mainMenuController.setLoadState("FINISHED");
             guiController.setScreenState("In Game");
-            gameStateController.setGamePhase("ACTION");
+            gameStateController.setGamePhase("INIT");
         });
 
         gameStateController.loadMapObservable().pipe(skip(1)).subscribe(() => {
             mainMenuController.setLoadState("FINISHED");
             guiController.setScreenState("In Game");
+            gameStateController.setGamePhase("INIT");
         })
 
         guiController.screenStateObservable().subscribe(screenState => {

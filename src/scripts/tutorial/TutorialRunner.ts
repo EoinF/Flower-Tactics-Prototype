@@ -89,7 +89,6 @@ export class TutorialRunner {
         giftCloudToPlayer$.pipe(
             withLatestFrom(this.gameStateController.currentPlayerObservable())
         ).subscribe(([_, playerId]) => {
-            console.log("Gifting cloud to player");
             const delta = new GameStateDelta();
 
             delta.addDelta(["players", playerId, "cloudOwned"], "1", "DELTA_REPLACE");

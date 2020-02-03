@@ -31,7 +31,15 @@ export function setupGameStateManager(
     const onClickEvolveButton$ = guiController.onClickEvolveButtonObservable();
     const evolveChoices$ = evolveSeedController.evolveChoicesObservable();
 
-    guiController.endTurnObservable().subscribe(() => {
+    gameStateController.gamePhaseObservable().pipe(
+        filter(gamePhase => gamePhase === 'INIT'),
+        withLatestFrom(gameStateController.gameStateObservable())
+    ).subscribe(([_, gameState]) => {
+        gameActionController.setPlayers(Object.keys(gameState.players));
+        gameStateController.setGamePhase('ACTION');
+    });
+    
+    gameActionController.endOfTurnObservable().subscribe(() => {
         gameStateController.setGamePhase("ACTION_RESOLUTION");
     })
 

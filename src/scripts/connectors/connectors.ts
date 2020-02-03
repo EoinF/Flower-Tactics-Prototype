@@ -12,6 +12,7 @@ import { setupGameDeltaManager } from './gameDeltaConnectors';
 import { setupGameStateManager } from './gameStateConnectors';
 import { GameActionController } from '../controllers/GameActionController';
 import { setupGameInputConnectors } from './gameInputConnectors';
+import { setupAIConnectors } from './aiConnectors';
 
 interface TileLocation {
     tileX: number,
@@ -51,6 +52,7 @@ export function setupConnectors(
     setupGameStateManager(gameStateController, gameDeltaController, gameActionController, guiController, evolveSeedController);
     setupGameDeltaManager(gameStateController, gameDeltaController, gameActionController);
     setupGameInputConnectors(gameStateController, gameDeltaController, heldObjectController, guiController, mapController, gameActionController);
+    setupAIConnectors(gameStateController, gameActionController);
 
     combineLatest(gameState$, currentPlayer$).pipe(
         map(([state, currentPlayerId]) => state.players[currentPlayerId as string].seedsOwned),

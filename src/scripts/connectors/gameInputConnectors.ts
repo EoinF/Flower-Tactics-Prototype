@@ -101,4 +101,10 @@ export function setupGameInputConnectors(
                 gameActionController.placeCloud(gameState.players[currentPlayerId].cloudOwned, tileIndex);
             }
         });
+
+    guiController.endTurnObservable().pipe(
+        withLatestFrom(gameStateController.currentPlayerObservable())
+    ).subscribe(([_, playerId]) => {
+        gameActionController.endTurn(playerId);
+    })
 }

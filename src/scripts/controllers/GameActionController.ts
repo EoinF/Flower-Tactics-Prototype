@@ -1,5 +1,5 @@
-import { Subject, Observable, merge } from "rxjs";
-import { scan, map, shareReplay, startWith, mapTo, debounceTime, throttleTime } from "rxjs/operators";
+import { Subject, Observable, merge, of, ReplaySubject } from "rxjs";
+import { scan, map, shareReplay, startWith, mapTo, debounceTime, throttleTime, filter, tap, take, flatMap } from "rxjs/operators";
 import { StringMap } from "../types";
 
 interface PlacedSeedInstance {
@@ -21,6 +21,11 @@ interface PlacedSeedEvent {
     isReset: boolean;
     data: SeedTypeToPlacedSeedsMap | PlacedSeedInstance | null;
     delta: number;
+}
+
+interface PlayerStatus {
+    playerId: string;
+    hasEndedTurn: boolean;
 }
 
 export class SeedTypeToPlacedSeedsMap {
@@ -69,6 +74,9 @@ export class SeedTypeToPlacedSeedsMap {
 }
 
 export class GameActionController {
+    private endTurnPlayerId$: Subject<string>;
+    private endTurnAllPlayers$: Observable<void>;
+    private players$: Subject<string[]>;
     private placeSeed$: Subject<PlacedSeedInstance>;
     private removeSeed$: Subject<PlacedSeedInstance>;
     private resetSeeds$: Subject<SeedTypeToPlacedSeedsMap>;
@@ -82,6 +90,8 @@ export class GameActionController {
         this.resetSeeds$ = new Subject();
         this.onPlaceCloud$ = new Subject();
         this.resetClouds$ = new Subject();
+        this.endTurnPlayerId$ = new Subject();
+        this.players$ = new Subject();
 
         this.placedSeedsMap$ =
             merge(
@@ -109,6 +119,31 @@ export class GameActionController {
                 }, new SeedTypeToPlacedSeedsMap()),
                 shareReplay(1)
             );
+
+        this.endTurnAllPlayers$ = merge(
+            this.endTurnPlayerId$.pipe(
+                map(playerId => ({playerId, hasEndedTurn: true}))
+            ),
+            this.players$.pipe(
+                flatMap(players => players.map(playerId => ({playerId, hasEndedTurn: false})))
+            )
+        ).pipe(
+            scan<PlayerStatus, PlayerStatus[]>((currentState, nextState) => {
+                let updatedState: PlayerStatus[] = JSON.parse(JSON.stringify(currentState));
+                if (currentState.every(playerState => playerState.hasEndedTurn)) {
+                    updatedState = updatedState.map(playerState => ({ ...playerState, hasEndedTurn: false }));
+                }
+                const existingIndex = updatedState.findIndex(state => state.playerId === nextState.playerId);
+                if (existingIndex !== -1) {
+                    updatedState[existingIndex].hasEndedTurn = nextState.hasEndedTurn;
+                } else {
+                    updatedState.push(nextState)
+                }
+                return updatedState;
+            }, []),
+            filter(endTurnArray => endTurnArray.every(playerState => playerState.hasEndedTurn)),
+            mapTo(undefined)
+        )
     }
 
     placeSeed(type: string, tileIndex: number, ownerId: string) {
@@ -129,6 +164,14 @@ export class GameActionController {
     
     resetClouds() {
         this.resetClouds$.next();
+    }
+
+    setPlayers(playerIds: string[]) {
+        this.players$.next(playerIds);
+    }
+
+    endTurn(playerId: string) {
+        this.endTurnPlayerId$.next(playerId);
     }
 
     onPlaceSeedObservable(): Observable<PlacedSeedInstance> {
@@ -159,5 +202,9 @@ export class GameActionController {
                 }
             }, {})
         );
+    }
+
+    endOfTurnObservable(): Observable<void> {
+        return this.endTurnAllPlayers$;
     }
 }

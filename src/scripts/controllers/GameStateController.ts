@@ -5,7 +5,7 @@ import { scan, filter, map, distinctUntilChanged, flatMap, delayWhen, tap, start
 import { applyDeltas } from "../connectors/gameStateConnectors";
 import { APPLYING_DELTAS_DURATION, ACTION_RESOLUTION_DURATION } from "../constants";
 
-export type GamePhase = "ACTION" | "ACTION_RESOLUTION" | "APPLYING_DELTAS";
+export type GamePhase = "INIT" | "ACTION" | "ACTION_RESOLUTION" | "APPLYING_DELTAS";
 
 interface GamePhaseWithDelay {
     nextPhase: GamePhase;
@@ -65,7 +65,7 @@ export class GameStateController {
         }
         
         this.gameState$.next(gameState);
-        this.currentPlayer$.next(Object.keys(gameState.players)[0]);
+        this.currentPlayer$.next(Object.keys(gameState.players).find(playerId => gameState.players[playerId].controlledBy === 'Human'));
         this.loadMap$.next(gameState);
     }
 
@@ -79,24 +79,30 @@ export class GameStateController {
     gamePhaseObservable(): Observable<GamePhase> {
         return this.gamePhase$.pipe(
             flatMap<GamePhase, GamePhaseWithDelay[]>(phase => {
-                const nextPhases = [{
+                let nextPhases = [{
                     nextPhase: phase,
                     delayedBy: 0
                 }];
                 if (phase === 'ACTION_RESOLUTION') {
-                    nextPhases.push({
-                        nextPhase: 'APPLYING_DELTAS',
-                        delayedBy: ACTION_RESOLUTION_DURATION
-                    });
-                    nextPhases.push({
-                        nextPhase: 'ACTION',
-                        delayedBy: ACTION_RESOLUTION_DURATION + APPLYING_DELTAS_DURATION
-                    });
-                } else {
-                    nextPhases.push({
-                        nextPhase: 'ACTION',
-                        delayedBy: APPLYING_DELTAS_DURATION
-                    });
+                    nextPhases = [
+                        ...nextPhases,
+                        {
+                            nextPhase: 'APPLYING_DELTAS',
+                            delayedBy: ACTION_RESOLUTION_DURATION
+                        },
+                        {
+                            nextPhase: 'ACTION',
+                            delayedBy: ACTION_RESOLUTION_DURATION + APPLYING_DELTAS_DURATION
+                        }
+                    ];
+                } else if (phase === 'APPLYING_DELTAS') {
+                    nextPhases = [
+                        ...nextPhases,
+                        {
+                            nextPhase: 'ACTION',
+                            delayedBy: APPLYING_DELTAS_DURATION
+                        }
+                    ];
                 }
                 return nextPhases;
             }),
