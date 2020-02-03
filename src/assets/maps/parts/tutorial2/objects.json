@@ -4,7 +4,11 @@
             "cloudOwned": null,
             "seedsOwned": ["1"],
             "flowers": ["0", "1", "2"],
-            "autoReplantTileMap": {}
+            "autoReplantTileMap": {
+                "60": "1",
+                "61": "1",
+                "62": "1"
+            }
         }
     },
     "seedStatus": {

@@ -68,7 +68,7 @@ export class Tutorial2 extends TutorialBase {
                         title: this.title,
                         content: "Clicking the > button on a seed in your inventory will stage the seed for evolution."
                             + "\nNote: You can only stage one type of seed at a time",
-                        position: undefined
+                        position: { x: 80, y: 112 }
                     }
                 ]);
             }
@@ -122,7 +122,7 @@ export class Tutorial2 extends TutorialBase {
                     {
                         title: this.title,
                         content: "Click the evolve button to commit the staged seeds and see the outcome of the evolution.",
-                        position: undefined
+                        position: { x: 470, y: 500 }
                     }
                 ]);
             }
@@ -138,8 +138,8 @@ export class Tutorial2 extends TutorialBase {
                 callbacks.showTips([
                     {
                         title: this.title,
-                        content: "You now have a new seed with improved stats. Place it on the map to start producing seeds of that same type.",
-                        position: { x: 470, y: 320 }
+                        content: "You now have a new seed with improved stats. Close the evolve screen and plant the new seed on the map.",
+                        position: { x: 880, y: 500 }
                     }
                 ]);
             }
@@ -149,8 +149,8 @@ export class Tutorial2 extends TutorialBase {
             1,
             (gameState, playerId) => (
                 gameState.players[playerId].seedsOwned.length > 1 &&
-                gameState.players[playerId].seedsOwned.every(seedKey => 
-                    Object.keys(gameState.flowersMap).some(flowerKey => 
+                gameState.players[playerId].seedsOwned.every(seedKey =>
+                    Object.keys(gameState.flowersMap).some(flowerKey =>
                         gameState.flowersMap[flowerKey].type === seedKey
                     )
                 )
@@ -164,8 +164,13 @@ export class Tutorial2 extends TutorialBase {
                     },
                     {
                         title: this.title,
-                        content: "You have the ability to place a cloud anywhere on the map. This will provide a water source to that tile.",
-                        position: { x: 670, y: 420 }
+                        content: "You have been given the ability to place a cloud anywhere on the map. Clouds provide a water source to flowers.",
+                        position: undefined
+                    },
+                    {
+                        title: this.title,
+                        content: "The cloud placement button is located here, to the right of the 'Next' button",
+                        position: { x: 835, y: 445 }
                     },
                     {
                         title: this.title,

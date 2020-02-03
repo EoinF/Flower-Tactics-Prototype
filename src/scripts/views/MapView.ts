@@ -170,7 +170,6 @@ export class MapView {
 				.reduce<PlacedSeed[][]>((groupings, nextSeed) => {
 					const matchingSeedIndex = groupings.findIndex(
 						group => {
-							console.log(group);
 							return (group.length === 1) && (group[0].tileIndex === nextSeed.tileIndex)}
 					);
 					if (matchingSeedIndex !== -1) {
