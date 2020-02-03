@@ -1,11 +1,11 @@
 import { GameState, GameStateData } from "../objects/GameState";
 import { Subject, Observable, ReplaySubject, merge, timer } from "rxjs";
 import { GameStateDelta } from "../objects/GameStateDelta";
-import { scan, filter, map, distinctUntilChanged, flatMap, delayWhen, tap, startWith } from "rxjs/operators";
+import { scan, filter, map, distinctUntilChanged, flatMap, delayWhen } from "rxjs/operators";
 import { applyDeltas } from "../connectors/gameStateConnectors";
-import { APPLYING_DELTAS_DURATION, ACTION_RESOLUTION_DURATION } from "../constants";
+import { APPLYING_DELTAS_DURATION, ACTION_RESOLUTION_DURATION, RESETTING_ACTIONS_DURATION } from "../constants";
 
-export type GamePhase = "INIT" | "ACTION" | "ACTION_RESOLUTION" | "APPLYING_DELTAS";
+export type GamePhase = "INIT" | "ACTION" | "ACTION_RESOLUTION" | "APPLYING_DELTAS" | "RESETTING_ACTIONS";
 
 interface GamePhaseWithDelay {
     nextPhase: GamePhase;
@@ -91,18 +91,16 @@ export class GameStateController {
                             delayedBy: ACTION_RESOLUTION_DURATION
                         },
                         {
-                            nextPhase: 'ACTION',
-                            delayedBy: ACTION_RESOLUTION_DURATION + APPLYING_DELTAS_DURATION
-                        }
-                    ];
-                } else if (phase === 'APPLYING_DELTAS') {
-                    nextPhases = [
-                        ...nextPhases,
+                            nextPhase: 'RESETTING_ACTIONS',
+                            delayedBy: ACTION_RESOLUTION_DURATION + RESETTING_ACTIONS_DURATION
+                        },
                         {
                             nextPhase: 'ACTION',
-                            delayedBy: APPLYING_DELTAS_DURATION
+                            delayedBy: ACTION_RESOLUTION_DURATION + RESETTING_ACTIONS_DURATION + APPLYING_DELTAS_DURATION
                         }
                     ];
+                } else if (phase !== 'INIT' && phase !== 'ACTION') {
+                    console.error(`Not allowed to directly set the phase to ${phase}. Set it to ACTION_RESOLUTION to apply end of turn effects`);
                 }
                 return nextPhases;
             }),

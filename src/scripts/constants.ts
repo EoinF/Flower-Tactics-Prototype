@@ -58,3 +58,4 @@ export const SUCCESS_PLUS_3_INTERVALS =     [0, 0,   0,  0, 0,   0, 30,     60];
 
 export const ACTION_RESOLUTION_DURATION = 500;
 export const APPLYING_DELTAS_DURATION = 50;
+export const RESETTING_ACTIONS_DURATION = 10;

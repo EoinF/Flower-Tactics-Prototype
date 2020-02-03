@@ -38,7 +38,7 @@ export function setupGameStateManager(
         gameActionController.setPlayers(Object.keys(gameState.players));
         gameStateController.setGamePhase('ACTION');
     });
-    
+
     gameActionController.endOfTurnObservable().subscribe(() => {
         gameStateController.setGamePhase("ACTION_RESOLUTION");
     })
@@ -53,7 +53,7 @@ export function setupGameStateManager(
 
     // Get the new state applied after ending turn
     gameStateController.gamePhaseObservable().pipe(
-        filter(gamePhase => gamePhase === "ACTION"),
+        filter(gamePhase => gamePhase === "RESETTING_ACTIONS"),
         withLatestFrom(gameState$),
     ).subscribe(([_, newState]) => {
         const seedsRemainingByType: StringMap<number> = {};
