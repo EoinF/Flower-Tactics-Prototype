@@ -1,3 +1,5 @@
+import { SeedPlacementErrorStatus } from "./connectors/utils";
+
 export const NITROGEN_VALUE_RANGE = { min: 0, max: 3000 };
 export const PHOSPHOROUS_VALUE_RANGE = { min: 0, max: 3000 };
 export const POTASSIUM_VALUE_RANGE = { min: 0, max: 3000 };
@@ -59,3 +61,15 @@ export const SUCCESS_PLUS_3_INTERVALS =     [0, 0,   0,  0, 0,   0, 30,     60];
 export const ACTION_RESOLUTION_DURATION = 500;
 export const APPLYING_DELTAS_DURATION = 50;
 export const RESETTING_ACTIONS_DURATION = 10;
+
+type SeedPlacementStatusToStringMap = {
+    [status in SeedPlacementErrorStatus]: string;
+};
+
+export const SEED_PLACEMENT_MESSAGE_MAP: SeedPlacementStatusToStringMap = {
+    "FLOWER_BLOCKING": "A flower is blocking seed placement.",
+    "MOUNTAIN_BLOCKING": "A mountain is blocking seed placement.",
+    "ADJACENT_FLOWER_REQUIRED": "You can only place seeds near your existing flowers.",
+    "OTHER_SEED_TYPE_BLOCKING": "Another type of seed is already placed on this tile.",
+    "INSUFFICIENT_SEEDS_REMAINING": "You don't have any seeds remaining."
+}

@@ -40,7 +40,7 @@ export default class MainMenuScene extends Phaser.Scene {
             this.loadMap(levelName);
         });
 
-        gameStateController.loadMapObservable().pipe(first()).subscribe((gameState) => {
+        gameStateController.loadMapObservable().pipe(first()).subscribe(() => {
             this.scene.launch('MainScene');
             this.scene.launch('UIScene');
             this.scene.launch('EvolveSeedScene');

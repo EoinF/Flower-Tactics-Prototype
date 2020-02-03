@@ -18,12 +18,12 @@
     "seedStatus": {
         "1": {
             "type": "1",
-            "quantity": 100,
+            "quantity": 5,
             "progress": 0
         },
         "2": {
             "type": "2",
-            "quantity": 0,
+            "quantity": 5,
             "progress": 0
         }
     },

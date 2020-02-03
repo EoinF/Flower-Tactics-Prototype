@@ -15,6 +15,7 @@ import { FlowerAugmentation } from "../objects/FlowerAugmentation";
 import { calculateSeedEvolutionOutcome, calculateSeedEvolutionResults } from "../deltaCalculators/calculateSeedEvolve";
 import { gameStateController } from "../game";
 import { indexToMapCoordinates } from "../widgets/utils";
+import { getPlacementStatus } from "./utils";
 
 export function setupGameStateManager(
     gameStateController: GameStateController,
@@ -69,19 +70,11 @@ export function setupGameStateManager(
                 const type = newState.players[playerId].autoReplantTileMap[tileIndexKey];
                 const tileIndex = parseInt(tileIndexKey);
 
-                const playerFlowers = newState.players[playerId].flowers;
-                const { x, y } = indexToMapCoordinates(tileIndex, newState.numTilesX);
-                const isFlowerBlockingTile = (newState.getFlowerIndexAtTile(newState.tiles[tileIndex]) != null);
-                const isFlowerAdjacent = newState.getTilesAdjacent(x, y).some(adjacentTile => {
-                    const flowerAtTile = newState.getFlowerIndexAtTile(adjacentTile);
-                    return flowerAtTile != null && playerFlowers.indexOf(flowerAtTile) !== -1
-                });
-
-                if (!isFlowerBlockingTile && isFlowerAdjacent) {
-                    if (seedsRemainingByType[type] > 0) {
-                        autoPlacedSeedsMap.addPlacedSeed(type, tileIndex, playerId);
-                        seedsRemainingByType[type]--;
-                    }
+                const status = getPlacementStatus(newState.tiles[tileIndex], newState, playerId, autoPlacedSeedsMap, type);
+                
+                if (status === "PLACEMENT_ALLOWED" && seedsRemainingByType[type] > 0) {
+                    autoPlacedSeedsMap.addPlacedSeed(type, tileIndex, playerId);
+                    seedsRemainingByType[type]--;
                 }
             });
         });
