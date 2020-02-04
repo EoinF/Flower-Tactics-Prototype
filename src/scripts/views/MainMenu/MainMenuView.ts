@@ -3,6 +3,7 @@ import { MainMenuController } from "../../controllers/MainMenuController";
 import { MapGenerator } from "../../MapGenerator";
 import { gameStateController } from "../../game";
 import { GameStateController } from "../../controllers/GameStateController";
+import { MapSaver } from "../../MapSaver";
 
 export class MainMenuView {
     constructor(scene: Phaser.Scene, mainMenuController: MainMenuController, gameStateController: GameStateController) {
@@ -20,9 +21,10 @@ export class MainMenuView {
         });
 
         container.addButton(scene, "Generate Map", () => {
-            gameStateController.loadGame(
+            const generatedMap =
                 new MapGenerator(0).generateNewMap({numTilesX: 15, numTilesY: 20})
-            );
+            
+            gameStateController.loadGame(generatedMap);
         })
         
         container.addButton(scene, "Give feedback", () => {

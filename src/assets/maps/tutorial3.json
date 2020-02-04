@@ -45,9 +45,9 @@
         {
             "index": 5,
             "soil": {
-                "nitrogenContent": 1,
-                "phosphorousContent": 1,
-                "potassiumContent": 3
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
             }
         },
         {
@@ -85,17 +85,17 @@
         {
             "index": 10,
             "soil": {
-                "nitrogenContent": 1,
-                "phosphorousContent": 1,
-                "potassiumContent": 3
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
             }
         },
         {
             "index": 11,
             "soil": {
-                "nitrogenContent": 1,
-                "phosphorousContent": 1,
-                "potassiumContent": 3
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
             }
         },
         {
@@ -125,25 +125,25 @@
         {
             "index": 15,
             "soil": {
-                "nitrogenContent": 1,
-                "phosphorousContent": 1,
-                "potassiumContent": 3
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
             }
         },
         {
             "index": 16,
             "soil": {
-                "nitrogenContent": 1,
-                "phosphorousContent": 1,
-                "potassiumContent": 3
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
             }
         },
         {
             "index": 17,
             "soil": {
-                "nitrogenContent": 1,
-                "phosphorousContent": 1,
-                "potassiumContent": 3
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
             }
         },
         {
@@ -165,33 +165,33 @@
         {
             "index": 20,
             "soil": {
-                "nitrogenContent": 1,
-                "phosphorousContent": 1,
-                "potassiumContent": 3
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
             }
         },
         {
             "index": 21,
             "soil": {
-                "nitrogenContent": 1,
-                "phosphorousContent": 1,
-                "potassiumContent": 3
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
             }
         },
         {
             "index": 22,
             "soil": {
-                "nitrogenContent": 1,
-                "phosphorousContent": 1,
-                "potassiumContent": 3
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
             }
         },
         {
             "index": 23,
             "soil": {
-                "nitrogenContent": 1,
-                "phosphorousContent": 1,
-                "potassiumContent": 3
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
             }
         },
         {
@@ -205,33 +205,33 @@
         {
             "index": 25,
             "soil": {
-                "nitrogenContent": 1,
-                "phosphorousContent": 1,
-                "potassiumContent": 3
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
             }
         },
         {
             "index": 26,
             "soil": {
-                "nitrogenContent": 1,
-                "phosphorousContent": 1,
-                "potassiumContent": 3
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
             }
         },
         {
             "index": 27,
             "soil": {
-                "nitrogenContent": 1,
-                "phosphorousContent": 1,
-                "potassiumContent": 3
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
             }
         },
         {
             "index": 28,
             "soil": {
-                "nitrogenContent": 1,
-                "phosphorousContent": 1,
-                "potassiumContent": 3
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
             }
         },
         {
@@ -294,12 +294,44 @@
                 "0"
             ],
             "autoReplantTileMap": {}
+        },
+        "2": {
+            "controlledBy": "None",
+            "cloudOwned": null,
+            "seedsOwned": [
+                "2"
+            ],
+            "flowers": [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8"
+            ],
+            "autoReplantTileMap": {
+                "24": "2",
+                "27": "2",
+                "28": "2",
+                "29": "2",
+                "31": "2",
+                "32": "2",
+                "33": "2",
+                "34": "2"
+            }
         }
     },
     "seedStatus": {
         "1": {
             "type": "1",
-            "quantity": 0,
+            "quantity": 400,
+            "progress": 0
+        },
+        "2": {
+            "type": "2",
+            "quantity": 99999,
             "progress": 0
         }
     },
@@ -310,35 +342,71 @@
             "name": "Daisy",
             "turnsUntilGrown": 2,
             "turnsUntilDead": 9999,
-            "seedProductionRate": 35,
+            "seedProductionRate": 1,
             "tenacity": 0,
             "nitrogen": 2,
             "phosphorous": 2,
-            "potassium": 1
+            "potassium": 2
+        },
+        "2": {
+            "type": "2",
+            "name": "Rotweed",
+            "turnsUntilGrown": 3,
+            "turnsUntilDead": 3,
+            "seedProductionRate": 0,
+            "tenacity": 0,
+            "nitrogen": 2,
+            "phosphorous": 2,
+            "potassium": 2
         }
     },
     "clouds": {},
-    "rivers": [],
+    "rivers": [
+        {
+            "x": 4,
+            "y": 0
+        },
+        {
+            "x": 4,
+            "y": 1
+        },
+        {
+            "x": 4,
+            "y": 2
+        },
+        {
+            "x": 4,
+            "y": 3
+        },
+        {
+            "x": 4,
+            "y": 4
+        }
+    ],
     "mountains": [
         {
+            "x": 0,
+            "y": 5
+        },
+        {
+            "x": 1,
+            "y": 5
+        },
+        {
+            "x": 0,
+            "y": 4
+        },
+        {
+            "x": 1,
+            "y": 4
+        },
+        {
             "x": 2,
-            "y": 1
+            "y": 4
         },
         {
             "x": 3,
-            "y": 1
-        },
-        {
-            "x": 2,
-            "y": 2
-        },
-        {
-            "x": 3,
-            "y": 2
-        },
-        {
-            "x": 3,
-            "y": 3
+            "y": 4
         }
     ],
     "flowersMap": {
@@ -347,6 +415,54 @@
             "y": 6,
             "type": "1",
             "growth": 0
+        },
+        "1": {
+            "x": 1,
+            "y": 6,
+            "type": "2",
+            "growth": 5
+        },
+        "2": {
+            "x": 2,
+            "y": 6,
+            "type": "2",
+            "growth": 3
+        },
+        "3": {
+            "x": 2,
+            "y": 5,
+            "type": "2",
+            "growth": 1
+        },
+        "4": {
+            "x": 3,
+            "y": 6,
+            "type": "2",
+            "growth": 2
+        },
+        "5": {
+            "x": 3,
+            "y": 5,
+            "type": "2",
+            "growth": 1
+        },
+        "6": {
+            "x": 4,
+            "y": 6,
+            "type": "2",
+            "growth": 0
+        },
+        "7": {
+            "x": 4,
+            "y": 5,
+            "type": "2",
+            "growth": 2
+        },
+        "8": {
+            "x": 4,
+            "y": 4,
+            "type": "2",
+            "growth": 2
         }
     }
 }

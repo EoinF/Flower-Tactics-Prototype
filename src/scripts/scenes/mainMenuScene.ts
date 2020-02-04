@@ -10,6 +10,7 @@ import { filter, mapTo, startWith, tap, first, skip } from "rxjs/operators";
 import { LevelSelectView } from "../views/MainMenu/LevelSelectView";
 import { MainMenuView } from "../views/MainMenu/MainMenuView";
 import { Tutorial3 } from "../tutorial/Tutorial3";
+import { GameStateData } from "../objects/GameState";
 
 export default class MainMenuScene extends Phaser.Scene {
     constructor() {
@@ -66,17 +67,6 @@ export default class MainMenuScene extends Phaser.Scene {
             }
         });
     }
-
-	getMapImageData(textureKey: string) {
-		const frame = this.textures.getFrame(textureKey);
-		const cnv = this.textures.createCanvas('temp' + Math.random(), frame.width, frame.height);
-		let ctx = cnv.getContext();
-		ctx.clearRect(0, 0, frame.width, frame.height);
-		ctx.drawImage(frame.source.image, 0, 0, frame.width, frame.height, 0, 0, frame.width, frame.height);
-
-		const imageData = ctx.getImageData(0, 0, frame.width, frame.height);
-		return imageData;
-	}
     
 	loadMap(mapName: string) {
         const soilColourConverter = new SoilColourConverter();
@@ -84,10 +74,7 @@ export default class MainMenuScene extends Phaser.Scene {
         const mapLoader = new MapLoader(soilColourConverter);
 
         this.load.on('complete', () => {
-            const imageData = this.getMapImageData(`map-soil-${mapName}`);
-            const objectData = this.cache.json.get(`object-data-${mapName}`) as ObjectData;
-
-            const initialState = mapLoader.loadMap(imageData, objectData);
+            const initialState = this.cache.json.get(`data-${mapName}`) as GameStateData;
 
             if (mapName === "tutorial1") {
                 tutorialRunner.runTutorial(new Tutorial1());
@@ -99,12 +86,12 @@ export default class MainMenuScene extends Phaser.Scene {
                 tutorialRunner.runTutorial(new Tutorial3());
             }
 
+            // new MapSaver().saveMap(initialState);
             gameStateController.loadGame(initialState);
             this.load.removeAllListeners();
         }, this)
 
-        this.load.image(`map-soil-${mapName}`, `assets/maps/parts/${mapName}/soil.bmp`);
-        this.load.json(`object-data-${mapName}`, `assets/maps/parts/${mapName}/objects.json`);
+        this.load.json(`data-${mapName}`, `assets/maps/${mapName}.json`);
         this.load.start();
 	}
 }

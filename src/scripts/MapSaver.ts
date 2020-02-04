@@ -18,7 +18,7 @@ export class MapSaver {
                 seedStatus: gameState.seedStatus,
                 players: gameState.players,
                 tiles: gameState.tiles,
-                randomNumberGeneratorSeed: gameState.randomNumberGeneratorSeed
+                randomNumberGeneratorSeed: gameState.getRandomNumberSeed()
             } as GameStateData
         } else {
             data = gameState
@@ -26,7 +26,9 @@ export class MapSaver {
         this.save(data);
     }
 
-    save(data: GameStateData) {
-        document.getElementById("map-data-text")!.innerText = JSON.stringify(data);
+    private save(data: GameStateData) {
+        const element = document.getElementById("map-data-text")!;
+        element.innerText = JSON.stringify(data);
+        element.style.display = "block";
     }
 }

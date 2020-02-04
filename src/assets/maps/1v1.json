@@ -1,0 +1,1796 @@
+{
+    "numTilesX": 14,
+    "numTilesY": 14,
+    "tiles": [
+        {
+            "index": 0,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 1,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 2,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 3,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 4,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 5,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 6,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 7,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 8,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 9,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 10,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 11,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 12,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 13,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 14,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 15,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 16,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 17,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 18,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 19,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 20,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 21,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 22,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 23,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 24,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 25,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 26,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 27,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 28,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 29,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 30,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 31,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 32,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 33,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 34,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 35,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 36,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 37,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 38,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 39,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 40,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 41,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 42,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 43,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 44,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 45,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 46,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 47,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 48,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 49,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 50,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 51,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 52,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 53,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 54,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 55,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 56,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 57,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 58,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 59,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 60,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 61,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 62,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 63,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 64,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 65,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 66,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 67,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 68,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 69,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 70,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 71,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 72,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 73,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 74,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 75,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 76,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 77,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 78,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 79,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 80,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 81,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 82,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 83,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 84,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 85,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 86,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 87,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 88,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 89,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 90,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 91,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 92,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 93,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 94,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 95,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 96,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 97,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 98,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 99,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 100,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 101,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 102,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 103,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 104,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 105,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 106,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 107,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 108,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 109,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 110,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 111,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 112,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 113,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 114,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 115,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 116,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 117,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 118,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 119,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 120,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 121,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 122,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 123,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 124,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 125,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 2
+            }
+        },
+        {
+            "index": 126,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 127,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 128,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 129,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 130,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 131,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 132,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 133,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 134,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 135,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 136,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 137,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 138,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 139,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 140,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 141,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 142,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 143,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 144,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 145,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 146,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 147,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 148,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 149,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 150,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 151,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 152,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 153,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 154,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 155,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 156,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 157,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 158,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 159,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 160,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 161,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 162,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 163,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 164,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 165,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 166,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 167,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 168,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 169,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 170,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 171,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 172,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 173,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 174,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 175,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 176,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 177,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 178,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 179,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 180,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 181,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 182,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        },
+        {
+            "index": 183,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 184,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 185,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 186,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 187,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 188,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 189,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 190,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 191,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 192,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 193,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 194,
+            "soil": {
+                "nitrogenContent": 2,
+                "phosphorousContent": 2,
+                "potassiumContent": 1
+            }
+        },
+        {
+            "index": 195,
+            "soil": {
+                "nitrogenContent": 1,
+                "phosphorousContent": 1,
+                "potassiumContent": 3
+            }
+        }
+    ],
+    "players": {
+        "1": {
+            "controlledBy": "Human",
+            "cloudOwned": "1",
+            "seedsOwned": [
+                "1"
+            ],
+            "flowers": [
+                "0"
+            ],
+            "autoReplantTileMap": {}
+        },
+        "2": {
+            "controlledBy": "AI",
+            "cloudOwned": "2",
+            "seedsOwned": [
+                "2"
+            ],
+            "flowers": [
+                "1"
+            ],
+            "autoReplantTileMap": {}
+        }
+    },
+    "seedStatus": {
+        "1": {
+            "type": "1",
+            "quantity": 5,
+            "progress": 0
+        },
+        "2": {
+            "type": "2",
+            "quantity": 5,
+            "progress": 0
+        }
+    },
+    "flowerAugmentations": {
+        "0": [
+            {
+                "type": "tenacity",
+                "strength": 100,
+                "turnsRemaining": 10
+            }
+        ],
+        "1": [
+            {
+                "type": "tenacity",
+                "strength": 100,
+                "turnsRemaining": 10
+            }
+        ]
+    },
+    "flowerTypes": {
+        "1": {
+            "type": "1",
+            "name": "Daisy",
+            "turnsUntilGrown": 4,
+            "turnsUntilDead": 5,
+            "seedProductionRate": 25,
+            "tenacity": 0,
+            "nitrogen": 2,
+            "phosphorous": 2,
+            "potassium": 1
+        },
+        "2": {
+            "type": "2",
+            "name": "Daffodil",
+            "turnsUntilGrown": 4,
+            "turnsUntilDead": 5,
+            "seedProductionRate": 25,
+            "tenacity": 0,
+            "nitrogen": 2,
+            "phosphorous": 2,
+            "potassium": 1
+        }
+    },
+    "clouds": {
+        "1": {
+            "tileIndex": 189
+        },
+        "2": {
+            "tileIndex": 6
+        }
+    },
+    "rivers": [
+        {
+            "x": 0,
+            "y": 7
+        },
+        {
+            "x": 1,
+            "y": 6
+        },
+        {
+            "x": 2,
+            "y": 7
+        },
+        {
+            "x": 3,
+            "y": 6
+        },
+        {
+            "x": 4,
+            "y": 7
+        },
+        {
+            "x": 5,
+            "y": 6
+        },
+        {
+            "x": 6,
+            "y": 7
+        },
+        {
+            "x": 7,
+            "y": 6
+        },
+        {
+            "x": 8,
+            "y": 7
+        },
+        {
+            "x": 9,
+            "y": 6
+        },
+        {
+            "x": 10,
+            "y": 7
+        },
+        {
+            "x": 11,
+            "y": 6
+        },
+        {
+            "x": 12,
+            "y": 7
+        },
+        {
+            "x": 13,
+            "y": 6
+        },
+        {
+            "x": 2,
+            "y": 0
+        },
+        {
+            "x": 11,
+            "y": 0
+        },
+        {
+            "x": 2,
+            "y": 13
+        },
+        {
+            "x": 11,
+            "y": 13
+        }
+    ],
+    "mountains": [
+        {
+            "x": 1,
+            "y": 4
+        },
+        {
+            "x": 1,
+            "y": 5
+        },
+        {
+            "x": 2,
+            "y": 5
+        },
+        {
+            "x": 1,
+            "y": 8
+        },
+        {
+            "x": 1,
+            "y": 9
+        },
+        {
+            "x": 2,
+            "y": 8
+        },
+        {
+            "x": 11,
+            "y": 5
+        },
+        {
+            "x": 12,
+            "y": 5
+        },
+        {
+            "x": 12,
+            "y": 4
+        },
+        {
+            "x": 11,
+            "y": 8
+        },
+        {
+            "x": 12,
+            "y": 8
+        },
+        {
+            "x": 12,
+            "y": 9
+        }
+    ],
+    "flowersMap": {
+        "0": {
+            "x": 7,
+            "y": 13,
+            "type": "1",
+            "growth": 4
+        },
+        "1": {
+            "x": 6,
+            "y": 0,
+            "type": "2",
+            "growth": 4
+        }
+    }
+}
