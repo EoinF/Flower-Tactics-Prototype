@@ -1,15 +1,15 @@
-import { BaseUIObject, UIObject } from "../generic/UIObject";
+import { UIObject } from "../generic/UIObject";
 import { COLOURS, NITROGEN_VALUE_RANGE, PHOSPHOROUS_VALUE_RANGE, POTASSIUM_VALUE_RANGE } from "../../constants";
 import { TextLabel } from "../generic/TextLabel";
-import { NumberRangeDisplay } from "../generic/NumberDisplay/NumberRangeDisplay";
 import { UIContainer } from "../generic/UIContainer";
 import { FlexUIContainer } from "../generic/FlexUIContainer";
 import { FlowerType } from "../../objects/FlowerType";
+import { NumberPointDisplay } from "../generic/NumberDisplay/NumberPointDisplay";
 
 export class FlowerStatsDisplay implements UIObject {
-    private nitrogenDisplay: NumberRangeDisplay;
-    private phosphorousDisplay: NumberRangeDisplay;
-    private potassiumDisplay: NumberRangeDisplay;
+    private nitrogenDisplay: NumberPointDisplay;
+    private phosphorousDisplay: NumberPointDisplay;
+    private potassiumDisplay: NumberPointDisplay;
 
     x: number;
     y: number;
@@ -45,7 +45,7 @@ export class FlowerStatsDisplay implements UIObject {
         const labelColumnWidth = Math.max(nitrogenLabel.width, phosphorousLabel.width, potassiumLabel.width);
 
         // Nitrogen section
-        this.nitrogenDisplay = new NumberRangeDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
+        this.nitrogenDisplay = new NumberPointDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
             COLOURS.WHITE, COLOURS.BLACK,
             { startLabelText: "0%", endLabelText: "30%" },
             NITROGEN_VALUE_RANGE
@@ -55,7 +55,7 @@ export class FlowerStatsDisplay implements UIObject {
         nitrogenSection.addChild(this.nitrogenDisplay, "Middle");
 
         // Phosphorous section
-        this.phosphorousDisplay = new NumberRangeDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
+        this.phosphorousDisplay = new NumberPointDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
             COLOURS.GREEN, COLOURS.RED,
             { startLabelText: "0%", endLabelText: "30%" },
             PHOSPHOROUS_VALUE_RANGE
@@ -65,7 +65,7 @@ export class FlowerStatsDisplay implements UIObject {
         phosphorousSection.addChild(this.phosphorousDisplay, "Middle");
 
         // Potassium section
-        this.potassiumDisplay = new NumberRangeDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
+        this.potassiumDisplay = new NumberPointDisplay(scene, 2 + labelColumnWidth, 2, displayWidth, displayHeight,
             COLOURS.GRAY, COLOURS.BLUE,
             { startLabelText: "0%", endLabelText: "30%" },
             POTASSIUM_VALUE_RANGE
@@ -84,9 +84,9 @@ export class FlowerStatsDisplay implements UIObject {
     }
     
     setValues(flowerTypeDetails: FlowerType) {
-        this.nitrogenDisplay.setValues({min: flowerTypeDetails.nitrogenMin, max: flowerTypeDetails.nitrogenMax});
-        this.phosphorousDisplay.setValues({min: flowerTypeDetails.phosphorousMin, max: flowerTypeDetails.phosphorousMax});
-        this.potassiumDisplay.setValues({min: flowerTypeDetails.potassiumMin, max: flowerTypeDetails.potassiumMax});
+        this.nitrogenDisplay.setValue(flowerTypeDetails.nitrogen);
+        this.phosphorousDisplay.setValue(flowerTypeDetails.phosphorous);
+        this.potassiumDisplay.setValue(flowerTypeDetails.potassium);
         this.setVisible(true);
     }
 

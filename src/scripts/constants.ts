@@ -1,8 +1,8 @@
 import { SeedPlacementErrorStatus } from "./connectors/utils";
 
-export const NITROGEN_VALUE_RANGE = { min: 0, max: 3000 };
-export const PHOSPHOROUS_VALUE_RANGE = { min: 0, max: 3000 };
-export const POTASSIUM_VALUE_RANGE = { min: 0, max: 3000 };
+export const NITROGEN_VALUE_RANGE = { min: 0, max: 3 };
+export const PHOSPHOROUS_VALUE_RANGE = { min: 0, max: 3};
+export const POTASSIUM_VALUE_RANGE = { min: 0, max: 3 };
 
 export const ALERT_MESSAGE_TIMEOUT = 2000;
 
@@ -51,12 +51,12 @@ export const COLOURS = {
     }
 };
 
-export const SEED_INTERVALS =               [0, 5,  10, 20, 30, 50, 100,    200]; // Number of seeds
+export const SEED_INTERVALS =               [0, 10, 20, 30, 50, 100,    200]; // Number of seeds
 
-export const SUCCESS_INTERVALS =            [0, 50, 70, 80, 40, 0,  0,      0];  // % chance
-export const SUCCESS_PLUS_INTERVALS =       [0, 0,  10, 30, 65, 80, 30,     0];  // % chance
-export const SUCCESS_PLUS_2_INTERVALS =     [0, 0,   0,  0, 10, 50, 70,     80]; // % chance
-export const SUCCESS_PLUS_3_INTERVALS =     [0, 0,   0,  0, 0,   0, 30,     60]; // % chance
+export const SUCCESS_INTERVALS =            [0, 100,    100,    100,    0,      0,      0];  // % chance
+export const SUCCESS_PLUS_INTERVALS =       [0, 0,      50,     80,     100,    100,    0];  // % chance
+export const SUCCESS_PLUS_2_INTERVALS =     [0, 0,      0,      20,     50,     60,     100]; // % chance
+export const SUCCESS_PLUS_3_INTERVALS =     [0, 0,      0,      0,      0,      10,     70]; // % chance
 
 export const ACTION_RESOLUTION_DURATION = 500;
 export const APPLYING_DELTAS_DURATION = 50;

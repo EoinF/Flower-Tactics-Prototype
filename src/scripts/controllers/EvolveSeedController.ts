@@ -1,8 +1,7 @@
 import { Subject, BehaviorSubject, Observable, merge } from "rxjs";
-import { StringMap } from "../types";
 import { EvolutionOutcome } from "../deltaCalculators/calculateSeedEvolve";
 import { GameStateDelta } from "../objects/GameStateDelta";
-import { mapTo, startWith, distinctUntilChanged } from "rxjs/operators";
+import { mapTo, startWith } from "rxjs/operators";
 
 export interface StagedSeed {
     type: string;

@@ -45,12 +45,9 @@
             "turnsUntilDead": 9999,
             "seedProductionRate": 1,
             "tenacity": 0,
-            "nitrogenMin": 1800,
-            "nitrogenMax": 2300,
-            "phosphorousMin": 2000,
-            "phosphorousMax": 2500,
-            "potassiumMin": 1100,
-            "potassiumMax": 1500
+            "nitrogen": 2,
+            "phosphorous": 2,
+            "potassium": 2
         },
         "2": {
             "type": "2",
@@ -59,12 +56,9 @@
             "turnsUntilDead": 3,
             "seedProductionRate": 0,
             "tenacity": 0,
-            "nitrogenMin": 1800,
-            "nitrogenMax": 2300,
-            "phosphorousMin": 2000,
-            "phosphorousMax": 2500,
-            "potassiumMin": 1100,
-            "potassiumMax": 1500
+            "nitrogen": 2,
+            "phosphorous": 2,
+            "potassium": 2
         }
     },
     "clouds": {},

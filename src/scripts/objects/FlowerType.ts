@@ -6,10 +6,7 @@ export interface FlowerType {
     seedProductionRate: number,
     tenacity: number;
     
-    nitrogenMin: number;
-    nitrogenMax: number;
-    phosphorousMin: number;
-    phosphorousMax: number;
-    potassiumMin: number;
-    potassiumMax: number;
+    nitrogen: number;
+    phosphorous: number;
+    potassium: number;
 }

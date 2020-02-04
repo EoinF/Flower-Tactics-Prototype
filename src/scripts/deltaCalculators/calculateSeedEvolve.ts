@@ -26,26 +26,26 @@ export function calculateSeedEvolutionResults(outcomeType: EvolutionOutcome, sta
     let newFlowerDeltas: GameStateDelta[] = [];
     if (outcomeType === 'SUCCESS+++') {
         newFlowerDeltas = [
-            applyImprovements(existingFlower,  gameState, 50),
-            applyImprovements(existingFlower,  gameState, 50),
-            applyImprovements(existingFlower,  gameState, 50)
+            applyImprovements(existingFlower,  gameState, 5),
+            applyImprovements(existingFlower,  gameState, 5),
+            applyImprovements(existingFlower,  gameState, 5)
         ]
     } else if (outcomeType === 'SUCCESS++') {
         newFlowerDeltas = [
-            applyImprovements(existingFlower, gameState, 25),
-            applyImprovements(existingFlower,  gameState, 25),
-            applyImprovements(existingFlower,  gameState, 25)
+            applyImprovements(existingFlower, gameState, 3),
+            applyImprovements(existingFlower,  gameState, 2),
+            applyImprovements(existingFlower,  gameState, 2)
         ]
     } else if (outcomeType === 'SUCCESS+') {
         newFlowerDeltas = [
-            applyImprovements(existingFlower, gameState, 15),
-            applyImprovements(existingFlower,  gameState, 15),
-            applyImprovements(existingFlower,  gameState, 15)
+            applyImprovements(existingFlower, gameState, 1),
+            applyImprovements(existingFlower,  gameState, 1),
+            applyImprovements(existingFlower,  gameState, 1)
         ]
     } else if (outcomeType === 'SUCCESS') {
         newFlowerDeltas = [
-            applyImprovements(existingFlower, gameState, 5),
-            applyImprovements(existingFlower,  gameState, 5)
+            applyImprovements(existingFlower, gameState, 1),
+            applyImprovements(existingFlower,  gameState, 1)
         ]
     }
     
@@ -66,18 +66,19 @@ function applyImprovements(baseFlower: FlowerType, gameState: GameState, improve
     const improvementsChances = {
         'growth': 1,
         'seed production': 3,
-        'turns until dead': 1,
-        'requirements': 4,
+        'turns until dead': 2,
+        'requirementsUp': 2,
+        'requirementsDown': 2,
         'tenacity': 3
     }
     // points should be distributed randomly (based on the above weights) to improve each of these stats
 
     const improvementCosts = {
-        'growth': 17 - baseFlower.turnsUntilGrown,
-        'turns until dead': Math.max(7, 15 - baseFlower.turnsUntilDead),
-        'seed production': Math.max(3, Math.round(baseFlower.seedProductionRate / 2) - 15),
+        'growth': 1,
+        'turns until dead': 1,
+        'seed production': 1,
         'requirements': 1,
-        'tenacity': 1 + Math.floor(baseFlower.tenacity / 20)
+        'tenacity': 1
     };
 
     const delta = new GameStateDelta();
@@ -103,39 +104,25 @@ function applyImprovementDelta(delta: GameStateDelta, improvementType: string, g
             delta.addDelta(["turnsUntilGrown"], -deltaValue);
             break;
         case 'seed production':
-            delta.addDelta(["seedProductionRate"], deltaValue);
+            delta.addDelta(["seedProductionRate"], deltaValue * 7);
             break;
         case 'turns until dead':
-            delta.addDelta(["turnsUntilDead"], -deltaValue);
+            delta.addDelta(["turnsUntilDead"], deltaValue);
             break;
-        case 'requirements':
+        case 'requirementsUp':
+        case 'requirementsDown':
+            const change = improvementType === 'requirementsUp' ? deltaValue: -deltaValue;
             const roll = gameState.getNextRandomNumber(1, 3);
             if (roll === 1) {
-                const result = improveRequirements(gameState, deltaValue);
-                delta.addDelta(["nitrogenMin"], result.min);
-                delta.addDelta(["nitrogenMax"], result.max);
+                delta.addDelta(["nitrogen"], change);
             } else if (roll === 2) {
-                const result = improveRequirements(gameState, deltaValue);
-                delta.addDelta(["potassiumMin"], result.min);
-                delta.addDelta(["potassiumMax"], result.max);
+                delta.addDelta(["potassium"], change);
             } else {
-                const result = improveRequirements(gameState, deltaValue);
-                delta.addDelta(["phosphorousMin"], result.min);
-                delta.addDelta(["phosphorousMax"], result.max);
+                delta.addDelta(["phosphorous"], change);
             }
             break;
         case 'tenacity':
-            delta.addDelta(["tenacity"], deltaValue);
+            delta.addDelta(["tenacity"], deltaValue * 10);
             break;
-    }
-}
-
-function improveRequirements(gameState: GameState, deltaValue: number) {
-    const random = gameState.getNextRandomNumber(0, 1);
-    const variance = random === 0 ? -20 : +20;
-
-    return {
-        min: (variance - 10) * deltaValue,
-        max: (10 + variance) * deltaValue
     }
 }

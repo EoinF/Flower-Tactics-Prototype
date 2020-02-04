@@ -2,7 +2,6 @@ import { Soil } from "./objects/Tile";
 import { HSLColor } from "./extensions";
 import { NITROGEN_VALUE_RANGE, POTASSIUM_VALUE_RANGE, PHOSPHOROUS_VALUE_RANGE } from "./constants";
 
-
 export class SoilColourConverter {
     colourToSoil(colour: HSLColor): Soil {
         let phosphorousRatio = (1 - colour.h * (240 / 54));

@@ -37,13 +37,13 @@ export function setupGameInputConnectors(
             if (heldSeed != null) {
                 const result = getPlacementStatus(gameState.tiles[clickedTile], gameState, currentPlayerId, placedSeedsMap, heldSeed.type);
 
-                if (result === "PLACEMENT_ALLOWED") {
-                    gameActionController.placeSeed(heldSeed.type, clickedTile, currentPlayerId);
-                } else if (inputManager.shift!.isDown 
-                    && (result === 'INSUFFICIENT_SEEDS_REMAINING' || result === 'OTHER_SEED_TYPE_BLOCKING')
+                if (inputManager.shift!.isDown
+                    && (result === 'INSUFFICIENT_SEEDS_REMAINING' || result === 'OTHER_SEED_TYPE_BLOCKING' || result === 'PLACEMENT_ALLOWED')
                 ) {
                     const playerOwnedTypeOnTile = placedSeedsMap.getSeedsAtTile(clickedTile).find(seed => seed.ownerId === currentPlayerId)!.type;
                     gameActionController.removeSeed(playerOwnedTypeOnTile!, clickedTile, currentPlayerId);
+                } else if (result === "PLACEMENT_ALLOWED") {
+                    gameActionController.placeSeed(heldSeed.type, clickedTile, currentPlayerId);
                 } else {
                     guiController.createAlertMessage(SEED_PLACEMENT_MESSAGE_MAP[result]);
                 }

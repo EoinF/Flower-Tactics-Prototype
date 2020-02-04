@@ -1,7 +1,5 @@
 import { Tile } from "../objects/Tile";
 import { Flower } from "../objects/Flower";
-import { StringMap } from "../types";
-import { FlowerType } from "../objects/FlowerType";
 import { GameState } from "../objects/GameState";
 import { isRequirementsSatisfied } from "./helpers";
 import { GameStateDelta } from "../objects/GameStateDelta";
