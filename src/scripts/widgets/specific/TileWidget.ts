@@ -74,6 +74,11 @@ export class TileWidget extends ClickableWidget {
         this.updateDisplay();
     }
 
+    setIsHighlighted(isHighlighted: boolean) {
+        this.isHovering = isHighlighted;
+        this.updateDisplay();
+    }
+
     private updateDisplay() {
         let tintColour = this.soilColour;
         let colourRatio = 70;

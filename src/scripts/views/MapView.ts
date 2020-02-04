@@ -1,12 +1,12 @@
 import { SoilColourConverter } from "../SoilColourConverter";
 import { GameStateController } from "../controllers/GameStateController";
 import { MapController } from "../controllers/MapController";
-import { startWith, pairwise, distinctUntilChanged, withLatestFrom, map, filter } from "rxjs/operators";
+import { startWith, pairwise, distinctUntilChanged, withLatestFrom, map, filter, flatMap } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
 import { TileWidget } from "../widgets/specific/TileWidget";
 import { indexToMapCoordinates, getPlayerColour } from "../widgets/utils";
-import { combineLatest } from "rxjs";
+import { combineLatest, merge } from "rxjs";
 import { HeldObjectController } from "../controllers/HeldObjectController";
 import { isRequirementsSatisfied } from "../deltaCalculators/helpers";
 import { GameActionController, PlacedSeed } from "../controllers/GameActionController";
@@ -14,6 +14,8 @@ import { PlacedCloudWidget } from "../widgets/specific/PlacedCloudWidget";
 import { COLOURS } from "../constants";
 import { PlacedFlowerWidget } from "../widgets/specific/PlacedFlowerWidget";
 import { CompetingSeedsWidget } from "../widgets/specific/CompetingSeedsWidget";
+import { GuiController } from "../controllers/GuiController";
+import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
 
 export class MapView {
     scene: Phaser.Scene;
@@ -34,7 +36,9 @@ export class MapView {
 	  gameActionController: GameActionController,
       soilColourConverter: SoilColourConverter,
 	  heldObjectController: HeldObjectController,
-	  mapController: MapController
+	  mapController: MapController,
+	  guiController: GuiController,
+	  flowerSelectionController: FlowerSelectionController
     ) {
 		this.scene = scene;
 		this.soilColourConverter = soilColourConverter;
@@ -47,7 +51,7 @@ export class MapView {
 		this.placedSeedSprites = new Map<number, PlacedSeedWidget>();
 
         this.setupSprites(scene, gameStateController);
-        this.setupCallbacks(gameStateController, gameActionController, mapController, heldObjectController);
+        this.setupCallbacks(gameStateController, gameActionController, mapController, heldObjectController, guiController, flowerSelectionController);
     }
 
     setupSprites(scene: Phaser.Scene, gameStateController: GameStateController) {
@@ -127,7 +131,8 @@ export class MapView {
 
 	setupCallbacks(
 		gameStateController: GameStateController, gameActionController: GameActionController,
-		mapController: MapController, heldObjectController: HeldObjectController
+		mapController: MapController, heldObjectController: HeldObjectController, guiController: GuiController,
+		flowerSelectionController: FlowerSelectionController
 	) {
         gameStateController.gameStateObservable().subscribe((newState) => {
 			this.tileButtons.forEach(button => {
@@ -201,30 +206,47 @@ export class MapView {
 			}
 		});
 		
-		combineLatest(heldObjectController.heldSeedObservable(), gameStateController.gameStateObservable(), gameStateController.currentPlayerObservable())
-			.subscribe(([pickedUpSeed, gameState, currentPlayerId]) => {
-				if (pickedUpSeed != null) {
-					for (let i = 0; i < gameState.tiles.length; i++) {
-						const tile = gameState.tiles[i];
-
-						const x = tile.index % gameState.numTilesX;
-						const y = Math.floor(tile.index / gameState.numTilesX);
-						
-						const playerFlowers = gameState.players[currentPlayerId].flowers;
-						const isPlaceable = gameState.getMountainAtTile(tile) == null
-							&& gameState.getFlowerIndexAtTile(tile) == null
-							&& gameState.getTilesAdjacent(x, y).some(adjacentTile => {
-									const flowerAtTile = gameState.getFlowerIndexAtTile(adjacentTile);
-									return flowerAtTile != null && playerFlowers.indexOf(flowerAtTile) !== -1
-								}
-							);
-							
-						const isViable = isRequirementsSatisfied(tile.soil, gameState.flowerTypes[pickedUpSeed.type]);
-
-						this.tileButtons[tile.index].setPlacementState(isPlaceable ? "allowed": "blocked", isViable ? "viable" : "unviable");
-					};
-				}
+		combineLatest(
+			flowerSelectionController.selectedFlowerTypeObservable(),
+			guiController.revealSeedsOfTypeObservable(),
+			gameStateController.gameStateObservable()
+		).subscribe(([selectedFlowerType, isRevealingSeeds, gameState]) => {
+			Object.keys(gameState.flowersMap).filter(key =>
+				gameState.flowersMap[key].type === selectedFlowerType
+			).forEach(key => {
+				const flower = gameState.flowersMap[key];
+				const tile = gameState.getTileAt(flower.x, flower.y)!;
+				this.tileButtons[tile.index].setIsHighlighted(isRevealingSeeds);
 			});
+		});
+
+		combineLatest(
+			heldObjectController.heldSeedObservable(),
+			gameStateController.gameStateObservable(),
+			gameStateController.currentPlayerObservable()
+		).subscribe(([pickedUpSeed, gameState, currentPlayerId]) => {
+			if (pickedUpSeed != null) {
+				for (let i = 0; i < gameState.tiles.length; i++) {
+					const tile = gameState.tiles[i];
+
+					const x = tile.index % gameState.numTilesX;
+					const y = Math.floor(tile.index / gameState.numTilesX);
+					
+					const playerFlowers = gameState.players[currentPlayerId].flowers;
+					const isPlaceable = gameState.getMountainAtTile(tile) == null
+						&& gameState.getFlowerIndexAtTile(tile) == null
+						&& gameState.getTilesAdjacent(x, y).some(adjacentTile => {
+								const flowerAtTile = gameState.getFlowerIndexAtTile(adjacentTile);
+								return flowerAtTile != null && playerFlowers.indexOf(flowerAtTile) !== -1
+							}
+						);
+						
+					const isViable = isRequirementsSatisfied(tile.soil, gameState.flowerTypes[pickedUpSeed.type]);
+
+					this.tileButtons[tile.index].setPlacementState(isPlaceable ? "allowed": "blocked", isViable ? "viable" : "unviable");
+				};
+			}
+		});
 
 		heldObjectController.heldSeedObservable()
 			.pipe(filter(heldObject => heldObject == null))

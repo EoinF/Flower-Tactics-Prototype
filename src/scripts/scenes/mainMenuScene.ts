@@ -82,7 +82,6 @@ export default class MainMenuScene extends Phaser.Scene {
                 tutorialRunner.runTutorial(new Tutorial3());
             }
 
-            // new MapSaver().saveMap(initialState);
             gameStateController.loadGame(initialState);
             this.load.removeAllListeners();
         }, this)

@@ -69,8 +69,19 @@ export class SeedContainerView {
                 guiController.setScreenState("Evolve");
             });
 
+        
+        const eyeButton = new ImageButton(scene, 16 + seedPlacementButton.width + evolveButton.width, 0, "button-eye", 24, 24, COLOURS.PURPLE_100, COLOURS.LIGHT_YELLOW, COLOURS.RED, COLOURS.RED)
+            .setBorder(1, COLOURS.BLACK)
+            .onHover(() => {
+                guiController.revealSeedsOfType();
+            })
+            .onLeave(() => {
+                guiController.disableRevealSeedsOfType();
+            });
+
         this.mainContainer.addChild(seedPlacementButton, "Middle", "Right");
         this.mainContainer.addChild(evolveButton, "Middle", "Right");
+        this.mainContainer.addChild(eyeButton, "Middle", "Right");
 
         this.width = this.mainContainer.width;
         this.height = this.mainContainer.height;

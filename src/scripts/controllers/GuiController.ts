@@ -16,6 +16,7 @@ export class GuiController {
     private onClickEvolveButton$: Subject<void>;
     private onClickSeedPlacementButton$: Subject<void>;
     private onClickCloudPlacementButton$: Subject<void>;
+    private revealSeedsOfType$: Subject<boolean>;
     private screenState$: Subject<ScreenState>;
     private alertMessage$: Subject<string>;
     private messagePromptQueue$: BehaviorSubject<MessagePromptQueue>;
@@ -30,6 +31,7 @@ export class GuiController {
         this.onClickEvolveButton$ = new Subject();
         this.onClickSeedPlacementButton$ = new Subject();
         this.onClickCloudPlacementButton$ = new Subject();
+        this.revealSeedsOfType$ = new Subject();
         this.screenState$ = new ReplaySubject(1);
         this.alertMessage$ = new Subject();
         this.messagePromptQueue$ = new BehaviorSubject({
@@ -82,6 +84,14 @@ export class GuiController {
         this.onClickCloudPlacementButton$.next();
     }
 
+    revealSeedsOfType() {
+        this.revealSeedsOfType$.next(true);
+    }
+
+    disableRevealSeedsOfType() {
+        this.revealSeedsOfType$.next(false);
+    }
+
     setScreenState(screenState: ScreenState) {
         this.screenState$.next(screenState);
     }
@@ -125,6 +135,10 @@ export class GuiController {
     }
     onClickCloudPlacementButtonObservable(): Observable<void> {
         return this.onClickCloudPlacementButton$;
+    }
+    
+    revealSeedsOfTypeObservable(): Observable<boolean> {
+        return this.revealSeedsOfType$;
     }
 
     screenStateObservable(): Observable<ScreenState> {
