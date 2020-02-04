@@ -30,13 +30,15 @@ export function setupAIConnectors(gameStateController: GameStateController, game
                     placedSeed => placedSeed.ownerId === playerId
                 );
                 const ownedCloudID = gameState.players[playerId].cloudOwned;
-                const ownedCloud = { id: ownedCloudID, tileIndex: placedCloud[ownedCloudID] };
+                const ownedCloud = ownedCloudID != null ? 
+                    { id: ownedCloudID, tileIndex: placedCloud[ownedCloudID] }
+                    : null;
                 act(playerId, gameState, ownPlacedSeeds, placedSeeds, ownedCloud, gameActionController)
             })
     })
 }
 
-function act(playerId: string, gameState: GameState, ownPlacedSeeds: PlacedSeed[], placedSeedsMap: SeedTypeToPlacedSeedsMap, ownedCloud: PlacedCloud, 
+function act(playerId: string, gameState: GameState, ownPlacedSeeds: PlacedSeed[], placedSeedsMap: SeedTypeToPlacedSeedsMap, ownedCloud: PlacedCloud | null, 
     gameActionController: GameActionController
 ) {
     const seedStatus = gameState.seedStatus[gameState.players[playerId].seedsOwned[0]];

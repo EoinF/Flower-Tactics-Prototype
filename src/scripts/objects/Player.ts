@@ -6,6 +6,6 @@ export interface Player {
     controlledBy: PlayerType;
     flowers: string[];
     seedsOwned: string[];
-    cloudOwned: string;
+    cloudOwned: string | null;
     autoReplantTileMap: StringMap<string>;
 }

@@ -56,7 +56,7 @@ export function setupGameInputConnectors(
         )
         .subscribe(([tileIndex, isHoldingCloud, gameState, currentPlayerId]) => {
             if (isHoldingCloud) {
-                gameActionController.placeCloud(gameState.players[currentPlayerId].cloudOwned, tileIndex);
+                gameActionController.placeCloud(gameState.players[currentPlayerId].cloudOwned!, tileIndex);
             }
         });
 

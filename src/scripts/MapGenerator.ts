@@ -26,12 +26,45 @@ export class MapGenerator {
             numTilesX,
             numTilesY,
             tiles: this.generateTiles(numTilesX, numTilesY),
-            flowersMap: {},
+            flowersMap: {
+                "0": {
+                    growth: 2,
+                    type: "1",
+                    x: 13,
+                    y: 0,
+                }
+            },
             mountains: [],
             rivers: this.generateRivers(numTilesX, numTilesY),
-            players: {},
-            flowerTypes: {},
-            seedStatus: {},
+            players: {
+                "1": {
+                    controlledBy: "Human",
+                    autoReplantTileMap: {},
+                    cloudOwned: null,
+                    flowers: ["0"],
+                    seedsOwned: ["1"]
+                }
+            },
+            flowerTypes: {
+                "1": {
+                    name: "Test flower",
+                    nitrogen: 2,
+                    potassium: 2,
+                    phosphorous: 2,
+                    seedProductionRate: 99,
+                    tenacity: 50,
+                    turnsUntilDead: 3,
+                    turnsUntilGrown: 3,
+                    type: "1"
+                }
+            },
+            seedStatus: {
+                "1": {
+                    progress: 0,
+                    quantity: 100,
+                    type: "1"
+                }
+            },
             flowerAugmentations: {},
             randomNumberGeneratorSeed: "0",
             clouds: {}
@@ -39,14 +72,29 @@ export class MapGenerator {
     }
     
     private generateTiles(numTilesX: number, numTilesY: number): Tile[] {
+        let n = 1;
+        let p = 1;
+        let k = 1;
         return new Array<Tile | undefined>(numTilesX * numTilesY)
             .fill(undefined)
             .map((_, index) => new Tile(index))
             .map((tile) => {
                 tile.soil = {
-                    nitrogenContent: 0.09 * this.rnd.frac(),
-                    potassiumContent: 0.07 * this.rnd.frac(),
-                    phosphorousContent: 0.1 * this.rnd.frac()
+                    nitrogenContent: n,
+                    potassiumContent: p,
+                    phosphorousContent: k
+                }
+                n++;
+                if (n > 3) {
+                    n = 1;
+                    p++;
+                    if (p > 3) {
+                        k++;
+                        p = 1;
+                        if (k > 3) {
+                            k = 1;
+                        }
+                    }
                 }
                 return tile;
             });
@@ -58,6 +106,7 @@ export class MapGenerator {
             .map((_, index) => ({
                 x: index % numTilesX,
                 y: Math.floor(index / numTilesX)
-            }));
+            }))
+            .filter(() => this.rnd.integerInRange(0, 3) == 2);
     }
 }

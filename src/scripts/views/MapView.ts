@@ -96,7 +96,7 @@ export class MapView {
 
 				const player = Object.keys(gameState.players).find((playerId) => {
 					const player = gameState.players[playerId];
-					return player.cloudOwned.indexOf(cloudKey) !== -1
+					return player.cloudOwned && player.cloudOwned.indexOf(cloudKey) !== -1
 				});
 				
 				const img = new PlacedCloudWidget(this.scene, location.x * 48 - 24, location.y * 48 - 24, getPlayerColour(player))
@@ -254,7 +254,7 @@ export class MapView {
                 withLatestFrom(gameStateController.gameStateObservable()),
             ).subscribe(([[placedClouds, playerId], gameState]) => {
 				const playerCloud = gameState.players[playerId].cloudOwned;
-				if (Object.keys(placedClouds).indexOf(playerCloud) !== -1) {
+				if (playerCloud != null && Object.keys(placedClouds).indexOf(playerCloud) !== -1) {
 					const location = indexToMapCoordinates(placedClouds[playerCloud], gameState.numTilesX);
 					this.placedCloudWidget.setVisible(true);
 					this.placedCloudWidget.setPosition(location.x * 48 - 24, location.y * 48 - 24);

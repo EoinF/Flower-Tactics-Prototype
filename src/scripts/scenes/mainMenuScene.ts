@@ -21,7 +21,7 @@ export default class MainMenuScene extends Phaser.Scene {
         mainMenuController.setActiveMenuScreen("MAIN_MENU");
         this.scene.launch("PreloadScene");
         new LevelSelectView(this, mainMenuController);
-        new MainMenuView(this, mainMenuController);
+        new MainMenuView(this, mainMenuController, gameStateController);
 
         const onLoadedGameAssets$ = mainMenuController.onFinishedLoadingGameAssetsObservable();
         const onSelectLevel$ = mainMenuController.loadLevelObservable();
