@@ -1,7 +1,5 @@
-import { gameStateController, guiController, mapController, mainMenuController, gameActionController } from "../game";
+import { gameStateController, guiController, mapController, mainMenuController } from "../game";
 import { combineLatest } from "rxjs";
-import { MapLoader, ObjectData } from "../MapLoader";
-import { MapSaver } from "../MapSaver";
 import { TutorialRunner } from "../tutorial/TutorialRunner";
 import { SoilColourConverter } from "../SoilColourConverter";
 import { Tutorial1 } from "../tutorial/Tutorial1";
@@ -69,9 +67,7 @@ export default class MainMenuScene extends Phaser.Scene {
     }
     
 	loadMap(mapName: string) {
-        const soilColourConverter = new SoilColourConverter();
         const tutorialRunner = new TutorialRunner(guiController, mapController, gameStateController)
-        const mapLoader = new MapLoader(soilColourConverter);
 
         this.load.on('complete', () => {
             const initialState = this.cache.json.get(`data-${mapName}`) as GameStateData;
