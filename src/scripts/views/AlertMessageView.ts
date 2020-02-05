@@ -7,10 +7,15 @@ import { ALERT_MESSAGE_TIMEOUT, COLOURS } from "../constants";
 
 export class AlertMessageView {
     constructor(scene: Phaser.Scene, guiController: GuiController) {
-        const mainContainer = new UIContainer(scene, 0, 0, 450, 50, "Middle", "Middle")
+        const mainContainer = new UIContainer(scene, 0, 100, 450, 50, "Top", "Middle")
             .setBackground(COLOURS.PURPLE_200)
             .setBorder(1, COLOURS.BLACK)
-            .setVisible(false);
+            .setVisible(false)
+            .setInteractive()
+            .setDepth(8)
+            .on('pointerdown', () => {
+                mainContainer.setVisible(false);
+            });
 
         let alertTimeoutSubscription = of(undefined)
             .subscribe(() => {});
