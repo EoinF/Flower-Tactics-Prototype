@@ -153,6 +153,7 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta, pl
 
     let newIndex = Math.max(0, ...Object.keys(gameState.flowersMap).map(type => parseInt(type))) + 1;
     placedSeedsMap.getAllSeeds()
+        .filter(seed => seed.amount > 0)
         .reduce<PlacedSeed[][]>((groupings, nextSeed) => {
             const matchingSeedIndex = groupings.findIndex(
                 group => {
