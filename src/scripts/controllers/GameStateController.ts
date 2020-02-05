@@ -1,7 +1,7 @@
 import { GameState, GameStateData } from "../objects/GameState";
 import { Subject, Observable, ReplaySubject, merge, timer } from "rxjs";
 import { GameStateDelta } from "../objects/GameStateDelta";
-import { scan, filter, map, distinctUntilChanged, flatMap, delayWhen } from "rxjs/operators";
+import { scan, filter, map, distinctUntilChanged, flatMap, delayWhen, shareReplay } from "rxjs/operators";
 import { applyDeltas } from "../connectors/gameStateConnectors";
 import { APPLYING_DELTAS_DURATION, ACTION_RESOLUTION_DURATION, RESETTING_ACTIONS_DURATION } from "../constants";
 
@@ -21,7 +21,7 @@ export class GameStateController {
     private currentGameState$: Observable<GameState | null>;
 
     constructor() {
-        this.gameState$ = new ReplaySubject(1);
+        this.gameState$ = new Subject();
         this.gamePhase$ = new ReplaySubject(1);
         this.currentPlayer$ = new ReplaySubject(1);
         this.loadMap$ = new ReplaySubject(1);
@@ -40,7 +40,8 @@ export class GameStateController {
                 } else {
                     return new GameState(applyDeltas(getCopiedState(currentGameState), deltaOrReset), currentGameState.turnCounter + 1)
                 }
-            }, null)
+            }, null),
+            shareReplay(1)
         )
     }
 

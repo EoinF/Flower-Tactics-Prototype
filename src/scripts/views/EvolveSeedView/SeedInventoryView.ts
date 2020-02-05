@@ -7,7 +7,7 @@ import { BaseUIObject } from "../../widgets/generic/UIObject";
 import { SeedInventoryTile } from "../../widgets/specific/SeedInventoryTile";
 import { combineLatest, merge } from "rxjs";
 import { EvolveSeedController, StagedSeed } from "../../controllers/EvolveSeedController";
-import { filter, pairwise, map, withLatestFrom, startWith, first, tap, switchMap } from "rxjs/operators";
+import { filter, pairwise, map, withLatestFrom, startWith, first, tap, switchMap, skip } from "rxjs/operators";
 import { StringMap } from "../../types";
 import { RadioButtonGroup } from "../../widgets/generic/RadioButtonGroup";
 import { BaseButton } from "../../widgets/generic/BaseButton";
@@ -103,7 +103,13 @@ export class SeedInventoryView extends BaseUIObject {
             })
         });
 
-        combineLatest(gameStateController.loadMapObservable(), flowerSelectionController.selectedFlowerTypeObservable()).pipe(
+        combineLatest(
+            gameStateController.gamePhaseObservable().pipe(
+                skip(1),
+                filter((previousPhase) => previousPhase === 'INIT')
+            ),
+            flowerSelectionController.selectedFlowerTypeObservable()
+        ).pipe(
             withLatestFrom(evolveSeedController.stagedSeedsObservable())
         ).subscribe(([[_, type], stagedSeeds]) => {
             if (stagedSeeds !== null && stagedSeeds.type !== type) {

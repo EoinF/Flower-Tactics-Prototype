@@ -200,7 +200,8 @@ export class GameActionController {
                         [nextValue.cloudKey!]: nextValue.tileIndex
                     };
                 }
-            }, {})
+            }, {}),
+            shareReplay()
         );
     }
 
