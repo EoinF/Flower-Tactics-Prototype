@@ -26,7 +26,7 @@ export class Tutorial2 extends TutorialBase {
         this.addEvent(
             1,
             (gameState: GameState, playerId: string) => gameState.players[playerId].seedsOwned.some(seedType => 
-                gameState.seedStatus[seedType].quantity >= 10
+                gameState.seedStatus[seedType].quantity >= 20
             ),
             (callbacks: TutorialRunnerCallbacks) => {
                 callbacks.showTips([
@@ -44,7 +44,7 @@ export class Tutorial2 extends TutorialBase {
             (gameState, playerId, isEvolveScreenOpen) => (
                 isEvolveScreenOpen &&
                 gameState.players[playerId].seedsOwned.some(seedType => 
-                    gameState.seedStatus[seedType].quantity >= 10
+                    gameState.seedStatus[seedType].quantity >= 20
                 )
             ),
             (callbacks) => {
@@ -80,7 +80,7 @@ export class Tutorial2 extends TutorialBase {
             (gameState, playerId, isEvolveScreenOpen, stagedSeed) => (
                 isEvolveScreenOpen &&
                 gameState.players[playerId].seedsOwned.some(seedType => 
-                    gameState.seedStatus[seedType].quantity >= 10
+                    gameState.seedStatus[seedType].quantity >= 20
                 ) && stagedSeed != null && gameState.players[playerId].seedsOwned.some(seedType =>
                     stagedSeed.type === seedType && stagedSeed.stagedAmount > 0
                 )
@@ -101,7 +101,7 @@ export class Tutorial2 extends TutorialBase {
             (gameState, playerId, isEvolveScreenOpen, stagedSeed) => (
                 isEvolveScreenOpen &&
                 gameState.players[playerId].seedsOwned.some(seedType => 
-                    gameState.seedStatus[seedType].quantity >= 10
+                    gameState.seedStatus[seedType].quantity >= 20
                 ) && stagedSeed != null && gameState.players[playerId].seedsOwned.some(seedType =>
                     stagedSeed.type === seedType && stagedSeed.stagedAmount > 1
                 )
@@ -140,6 +140,23 @@ export class Tutorial2 extends TutorialBase {
                         title: this.title,
                         content: "You now have a new seed with improved stats. Close the evolve screen and plant the new seed on the map.",
                         position: { x: 880, y: 500 }
+                    }
+                ]);
+            }
+        );
+        
+        this.addEvent(
+            1,
+            (gameState, playerId, isEvolveScreenOpen) => (
+                !isEvolveScreenOpen &&
+                gameState.players[playerId].seedsOwned.length > 1
+            ),
+            (callbacks) => {
+                callbacks.showTips([
+                    {
+                        title: this.title,
+                        content: "Click the left and right arrows below to switch through your seeds.",
+                        position: { x: 863, y: 445 }
                     }
                 ]);
             }
