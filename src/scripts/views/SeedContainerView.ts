@@ -17,6 +17,7 @@ import { GameDeltaController } from "../controllers/GameDeltaController";
 import { PlacedSeed } from "../controllers/GameActionController";
 import { StringMap } from "../types";
 import { getPlayerColour } from "../widgets/utils";
+import { gameActionController } from "../game";
 
 export class SeedContainerView {
     width: number;
@@ -120,14 +121,16 @@ export class SeedContainerView {
         })
         
         combineLatest(gameDeltaController.gameDeltaObservable(), flowerSelectionController.selectedFlowerTypeObservable())
-            .pipe(withLatestFrom(gameStateController.gameStateObservable()))
-                .subscribe(([[nextDelta, selectedFlowerType], nextState]) => {
+            .pipe(withLatestFrom(gameStateController.gameStateObservable(), gameActionController.placedSeedsMapObservable()))
+                .subscribe(([[nextDelta, selectedFlowerType], nextState, placedSeeds]) => {
                     const selectedSeedStatus = nextState.seedStatus[selectedFlowerType];
                     let amountAlreadyPlaced = 0;
-                    const placedSeedsMap = nextDelta.getIntermediateDelta<StringMap<PlacedSeed[]>>("placedSeeds");
-                    if (placedSeedsMap != null && selectedSeedStatus.type in placedSeedsMap) {
-                        amountAlreadyPlaced = placedSeedsMap[selectedSeedStatus.type].reduce((total, placedSeed) => total + placedSeed.amount, 0);
-                    }
+
+                    
+                    amountAlreadyPlaced = placedSeeds.getAllSeeds()
+                        .filter(seed => seed.type === selectedSeedStatus.type)
+                        .reduce((total, placedSeed) => total + placedSeed.amount, 0);
+                    
                     const amount = selectedSeedStatus.quantity - amountAlreadyPlaced;
                     seedAmountLabel.setText(`x${amount}`);
                 });

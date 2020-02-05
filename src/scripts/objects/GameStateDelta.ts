@@ -12,10 +12,8 @@ type DeltaType = "DELTA_ADD" | "DELTA_REMOVE" | "DELTA_REPLACE" | "DELTA_APPEND"
 
 export class GameStateDelta {
     private deltas: StringMap<GameStateDeltaInstance>;
-    private intermediateDeltas: StringMap<any>;
     constructor() {
         this.deltas = {};
-        this.intermediateDeltas = {};
     }
 
     addDelta(keys: GameStateKey[], deltaValue: number | null | object | string, deltaType: DeltaType = "DELTA_ADD") {
@@ -53,15 +51,7 @@ export class GameStateDelta {
         const combinedKey = `${keys.join(".")}:${deltaType}`;
         return this.deltas[combinedKey];
     }
-    
-    addIntermediateDelta<T>(key: string, updateFunction: (existingValue: T | null) => T) {
-        this.intermediateDeltas[key] = updateFunction(this.intermediateDeltas[key]);
-    }
 
-    getIntermediateDelta<T>(key: string): T | null {
-        return this.intermediateDeltas[key];
-    }
-    
     combineDeltas(otherDelta: GameStateDelta): GameStateDelta {
         Object.keys(otherDelta.deltas).forEach((key) => {
             const delta = otherDelta.deltas[key];

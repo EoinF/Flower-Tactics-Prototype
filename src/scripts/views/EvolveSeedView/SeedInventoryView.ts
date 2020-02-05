@@ -12,9 +12,10 @@ import { StringMap } from "../../types";
 import { RadioButtonGroup } from "../../widgets/generic/RadioButtonGroup";
 import { BaseButton } from "../../widgets/generic/BaseButton";
 import { GameDeltaController } from "../../controllers/GameDeltaController";
-import { PlacedSeed } from "../../controllers/GameActionController";
+import { PlacedSeed, SeedTypeToPlacedSeedsMap } from "../../controllers/GameActionController";
 import { GameStateDelta } from "../../objects/GameStateDelta";
 import { FlowerSelectionController } from "../../controllers/FlowerSelectionController";
+import { gameActionController } from "../../game";
 
 interface SeedInventoryItem {
     type: string;
@@ -35,7 +36,7 @@ export class SeedInventoryView extends BaseUIObject {
 
     constructor(scene: Phaser.Scene, x: number, y: number,
         width: number, height: number,
-        gameStateController: GameStateController, gameDeltaController: GameDeltaController,
+        gameStateController: GameStateController,
         evolveSeedController: EvolveSeedController, flowerSelectionController: FlowerSelectionController
     ) {
         super(scene, x, y, width, height);
@@ -56,8 +57,8 @@ export class SeedInventoryView extends BaseUIObject {
         const seedState$ = combineLatest(
             gameStateController.gameStateObservable(),
             evolveSeedController.stagedSeedsObservable(),
-            gameStateController.currentPlayerObservable(),
-            gameDeltaController.gameDeltaObservable()
+            gameActionController.placedSeedsMapObservable(),
+            gameStateController.currentPlayerObservable()
         );
 
         const loadMap$ = gameStateController.loadMapObservable();
@@ -67,7 +68,7 @@ export class SeedInventoryView extends BaseUIObject {
                 flowerSelectionController.selectFlowerByType(button.getData("type"));
             });
 
-        loadMap$.pipe(switchMap(() => 
+        loadMap$.pipe(switchMap(() =>
             merge(
                 seedState$.pipe(first()),
                 seedState$.pipe(
@@ -82,7 +83,7 @@ export class SeedInventoryView extends BaseUIObject {
             )
         ))
         .pipe(
-            map(([gameState, stagedSeeds, currentPlayerId, gameDelta]) => this.simplifySeedStates(gameState, gameDelta, stagedSeeds, currentPlayerId))
+            map(([gameState, stagedSeeds, placedSeeds, currentPlayerId]) => this.simplifySeedStates(gameState, placedSeeds, stagedSeeds, currentPlayerId))
         ).subscribe(({seedInventoryItems, isAnyStaged, currentPlayerId}) => {
             this.seedSelectionGrid.clear();
             this.createGrid(seedInventoryItems, evolveSeedController, isAnyStaged, currentPlayerId);
@@ -93,7 +94,7 @@ export class SeedInventoryView extends BaseUIObject {
             filter(([previous, current]) => Object.keys(previous[0].flowerTypes).length === Object.keys(current[0].flowerTypes).length),
             map(([_, current]) => current)
         ).pipe(
-            map(([gameState, stagedSeeds, currentPlayerId, gameDelta]) => this.simplifySeedStates(gameState, gameDelta, stagedSeeds, currentPlayerId))
+            map(([gameState, stagedSeeds, placedSeeds, currentPlayerId]) => this.simplifySeedStates(gameState, placedSeeds, stagedSeeds, currentPlayerId))
         ).subscribe(({seedInventoryItems, isAnyStaged}) => {
             seedInventoryItems.forEach((item) => {
                 if (item.amountStagedIndex > 0) {
@@ -142,16 +143,15 @@ export class SeedInventoryView extends BaseUIObject {
         this.radioGroup.setButtons(this.seedSelectionGrid.children as Array<BaseButton>);
     }
 
-    simplifySeedStates(state: GameState, delta: GameStateDelta, stagedSeed: StagedSeed | null, currentPlayerId: string) {
+    simplifySeedStates(state: GameState, placedSeeds: SeedTypeToPlacedSeedsMap, stagedSeed: StagedSeed | null, currentPlayerId: string) {
         let isAnyStaged = false;
         const seedInventoryItems = Object.keys(state.seedStatus)
             .filter(type => state.players[currentPlayerId].seedsOwned.indexOf(type) !== -1)
             .map(type => {
-                let amountPlaced = 0;
-                const placedSeeds = delta.getIntermediateDelta<StringMap<PlacedSeed[]>>("placedSeeds");
-                if (placedSeeds != null && type in placedSeeds) {
-                    amountPlaced = placedSeeds[type].reduce((total, placedSeed) => total + placedSeed.amount, 0);
-                }
+                let amountPlaced = placedSeeds.getAllSeeds()
+                    .filter(seed => seed.type === type)
+                    .reduce((total, placedSeed) => total + placedSeed.amount, 0);
+
                 let amountStagedIndex = 0;
                 if (stagedSeed != null && type === stagedSeed.type) {
                     isAnyStaged = true;

@@ -12,7 +12,7 @@ import { flowerSelectionController } from "../../game";
 export class EvolveSeedView {
     constructor(scene: Phaser.Scene,
         guiController: GuiController,
-        gameStateController: GameStateController, gameDeltaController: GameDeltaController,
+        gameStateController: GameStateController,
         evolveSeedController: EvolveSeedController
     ) {
         const canvas = scene.game.canvas;
@@ -22,7 +22,7 @@ export class EvolveSeedView {
 
         // Left hand panel
         const seedInventoryView = new SeedInventoryView(scene, 16, 16, (canvas.width * 0.6) - 24, canvas.height - 32,
-            gameStateController, gameDeltaController, evolveSeedController, flowerSelectionController);
+            gameStateController, evolveSeedController, flowerSelectionController);
 
         // Top right panel
         const seedStatsView = new SeedStatsView(scene, 16, 16, (canvas.width * 0.4) - 16, (canvas.height * 0.4) - 20,

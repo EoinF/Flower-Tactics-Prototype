@@ -1,9 +1,9 @@
-import { GameState, GameStateData } from "../objects/GameState";
+import { GameState } from "../objects/GameState";
 import { FlowerType } from "../objects/FlowerType";
 import { SEED_INTERVALS } from "../constants";
 import { GuiController } from "../controllers/GuiController";
 import { GameStateController } from "../controllers/GameStateController";
-import { withLatestFrom, map, mergeMap, skip, first, flatMap, take, switchMap, filter } from "rxjs/operators";
+import { withLatestFrom, map, filter } from "rxjs/operators";
 import { GameDeltaController } from "../controllers/GameDeltaController";
 import { EvolveSeedController, EvolutionChoice } from "../controllers/EvolveSeedController";
 import { GameStateDelta } from "../objects/GameStateDelta";
@@ -13,8 +13,6 @@ import { StringMap } from "../types";
 import { Flower } from "../objects/Flower";
 import { FlowerAugmentation } from "../objects/FlowerAugmentation";
 import { calculateSeedEvolutionOutcome, calculateSeedEvolutionResults } from "../deltaCalculators/calculateSeedEvolve";
-import { gameStateController } from "../game";
-import { indexToMapCoordinates } from "../widgets/utils";
 import { getPlacementStatus } from "./utils";
 
 export function setupGameStateManager(
@@ -31,6 +29,7 @@ export function setupGameStateManager(
     const stagedSeeds$ = evolveSeedController.stagedSeedsObservable();
     const onClickEvolveButton$ = guiController.onClickEvolveButtonObservable();
     const evolveChoices$ = evolveSeedController.evolveChoicesObservable();
+    const placedSeeds$ = gameActionController.placedSeedsMapObservable();
 
     gameStateController.gamePhaseObservable().pipe(
         filter(gamePhase => gamePhase === 'INIT'),
@@ -47,9 +46,9 @@ export function setupGameStateManager(
     // Apply the end of turn delta
     gameStateController.gamePhaseObservable().pipe(
         filter(gamePhase => gamePhase === "APPLYING_DELTAS"),
-        withLatestFrom(gameState$, gameDelta$)
-    ).subscribe(([_, gameState, gameDelta]) => {
-        gameStateController.applyDelta(calculateFinalDelta(gameState, gameDelta));
+        withLatestFrom(gameState$, gameDelta$, placedSeeds$)
+    ).subscribe(([_, gameState, gameDelta, placedSeeds]) => {
+        gameStateController.applyDelta(calculateFinalDelta(gameState, gameDelta, placedSeeds));
     });
 
     // Get the new state applied after ending turn
@@ -123,11 +122,12 @@ export function setupGameStateManager(
             withLatestFrom(gameState$, currentPlayerId$)
         )
         .subscribe(([evolveChoice, gameState, currentPlayerId]) => {
-            applyEvolveResult(gameState, evolveChoice, currentPlayerId);
+            const evolveDelta = applyEvolveResult(gameState, evolveChoice, currentPlayerId);
+            gameStateController.applyDelta(evolveDelta);
         });
 }
 
-function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): GameStateDelta {
+function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta, placedSeedsMap: SeedTypeToPlacedSeedsMap): GameStateDelta {
     const finalDelta = gameDelta;
 
     Object.keys(gameState.flowersMap).forEach((key) => {
@@ -151,11 +151,8 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta): G
         }
     });
 
-    const placedSeeds = gameDelta.getIntermediateDelta<StringMap<PlacedSeed[]>>("placedSeeds") || {};
     let newIndex = Math.max(0, ...Object.keys(gameState.flowersMap).map(type => parseInt(type))) + 1;
-    Object.keys(placedSeeds)
-        .map(key => placedSeeds[key])
-        .reduce((flatArray, nextArray) => [...flatArray, ...nextArray], []) // flatten
+    placedSeedsMap.getAllSeeds()
         .reduce<PlacedSeed[][]>((groupings, nextSeed) => {
             const matchingSeedIndex = groupings.findIndex(
                 group => {
@@ -225,7 +222,7 @@ export function applyDeltas<T>(gameData: T, deltas: GameStateDelta): T {
     return gameData;
 }
 
-function applyEvolveResult(gameState: GameState, evolveChoice: EvolutionChoice, currentPlayerId: string) {
+function applyEvolveResult(gameState: GameState, evolveChoice: EvolutionChoice, currentPlayerId: string): GameStateDelta {
     const existingFlowerCopy = JSON.parse(JSON.stringify(gameState.flowerTypes[evolveChoice.baseFlowerType])) as FlowerType;
     const existingTypes = Object.keys(gameState.flowerTypes).map(type => parseInt(type));
     const nextType = (Math.max(...existingTypes) + 1).toString();
@@ -245,7 +242,7 @@ function applyEvolveResult(gameState: GameState, evolveChoice: EvolutionChoice, 
     }, "DELTA_REPLACE");
     evolveDelta.addDelta(["seedStatus", evolveChoice.baseFlowerType, "quantity"], - evolveChoice.seedsRequired);
     evolveDelta.addDelta(["players", currentPlayerId, "seedsOwned"], newFlower.type, "DELTA_APPEND");
-    gameStateController.applyDelta(evolveDelta);
+    return evolveDelta;
 }
 
 function applyAugmentations(flowerType: FlowerType, flowerAugmentations: FlowerAugmentation[]): FlowerType {
