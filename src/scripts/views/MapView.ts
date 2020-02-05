@@ -215,8 +215,10 @@ export class MapView {
 				gameState.flowersMap[key].type === selectedFlowerType
 			).forEach(key => {
 				const flower = gameState.flowersMap[key];
-				const tile = gameState.getTileAt(flower.x, flower.y)!;
-				this.tileButtons[tile.index].setIsHighlighted(isRevealingSeeds);
+				const tile = gameState.getTileAt(flower.x, flower.y);
+				if (tile != null && this.tileButtons[tile.index] != null) {
+					this.tileButtons[tile.index].setIsHighlighted(isRevealingSeeds);
+				}
 			});
 		});
 

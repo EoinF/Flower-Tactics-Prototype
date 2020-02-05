@@ -119,17 +119,18 @@ export class SeedContainerView {
             });
         })
         
-        combineLatest(gameStateController.gameStateObservable(), gameDeltaController.gameDeltaObservable(), flowerSelectionController.selectedFlowerTypeObservable())
-            .subscribe(([nextState, nextDelta, selectedFlowerType]) => {
-                const selectedSeedStatus = nextState.seedStatus[selectedFlowerType];
-                let amountAlreadyPlaced = 0;
-                const placedSeedsMap = nextDelta.getIntermediateDelta<StringMap<PlacedSeed[]>>("placedSeeds");
-                if (placedSeedsMap != null && selectedSeedStatus.type in placedSeedsMap) {
-                    amountAlreadyPlaced = placedSeedsMap[selectedSeedStatus.type].reduce((total, placedSeed) => total + placedSeed.amount, 0);
-                }
-                const amount = selectedSeedStatus.quantity - amountAlreadyPlaced;
-                seedAmountLabel.setText(`x${amount}`);
-            });
+        combineLatest(gameDeltaController.gameDeltaObservable(), flowerSelectionController.selectedFlowerTypeObservable())
+            .pipe(withLatestFrom(gameStateController.gameStateObservable()))
+                .subscribe(([[nextDelta, selectedFlowerType], nextState]) => {
+                    const selectedSeedStatus = nextState.seedStatus[selectedFlowerType];
+                    let amountAlreadyPlaced = 0;
+                    const placedSeedsMap = nextDelta.getIntermediateDelta<StringMap<PlacedSeed[]>>("placedSeeds");
+                    if (placedSeedsMap != null && selectedSeedStatus.type in placedSeedsMap) {
+                        amountAlreadyPlaced = placedSeedsMap[selectedSeedStatus.type].reduce((total, placedSeed) => total + placedSeed.amount, 0);
+                    }
+                    const amount = selectedSeedStatus.quantity - amountAlreadyPlaced;
+                    seedAmountLabel.setText(`x${amount}`);
+                });
 
         combineLatest(gameStateController.gameStateObservable(), flowerSelectionController.selectedFlowerTypeObservable())
             .subscribe(([nextState, selectedFlowerType]) => {

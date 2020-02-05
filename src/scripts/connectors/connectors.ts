@@ -1,4 +1,4 @@
-import { withLatestFrom, map, filter, flatMap, first, distinctUntilChanged, mapTo, scan, tap, startWith } from 'rxjs/operators';
+import { withLatestFrom, map, filter, flatMap, first, distinctUntilChanged, mapTo, scan, tap, startWith, pairwise } from 'rxjs/operators';
 import { combineLatest, merge, of, Subject } from 'rxjs';
 import { GuiController } from '../controllers/GuiController';
 import { GameStateController } from '../controllers/GameStateController';
@@ -56,7 +56,10 @@ export function setupConnectors(
 
     combineLatest(gameState$, currentPlayer$).pipe(
         map(([state, currentPlayerId]) => state.players[currentPlayerId as string].seedsOwned),
-        distinctUntilChanged()
+        startWith<string[]>([]),
+        pairwise(),
+        filter(([previous, current]) => previous.length != current.length || current.some(curr => previous.indexOf(curr) === -1)),
+        map(([prev, current]) => current)
     ).subscribe(flowerTypes => {
         flowerSelectionController.setFlowerTypes(flowerTypes);
     });

@@ -1,5 +1,5 @@
 import { ReplaySubject, Observable, Subject, combineLatest, merge, of } from "rxjs";
-import { mapTo, startWith, map, scan, withLatestFrom, shareReplay, distinctUntilChanged, pairwise, filter } from "rxjs/operators";
+import { mapTo, startWith, map, scan, withLatestFrom, shareReplay, distinctUntilChanged, pairwise, filter, tap } from "rxjs/operators";
 
 interface SelectByIndexAction {
     index: number;
@@ -40,7 +40,7 @@ export class FlowerSelectionController {
             this.flowerTypes$.pipe(
                 startWith<string[]>([]),
                 pairwise(),
-                filter(([previous, current]) => previous.length != current.length),
+                filter(([previous, current]) => previous.length != current.length || current.some(curr => previous.indexOf(curr) === -1)), // Filter out unchanged arrays
                 map(([previous, current]) => current)
             ),
             nextAction$
