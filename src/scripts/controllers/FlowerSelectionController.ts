@@ -48,9 +48,9 @@ export class FlowerSelectionController {
             scan((currentIndex, [currentFlowerTypes, nextAction]) => {
                 if (nextAction.action === 'reset') {
                     return 0;
-                } else if (nextAction.action === 'next') {
-                    return currentIndex == 0 ? (currentFlowerTypes.length - 1) : (currentIndex - 1);
                 } else if (nextAction.action === 'previous') {
+                    return currentIndex == 0 ? (currentFlowerTypes.length - 1) : (currentIndex - 1);
+                } else if (nextAction.action === 'next') {
                     return (currentIndex + 1) % currentFlowerTypes.length;
                 } else if (nextAction.action === 'index') {
                     return nextAction.value as number;

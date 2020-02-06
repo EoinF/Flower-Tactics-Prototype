@@ -7224,13 +7224,6 @@
                 "8"
             ],
             "autoReplantTileMap": {}
-        },
-        "2": {
-            "controlledBy": "AI",
-            "cloudOwned": null,
-            "seedsOwned": [],
-            "flowers": [],
-            "autoReplantTileMap": {}
         }
     },
     "randomNumberGeneratorSeed": "123",

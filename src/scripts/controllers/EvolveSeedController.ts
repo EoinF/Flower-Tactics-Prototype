@@ -79,7 +79,7 @@ export class EvolveSeedController {
     }
 
     stagedSeedsObservable(): Observable<StagedSeed | null> {
-        return this.stagedSeed$;
+        return this.stagedSeed$.pipe(startWith(null));
     }
 
     evolveStatusObservable(): Observable<EvolutionOutcome> {

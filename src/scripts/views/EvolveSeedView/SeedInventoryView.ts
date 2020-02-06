@@ -76,7 +76,7 @@ export class SeedInventoryView extends BaseUIObject {
                     filter(([previous, current]) =>
                         Object.keys(current[0].flowerTypes).length != Object.keys(previous[0].flowerTypes).length ||
                         Object.keys(current[0].flowerTypes).some(
-                            curr => Object.keys(previous[0].flowerTypes).indexOf(curr) === -1 // Check if flower types has changed
+                            curr => Object.keys(previous[0].flowerTypes).indexOf(curr) === -1 // Check if flower types have changed
                         )),
                     map(([_, current]) => current)
                 )
@@ -91,7 +91,11 @@ export class SeedInventoryView extends BaseUIObject {
         
         seedState$.pipe(
             pairwise(),
-            filter(([previous, current]) => Object.keys(previous[0].flowerTypes).length === Object.keys(current[0].flowerTypes).length),
+            filter(([previous, current]) =>
+                Object.keys(current[0].flowerTypes).length === Object.keys(previous[0].flowerTypes).length &&
+                Object.keys(current[0].flowerTypes).every(
+                    curr => Object.keys(previous[0].flowerTypes).indexOf(curr) !== -1 // Check if flower types are the same
+                )),
             map(([_, current]) => current)
         ).pipe(
             map(([gameState, stagedSeeds, placedSeeds, currentPlayerId]) => this.simplifySeedStates(gameState, placedSeeds, stagedSeeds, currentPlayerId))
@@ -106,8 +110,8 @@ export class SeedInventoryView extends BaseUIObject {
 
         combineLatest(
             gameStateController.gamePhaseObservable().pipe(
-                skip(1),
-                filter((previousPhase) => previousPhase === 'INIT')
+                pairwise(),
+                filter(([previous, current]) => previous === 'INIT')
             ),
             flowerSelectionController.selectedFlowerTypeObservable()
         ).pipe(
@@ -122,7 +126,7 @@ export class SeedInventoryView extends BaseUIObject {
 
     createGrid(seedInventoryItems: SeedInventoryItem[], evolveSeedController: EvolveSeedController, isAnyStaged: boolean, ownerId: string) {
         this.inventoryMap = {};
-        seedInventoryItems.map((item, index) => {
+        seedInventoryItems.forEach((item, index) => {
             const x = (index % this.cellsPerRow) * this.cellWidth;
             const y = Math.floor(index / this.cellsPerRow) * this.cellHeight;
             const cell = new SeedInventoryTile(this.scene, x, y, this.cellWidth, this.cellHeight,
@@ -145,7 +149,7 @@ export class SeedInventoryView extends BaseUIObject {
 
     simplifySeedStates(state: GameState, placedSeeds: SeedTypeToPlacedSeedsMap, stagedSeed: StagedSeed | null, currentPlayerId: string) {
         let isAnyStaged = false;
-        const seedInventoryItems = Object.keys(state.seedStatus)
+        const seedInventoryItems = Object.keys(state.flowerTypes)
             .filter(type => state.players[currentPlayerId].seedsOwned.indexOf(type) !== -1)
             .map(type => {
                 let amountPlaced = placedSeeds.getAllSeeds()
