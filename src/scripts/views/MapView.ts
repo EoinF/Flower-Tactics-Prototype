@@ -26,7 +26,8 @@ export class MapView {
     flowerSprites: PlacedFlowerWidget[];
     mountainSprites: Phaser.GameObjects.Image[];
 	riverSprites: Phaser.GameObjects.Image[];
-	placedSeedSprites: Map<number, PlacedSeedWidget | CompetingSeedsWidget>;
+	placedSeedSprites: PlacedSeedWidget[];
+	competingSeedSprites: CompetingSeedsWidget[];
 	cloudSprites: PlacedCloudWidget[];
 	placedCloudWidget: PlacedCloudWidget;
 
@@ -48,7 +49,8 @@ export class MapView {
 		this.mountainSprites = [];
 		this.riverSprites = [];
 		this.cloudSprites = [];
-		this.placedSeedSprites = new Map<number, PlacedSeedWidget>();
+		this.placedSeedSprites = [];
+		this.competingSeedSprites = [];
 
         this.setupSprites(scene, gameStateController);
         this.setupCallbacks(gameStateController, gameActionController, mapController, heldObjectController, guiController, flowerSelectionController);
@@ -72,8 +74,6 @@ export class MapView {
 					.setDepth(5);
 				return img;
 			});
-			this.placedSeedSprites.forEach(s => s.destroy());
-			this.placedSeedSprites.clear();
 
 			this.placedCloudWidget = new PlacedCloudWidget(scene, 0, 0, COLOURS.BLACK)
 				.setDepth(6)
@@ -89,6 +89,28 @@ export class MapView {
 		}).map(tileWidget => tileWidget.onClick(() =>
 			this.mapController.clickTile(tileWidget.tileIndex)
 		));
+
+		this.placedSeedSprites = gameState.tiles.map((tile, index) => {
+			const location = indexToMapCoordinates(index, gameState.numTilesX);
+			return new PlacedSeedWidget(this.scene, 
+				(location.x * 48) - 24, (location.y * 48) - 24,
+				48, 48,
+				0,
+				COLOURS.BLACK
+			).setDepth(7).setVisible(false);
+		});
+
+		this.competingSeedSprites = gameState.tiles.map((tile, index) => {
+			const location = indexToMapCoordinates(index, gameState.numTilesX);
+			return new CompetingSeedsWidget(this.scene,
+				(location.x * 48) - 24, (location.y * 48) - 24,
+				48, 48,
+				0,
+				COLOURS.BLACK,
+				0,
+				COLOURS.BLACK
+			).setDepth(7).setVisible(false);
+		});
 	}
 
 	setupCloudSprites(gameState: GameState) {
@@ -144,20 +166,22 @@ export class MapView {
 		});
 
 		combineLatest(
-			gameActionController.placedSeedsMapObservable(),
-			gameStateController.gamePhaseObservable().pipe(filter(phase => phase === 'ACTION'))
-		).pipe(
-			withLatestFrom(gameStateController.gameStateObservable(), gameStateController.currentPlayerObservable())
-		).subscribe(([[placedSeeds, _], gameState, currentPlayerId]) => {
-			this.placedSeedSprites.forEach(sprite => sprite.destroy());
-			this.placedSeedSprites.clear();
-
-				placedSeeds.getAllSeeds().filter(seed =>
-					seed.ownerId === currentPlayerId && seed.amount > 0
-				).forEach(placedSeed => {
-					this.addSingleSeed(placedSeed, gameState);
-				});
-
+			gameActionController.placedSeedsMapObservable().pipe(pairwise()),
+			gameStateController.gamePhaseObservable().pipe(filter(phase => phase === 'ACTION')),
+			gameStateController.currentPlayerObservable()
+		).subscribe(([[oldPlacedSeeds, newPlacedSeeds], _, currentPlayerId]) => {
+			oldPlacedSeeds.getAllSeeds().filter(seed =>
+				seed.ownerId === currentPlayerId && seed.amount > 0
+			).forEach(placedSeed => {
+				this.placedSeedSprites[placedSeed.tileIndex].setVisible(false);
+			});
+			newPlacedSeeds.getAllSeeds().filter(seed =>
+				seed.ownerId === currentPlayerId && seed.amount > 0
+			).forEach(placedSeed => {
+				this.placedSeedSprites[placedSeed.tileIndex].setVisible(true);
+				this.placedSeedSprites[placedSeed.tileIndex].setColour(getPlayerColour(placedSeed.ownerId));
+				this.placedSeedSprites[placedSeed.tileIndex].setAmount(placedSeed.amount);
+			});
 		});
 
 		gameStateController.gamePhaseObservable().pipe(
@@ -167,9 +191,6 @@ export class MapView {
 				gameStateController.gameStateObservable()
 			)
 		).subscribe(([_, placedSeeds, gameState]) => {
-			this.placedSeedSprites.forEach(sprite => sprite.destroy());
-			this.placedSeedSprites.clear();
-
 			placedSeeds.getAllSeeds()
 				.filter(seed => seed.amount > 0)
 				.reduce<PlacedSeed[][]>((groupings, nextSeed) => {
@@ -186,10 +207,15 @@ export class MapView {
 				}, [])
 				.forEach(placedSeedGroup => {
 					if (placedSeedGroup.length === 1) {
-						this.addSingleSeed(placedSeedGroup[0], gameState);
+						this.placedSeedSprites[placedSeedGroup[0].tileIndex].applyEndOfTurnAnimation(
+							this.scene, placedSeedGroup[0].amount, getPlayerColour(placedSeedGroup[0].ownerId)
+						);
 					} else {
 						console.log('battle!', placedSeedGroup);
-						this.addDoubleSeed(placedSeedGroup[0], placedSeedGroup[1], gameState);
+						this.competingSeedSprites[placedSeedGroup[0].tileIndex].applyEndOfTurnAnimation(
+							this.scene, placedSeedGroup[0].amount, getPlayerColour(placedSeedGroup[0].ownerId),
+							placedSeedGroup[1].amount, getPlayerColour(placedSeedGroup[1].ownerId)
+						);
 					}
 				});
 		});
@@ -288,31 +314,5 @@ export class MapView {
 					this.placedCloudWidget.setVisible(false);
 				}
             })
-	}
-	
-	addSingleSeed(placedSeed: PlacedSeed, gameState: GameState) {
-		const location = indexToMapCoordinates(placedSeed.tileIndex, gameState.numTilesX);
-		const placedSeedWidget = new PlacedSeedWidget(this.scene, 
-			(location.x * 48) - 24, (location.y * 48) - 24,
-			48, 48,
-			placedSeed.amount,
-			getPlayerColour(placedSeed.ownerId)
-		).setDepth(7);
-		
-		this.placedSeedSprites.set(placedSeed.tileIndex, placedSeedWidget);
-	}
-
-	addDoubleSeed(seed1: PlacedSeed, seed2: PlacedSeed, gameState: GameState) {
-		const location = indexToMapCoordinates(seed1.tileIndex, gameState.numTilesX);
-		const seedsWidget = new CompetingSeedsWidget(this.scene, 
-			(location.x * 48) - 24, (location.y * 48) - 24,
-			48, 48,
-			seed1.amount,
-			getPlayerColour(seed1.ownerId),
-			seed2.amount,
-			getPlayerColour(seed2.ownerId)
-		).setDepth(7);
-		
-		this.placedSeedSprites.set(seed1.tileIndex, seedsWidget);
 	}
 }

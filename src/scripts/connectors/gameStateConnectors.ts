@@ -132,9 +132,9 @@ export function setupGameStateManager(
 function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta, placedSeedsMap: SeedTypeToPlacedSeedsMap): GameStateDelta {
     const finalDelta = gameDelta;
 
-    Object.keys(gameState.flowersMap).forEach((key) => {
-        const flower = gameState.flowersMap[key];
-        const augmentations = gameState.flowerAugmentations[key] || [];
+    Object.keys(gameState.flowersMap).forEach((flowerKey) => {
+        const flower = gameState.flowersMap[flowerKey];
+        const augmentations = gameState.flowerAugmentations[flowerKey] || [];
         const flowerStatsAfterAugmentation = applyAugmentations(gameState.flowerTypes[flower.type], augmentations);
         const tile = gameState.getTileAt(flower.x, flower.y)!;
         const isDying = !isRequirementsSatisfied(tile.soil, flowerStatsAfterAugmentation)
@@ -148,7 +148,10 @@ function calculateFinalDelta(gameState: GameState, gameDelta: GameStateDelta, pl
             const growthNeeded = Math.max(0, turnsUntilGrown - flower.growth);
             let survivalChance = tenacity - growthNeeded * 5;
             if (gameState.getNextRandomNumber(0, 99) >= survivalChance) {
-                finalDelta.addDelta(["flowersMap", key], null, "DELTA_DELETE");
+                const ownerId = Object.keys(gameState.players).find(key => gameState.players[key].flowers.indexOf(flowerKey) !== -1)!;
+                const ownerFlowerIndex = gameState.players[ownerId].flowers.indexOf(flowerKey);
+                finalDelta.addDelta(["flowersMap", flowerKey], null, "DELTA_DELETE");
+                finalDelta.addDelta(["players", ownerId, "flowers"], ownerFlowerIndex, "DELTA_REMOVE");
             }
         }
     });

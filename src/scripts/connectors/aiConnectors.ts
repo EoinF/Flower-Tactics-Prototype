@@ -83,9 +83,9 @@ function act(playerId: string, gameState: GameState, ownPlacedSeeds: PlacedSeed[
 }
 
 function getUniqueTilesForPlacement(gameState: GameState, playerId: string) {
-    const ownedFlowers = Object.keys(gameState.flowersMap)
-        .filter(flowerKey => gameState.players[playerId].flowers.indexOf(flowerKey) !== -1)
-        .map(flowerKey => gameState.flowersMap[flowerKey]);
+    const ownedFlowers = gameState.players[playerId].flowers.map(
+        flowerKey => gameState.flowersMap[flowerKey]
+    );
 
     let adjacentTiles: number[] = [];
     ownedFlowers.forEach(flower => {
@@ -151,6 +151,7 @@ function tryEvolveSeed(seedsAvailable: SeedsAvailable, gameState: GameState, flo
         newFlowerName: flowerNames[gameState.getNextRandomNumber(0, flowerNames.length - 1)],
         seedsRequired
     }));
+    seedsAvailable.amount -= seedsRequired;
     gameStateController.applyDelta(getEvolveResultDelta(gameState, choices[0], playerId));
 }
 
@@ -164,6 +165,7 @@ function placeCompetingSeeds(seedsAvailable: SeedsAvailable, opponentAdjacentTil
         const tileIndex = opponentAdjacentTiles[roll];
         gameActionController.placeSeed(seedsAvailable.type, tileIndex, playerId);
         placedSeedsMap.addPlacedSeed(seedsAvailable.type, tileIndex, playerId);
+        seedsAvailable.amount--;
         seedsToUse--;
     }
 }
