@@ -51,12 +51,12 @@ export const COLOURS = {
     }
 };
 
-export const SEED_INTERVALS =               [0, 10, 20, 30, 50, 100,    200]; // Number of seeds
+export const SEED_INTERVALS =               [0, 10,     20,     30,     50,     75,     100 ]; // Number of seeds required
 
-export const SUCCESS_INTERVALS =            [0, 100,    100,    100,    0,      0,      0];  // % chance
-export const SUCCESS_PLUS_INTERVALS =       [0, 0,      50,     80,     100,    100,    0];  // % chance
-export const SUCCESS_PLUS_2_INTERVALS =     [0, 0,      0,      20,     50,     60,     100]; // % chance
-export const SUCCESS_PLUS_3_INTERVALS =     [0, 0,      0,      0,      0,      10,     70]; // % chance
+export const SUCCESS_INTERVALS =            [0, 100,    100,    100,    0,      0,      0   ]; // % chance
+export const SUCCESS_PLUS_INTERVALS =       [0, 0,      50,     80,     100,    100,    0   ]; // % chance
+export const SUCCESS_PLUS_2_INTERVALS =     [0, 0,      0,      20,     50,     80,     0   ]; // % chance
+export const SUCCESS_PLUS_3_INTERVALS =     [0, 0,      0,      0,      0,      20,     100 ]; // % chance
 
 export const ACTION_RESOLUTION_DURATION = 500;
 export const APPLYING_DELTAS_DURATION = 50;
