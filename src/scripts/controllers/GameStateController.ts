@@ -66,7 +66,12 @@ export class GameStateController {
         }
         
         this.gameState$.next(gameState);
-        this.currentPlayer$.next(Object.keys(gameState.players).find(playerId => gameState.players[playerId].controlledBy === 'Human'));
+        const humanPlayer = Object.keys(gameState.players).find(playerId => gameState.players[playerId].controlledBy === 'Human');
+        if (humanPlayer != null) {
+            this.currentPlayer$.next(humanPlayer);
+        } else {
+            this.currentPlayer$.next(Object.keys(gameState.players)[0]);
+        }
         this.loadMap$.next(gameState);
     }
 

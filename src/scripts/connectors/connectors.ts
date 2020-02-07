@@ -52,7 +52,7 @@ export function setupConnectors(
     setupGameStateManager(gameStateController, gameDeltaController, gameActionController, guiController, evolveSeedController);
     setupGameDeltaManager(gameStateController, gameDeltaController, gameActionController);
     setupGameInputConnectors(gameStateController, gameDeltaController, heldObjectController, guiController, mapController, gameActionController);
-    setupAIConnectors(gameStateController, gameActionController);
+    setupAIConnectors(gameStateController, gameActionController, evolveSeedController);
 
     combineLatest(gameState$, currentPlayer$).pipe(
         map(([state, currentPlayerId]) => state.players[currentPlayerId as string].seedsOwned),

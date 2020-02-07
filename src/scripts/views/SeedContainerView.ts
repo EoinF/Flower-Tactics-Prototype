@@ -125,7 +125,6 @@ export class SeedContainerView {
                 .subscribe(([[nextDelta, selectedFlowerType], nextState, placedSeeds]) => {
                     const selectedSeedStatus = nextState.seedStatus[selectedFlowerType];
                     let amountAlreadyPlaced = 0;
-
                     
                     amountAlreadyPlaced = placedSeeds.getAllSeeds()
                         .filter(seed => seed.type === selectedSeedStatus.type)

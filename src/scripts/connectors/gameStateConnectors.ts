@@ -65,17 +65,19 @@ export function setupGameStateManager(
         const autoPlacedSeedsMap = new SeedTypeToPlacedSeedsMap();
 
         Object.keys(newState.players).forEach(playerId => {
-            Object.keys(newState.players[playerId].autoReplantTileMap).forEach(tileIndexKey => {
-                const type = newState.players[playerId].autoReplantTileMap[tileIndexKey];
-                const tileIndex = parseInt(tileIndexKey);
+            if (newState.players[playerId].controlledBy === 'Human') {
+                Object.keys(newState.players[playerId].autoReplantTileMap).forEach(tileIndexKey => {
+                    const type = newState.players[playerId].autoReplantTileMap[tileIndexKey];
+                    const tileIndex = parseInt(tileIndexKey);
 
-                const status = getPlacementStatus(newState.tiles[tileIndex], newState, playerId, autoPlacedSeedsMap, type);
-                
-                if (status === "PLACEMENT_ALLOWED" && seedsRemainingByType[type] > 0) {
-                    autoPlacedSeedsMap.addPlacedSeed(type, tileIndex, playerId);
-                    seedsRemainingByType[type]--;
-                }
-            });
+                    const status = getPlacementStatus(newState.tiles[tileIndex], newState, playerId, autoPlacedSeedsMap, type);
+                    
+                    if (status === "PLACEMENT_ALLOWED" && seedsRemainingByType[type] > 0) {
+                        autoPlacedSeedsMap.addPlacedSeed(type, tileIndex, playerId);
+                        seedsRemainingByType[type]--;
+                    }
+                });
+            }
         });
 
         gameActionController.resetClouds();
@@ -122,7 +124,7 @@ export function setupGameStateManager(
             withLatestFrom(gameState$, currentPlayerId$)
         )
         .subscribe(([evolveChoice, gameState, currentPlayerId]) => {
-            const evolveDelta = applyEvolveResult(gameState, evolveChoice, currentPlayerId);
+            const evolveDelta = getEvolveResultDelta(gameState, evolveChoice, currentPlayerId);
             gameStateController.applyDelta(evolveDelta);
         });
 }
@@ -223,7 +225,7 @@ export function applyDeltas<T>(gameData: T, deltas: GameStateDelta): T {
     return gameData;
 }
 
-function applyEvolveResult(gameState: GameState, evolveChoice: EvolutionChoice, currentPlayerId: string): GameStateDelta {
+export function getEvolveResultDelta(gameState: GameState, evolveChoice: EvolutionChoice, currentPlayerId: string): GameStateDelta {
     const existingFlowerCopy = JSON.parse(JSON.stringify(gameState.flowerTypes[evolveChoice.baseFlowerType])) as FlowerType;
     const existingTypes = Object.keys(gameState.flowerTypes).map(type => parseInt(type));
     const nextType = (Math.max(...existingTypes) + 1).toString();

@@ -188,6 +188,7 @@ export class MapView {
 					if (placedSeedGroup.length === 1) {
 						this.addSingleSeed(placedSeedGroup[0], gameState);
 					} else {
+						console.log('battle!', placedSeedGroup);
 						this.addDoubleSeed(placedSeedGroup[0], placedSeedGroup[1], gameState);
 					}
 				});

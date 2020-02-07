@@ -1573,7 +1573,7 @@
     ],
     "players": {
         "1": {
-            "controlledBy": "Human",
+            "controlledBy": "AI_1",
             "cloudOwned": "1",
             "seedsOwned": [
                 "1"
@@ -1584,7 +1584,7 @@
             "autoReplantTileMap": {}
         },
         "2": {
-            "controlledBy": "AI",
+            "controlledBy": "AI_2",
             "cloudOwned": "2",
             "seedsOwned": [
                 "2"

@@ -1,6 +1,6 @@
 import { StringMap } from "../types";
 
-type PlayerType = 'Human' | 'AI' | 'None';
+type PlayerType = 'Human' | 'AI_1' | 'AI_2' | 'None';
 
 export interface Player {
     controlledBy: PlayerType;

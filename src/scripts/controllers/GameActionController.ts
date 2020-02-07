@@ -71,6 +71,20 @@ export class SeedTypeToPlacedSeedsMap {
         }
         this.map.set(type, tileIndexMap);
     }
+
+    clone(): SeedTypeToPlacedSeedsMap {
+        const newMap = new SeedTypeToPlacedSeedsMap();
+        this.map.forEach((tileIndexMap, type) => {
+            let newTileIndexMap = new Map<number, PlacedSeed>();
+            tileIndexMap.forEach((placedSeed, tileIndex) => {
+                newTileIndexMap.set(tileIndex, {
+                    type, tileIndex, ownerId: placedSeed.ownerId, amount: placedSeed.amount
+                });
+            });
+            newMap.map.set(type, newTileIndexMap);
+        });
+        return newMap;
+    }
 }
 
 export class GameActionController {
