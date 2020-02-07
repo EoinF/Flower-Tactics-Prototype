@@ -1,6 +1,6 @@
 import { GameStateController } from "../controllers/GameStateController";
 import { GameActionController, PlacedSeed, SeedTypeToPlacedSeedsMap } from "../controllers/GameActionController";
-import { withLatestFrom, filter, skip, switchMap } from "rxjs/operators";
+import { withLatestFrom, filter, skip, switchMap, flatMap } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { getPlacementStatus } from "./utils";
 import { isRequirementsSatisfied } from "../deltaCalculators/helpers";
@@ -30,25 +30,29 @@ export function setupAIConnectors(gameStateController: GameStateController, game
     ).pipe(
         filter(phase => phase === 'ACTION'),
         withLatestFrom(
+            gameStateController.gameStateObservable()
+        ),
+        flatMap(([_, gameState]) => Object.keys(gameState.players)
+            .filter(playerId => 
+                gameState.players[playerId].controlledBy === 'AI_1' ||
+                gameState.players[playerId].controlledBy === 'AI_2'
+            )
+        ),
+        withLatestFrom(
             gameStateController.gameStateObservable(),
             gameActionController.placedSeedsMapObservable(),
             gameActionController.placedCloudsObservable(),
             evolveSeedController.flowerNamesObservable()
         )
-    ).subscribe(([_, gameState, placedSeeds, placedCloud, flowerNames]) => {
-        Object.keys(gameState.players)
-            .filter(playerId => gameState.players[playerId].controlledBy === 'AI_1' ||
-                gameState.players[playerId].controlledBy === 'AI_2')
-            .forEach(playerId => {
-                const ownPlacedSeeds = placedSeeds.getAllSeeds().filter(
-                    placedSeed => placedSeed.ownerId === playerId
-                );
-                const ownedCloudID = gameState.players[playerId].cloudOwned;
-                const ownedCloud = ownedCloudID != null ?
-                    { id: ownedCloudID, tileIndex: placedCloud[ownedCloudID] }
-                    : null;
-                act(playerId, gameState, ownPlacedSeeds, placedSeeds.clone(), ownedCloud, flowerNames, gameStateController, gameActionController)
-            })
+    ).subscribe(([playerId, gameState, placedSeeds, placedCloud, flowerNames]) => {
+        const ownPlacedSeeds = placedSeeds.getAllSeeds().filter(
+            placedSeed => placedSeed.ownerId === playerId
+        );
+        const ownedCloudID = gameState.players[playerId].cloudOwned;
+        const ownedCloud = ownedCloudID != null ?
+            { id: ownedCloudID, tileIndex: placedCloud[ownedCloudID] }
+            : null;
+        act(playerId, gameState, ownPlacedSeeds, placedSeeds.clone(), ownedCloud, flowerNames, gameStateController, gameActionController)
     })
 }
 

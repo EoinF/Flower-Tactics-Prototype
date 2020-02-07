@@ -85,8 +85,7 @@ export class SeedInventoryView extends BaseUIObject {
         .pipe(
             map(([gameState, stagedSeeds, placedSeeds, currentPlayerId]) => this.simplifySeedStates(gameState, placedSeeds, stagedSeeds, currentPlayerId))
         ).subscribe(({seedInventoryItems, isAnyStaged, currentPlayerId}) => {
-            this.seedSelectionGrid.clear();
-            this.createGrid(seedInventoryItems, evolveSeedController, isAnyStaged, currentPlayerId);
+            this.createOrUpdateGrid(seedInventoryItems, evolveSeedController, isAnyStaged, currentPlayerId);
         });
         
         seedState$.pipe(
@@ -124,26 +123,28 @@ export class SeedInventoryView extends BaseUIObject {
         })
     }
 
-    createGrid(seedInventoryItems: SeedInventoryItem[], evolveSeedController: EvolveSeedController, isAnyStaged: boolean, ownerId: string) {
-        this.inventoryMap = {};
-        seedInventoryItems.forEach((item, index) => {
-            const x = (index % this.cellsPerRow) * this.cellWidth;
-            const y = Math.floor(index / this.cellsPerRow) * this.cellHeight;
-            const cell = new SeedInventoryTile(this.scene, x, y, this.cellWidth, this.cellHeight,
-                item.name, item.amount, ownerId);
+    createOrUpdateGrid(seedInventoryItems: SeedInventoryItem[], evolveSeedController: EvolveSeedController, isAnyStaged: boolean, ownerId: string) {
+        seedInventoryItems
+            .filter(item => Object.keys(this.inventoryMap).indexOf(item.type) === -1)
+            .forEach((item, index) => {
+                const gridIndex = Object.keys(this.inventoryMap).length + index;
+                const x = (gridIndex % this.cellsPerRow) * this.cellWidth;
+                const y = Math.floor(gridIndex / this.cellsPerRow) * this.cellHeight;
+                const cell = new SeedInventoryTile(this.scene, x, y, this.cellWidth, this.cellHeight,
+                    item.name, item.amount, ownerId);
 
-            cell.setBackground(COLOURS.PURPLE_300, COLOURS.PURPLE_400)
-                .onAddSeed(() => {
-                    evolveSeedController.stageSeedForEvolution(item.type);
-                })
-                .onRemoveSeed(() => {
-                    evolveSeedController.unstageSeedForEvolution();
-                })
-                .setData("type", item.type)
-                .setAmount(item.amount, item.amountStagedIndex, isAnyStaged);
-            this.seedSelectionGrid.addChild(cell);
-            this.inventoryMap[item.type] = cell;
-        });
+                cell.setBackground(COLOURS.PURPLE_300, COLOURS.PURPLE_400)
+                    .onAddSeed(() => {
+                        evolveSeedController.stageSeedForEvolution(item.type);
+                    })
+                    .onRemoveSeed(() => {
+                        evolveSeedController.unstageSeedForEvolution();
+                    })
+                    .setData("type", item.type)
+                    .setAmount(item.amount, item.amountStagedIndex, isAnyStaged);
+                this.seedSelectionGrid.addChild(cell);
+                this.inventoryMap[item.type] = cell;
+            });
         this.radioGroup.setButtons(this.seedSelectionGrid.children as Array<BaseButton>);
     }
 
