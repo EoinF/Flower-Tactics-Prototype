@@ -30,8 +30,10 @@ interface PlayerStatus {
 
 export class SeedTypeToPlacedSeedsMap {
     private map: Map<string, Map<number, PlacedSeed>>;
+    count: number;
     
     constructor() {
+        this.count = 0;
         this.map = new Map<string, Map<number, PlacedSeed>>();
     }
     
@@ -83,6 +85,7 @@ export class SeedTypeToPlacedSeedsMap {
             });
             newMap.map.set(type, newTileIndexMap);
         });
+        newMap.count = this.count + 1; 
         return newMap;
     }
 }
@@ -123,12 +126,12 @@ export class GameActionController {
                     if (nextEvent.isReset) {
                         return nextEvent.data as SeedTypeToPlacedSeedsMap;
                     } else {
+                        const newMap = placedSeeds.clone();
                         const {
                             type, tileIndex, ownerId
                         } = nextEvent.data! as PlacedSeedInstance;
-                        const delta = nextEvent.delta;
-                        placedSeeds.addPlacedSeed(type, tileIndex, ownerId, delta);
-                        return placedSeeds;
+                        newMap.addPlacedSeed(type, tileIndex, ownerId, nextEvent.delta);
+                        return newMap;
                     }
                 }, new SeedTypeToPlacedSeedsMap()),
                 shareReplay(1)

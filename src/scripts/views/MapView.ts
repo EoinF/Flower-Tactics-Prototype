@@ -1,7 +1,7 @@
 import { SoilColourConverter } from "../SoilColourConverter";
 import { GameStateController } from "../controllers/GameStateController";
 import { MapController } from "../controllers/MapController";
-import { startWith, pairwise, distinctUntilChanged, withLatestFrom, map, filter, flatMap } from "rxjs/operators";
+import { startWith, pairwise, distinctUntilChanged, withLatestFrom, map, filter, flatMap, tap } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
 import { TileWidget } from "../widgets/specific/TileWidget";
@@ -213,9 +213,10 @@ export class MapView {
 					} else {
 						console.log('battle!', placedSeedGroup);
 						this.competingSeedSprites[placedSeedGroup[0].tileIndex].applyEndOfTurnAnimation(
-							this.scene, placedSeedGroup[0].amount, getPlayerColour(placedSeedGroup[0].ownerId),
+							placedSeedGroup[0].amount, getPlayerColour(placedSeedGroup[0].ownerId),
 							placedSeedGroup[1].amount, getPlayerColour(placedSeedGroup[1].ownerId)
 						);
+						this.placedSeedSprites[placedSeedGroup[0].tileIndex].setVisible(false);
 					}
 				});
 		});

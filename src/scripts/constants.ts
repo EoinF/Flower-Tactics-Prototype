@@ -58,9 +58,11 @@ export const SUCCESS_PLUS_INTERVALS =       [0, 0,      50,     80,     100,    
 export const SUCCESS_PLUS_2_INTERVALS =     [0, 0,      0,      20,     50,     80,     0   ]; // % chance
 export const SUCCESS_PLUS_3_INTERVALS =     [0, 0,      0,      0,      0,      20,     100 ]; // % chance
 
-export const ACTION_RESOLUTION_DURATION = 500;
+export const ACTION_RESOLUTION_DURATION = 700;
 export const APPLYING_DELTAS_DURATION = 50;
 export const RESETTING_ACTIONS_DURATION = 10;
+
+export const END_OF_TURN_DURATION = ACTION_RESOLUTION_DURATION + APPLYING_DELTAS_DURATION;
 
 type SeedPlacementStatusToStringMap = {
     [status in SeedPlacementErrorStatus]: string;

@@ -1,5 +1,5 @@
 import { TextLabel } from "../generic/TextLabel";
-import { COLOURS } from "../../constants";
+import { COLOURS, END_OF_TURN_DURATION } from "../../constants";
 import { BaseUIObject } from "../generic/UIObject";
 
 export class PlacedSeedWidget extends BaseUIObject {
@@ -23,10 +23,6 @@ export class PlacedSeedWidget extends BaseUIObject {
         
         this.container.addChild(this.seedSprite, "Middle", "Middle");
         this.container.addChild(this.amountText, "Bottom", "Right");
-
-        if (this.amount < 2) {
-            this.amountText.setVisible(false);
-        }
     }
 
     getAmount() {
@@ -56,10 +52,10 @@ export class PlacedSeedWidget extends BaseUIObject {
             targets: targets,
             alpha: {from: 1, to: 0},
             ease: 'Linear',
-            duration: 600,
-            delay: 0
-        }).on('complete', () => {
-            this.setVisible(false);
+            duration: END_OF_TURN_DURATION,
+            onComplete: () => {
+                this.setVisible(false);
+            }
         });
     }
 }

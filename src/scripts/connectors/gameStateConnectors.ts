@@ -65,7 +65,7 @@ export function setupGameStateManager(
         const autoPlacedSeedsMap = new SeedTypeToPlacedSeedsMap();
 
         Object.keys(newState.players).forEach(playerId => {
-            if (newState.players[playerId].controlledBy === 'Human') {
+            if (newState.players[playerId].controlledBy === 'Human' || newState.players[playerId].controlledBy === 'None') {
                 Object.keys(newState.players[playerId].autoReplantTileMap).forEach(tileIndexKey => {
                     const type = newState.players[playerId].autoReplantTileMap[tileIndexKey];
                     const tileIndex = parseInt(tileIndexKey);

@@ -40,8 +40,10 @@ export function setupGameInputConnectors(
                 if (inputManager.shift!.isDown
                     && (result === 'INSUFFICIENT_SEEDS_REMAINING' || result === 'OTHER_SEED_TYPE_BLOCKING' || result === 'PLACEMENT_ALLOWED')
                 ) {
-                    const playerOwnedTypeOnTile = placedSeedsMap.getSeedsAtTile(clickedTile).find(seed => seed.ownerId === currentPlayerId)!.type;
-                    gameActionController.removeSeed(playerOwnedTypeOnTile!, clickedTile, currentPlayerId);
+                    const playerOwnedSeedOnTile = placedSeedsMap.getSeedsAtTile(clickedTile).find(seed => seed.ownerId === currentPlayerId);
+                    if (playerOwnedSeedOnTile != null && playerOwnedSeedOnTile.amount > 0) {
+                        gameActionController.removeSeed(playerOwnedSeedOnTile.type, clickedTile, currentPlayerId);
+                    }
                 } else if (result === "PLACEMENT_ALLOWED") {
                     gameActionController.placeSeed(heldSeed.type, clickedTile, currentPlayerId);
                 } else {

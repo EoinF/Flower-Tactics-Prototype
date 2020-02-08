@@ -23,17 +23,19 @@ interface SeedsAvailable {
 }
 
 export function setupAIConnectors(gameStateController: GameStateController, gameActionController: GameActionController, evolveSeedController: EvolveSeedController) {
-    gameStateController.gamePhaseObservable().pipe(
+    const startOfTurn$ = gameStateController.gamePhaseObservable().pipe(
         withLatestFrom(gameStateController.gamePhaseObservable().pipe(skip(1))),
         filter(([_, phase]) => phase === 'ACTION'),
-        switchMap(() => gameStateController.gamePhaseObservable())
-    ).pipe(
-        filter(phase => phase === 'ACTION'),
+        switchMap(() => gameStateController.gamePhaseObservable()),
+        filter(phase => phase === 'ACTION')
+    );
+
+    startOfTurn$.pipe(
         withLatestFrom(
             gameStateController.gameStateObservable()
         ),
         flatMap(([_, gameState]) => Object.keys(gameState.players)
-            .filter(playerId => 
+            .filter(playerId =>
                 gameState.players[playerId].controlledBy === 'AI_1' ||
                 gameState.players[playerId].controlledBy === 'AI_2'
             )
@@ -53,6 +55,19 @@ export function setupAIConnectors(gameStateController: GameStateController, game
             { id: ownedCloudID, tileIndex: placedCloud[ownedCloudID] }
             : null;
         act(playerId, gameState, ownPlacedSeeds, placedSeeds.clone(), ownedCloud, flowerNames, gameStateController, gameActionController)
+    });
+
+    startOfTurn$.pipe(
+        withLatestFrom(
+            gameStateController.gameStateObservable()
+        ),
+        flatMap(([_, gameState]) => Object.keys(gameState.players)
+            .filter(playerId =>
+                gameState.players[playerId].controlledBy === 'None'
+            )
+        )
+    ).subscribe((playerId) => {
+        gameActionController.endTurn(playerId);
     })
 }
 
