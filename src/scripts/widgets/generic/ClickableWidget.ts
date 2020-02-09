@@ -26,24 +26,30 @@ export class ClickableWidget extends BaseUIObject {
         this.pointerState$ = new Subject<PointerState>();
         
         scene.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
-            this.pointerState$.next({
-                pointer,
-                actionType: "pointerUp"
-            });
-            this.onPointerUp();
+            if (this.active) {
+                this.pointerState$.next({
+                    pointer,
+                    actionType: "pointerUp"
+                });
+                this.onPointerUp();
+            }
         });
         this.container.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-            this.pointerState$.next({
-                pointer,
-                actionType: "pointerDown"
-            });
-            this.onPointerDown();
+            if (this.active) {
+                this.pointerState$.next({
+                    pointer,
+                    actionType: "pointerDown"
+                });
+                this.onPointerDown();
+            }
         });
         this.container.on('pointerup', (pointer: Phaser.Input.Pointer) => {
-            this.pointerState$.next({
-                pointer,
-                actionType: "pointerUpOverButton"
-            });
+            if (this.active) {
+                this.pointerState$.next({
+                    pointer,
+                    actionType: "pointerUpOverButton"
+                });
+            }
         });
     }
     
@@ -56,34 +62,6 @@ export class ClickableWidget extends BaseUIObject {
         this.y = y;
         this.container.setPosition(x, y);
         return this;
-    }
-
-    setVisible (isVisible: boolean) {
-        this.visible = isVisible;
-        this.container.setVisible(isVisible);
-        return this;
-    }
-    setDepth (depth: number) {
-        this.container.setDepth(depth);
-        return this;
-    }
-
-    getData(key: string) {
-        return this.container.getData(key);
-    }
-
-    setData(key: string, value: any) {
-        this.container.setData(key, value);
-        return this;
-    }
-
-    removeInteractive() {
-        this.container.removeInteractive();
-        return this;
-    }
-
-    destroy() {
-        this.container.destroy();
     }
 
     setBorder(thickness: number, strokeColour: Phaser.Display.Color) {
@@ -105,14 +83,4 @@ export class ClickableWidget extends BaseUIObject {
     
         return this;
     }
-
-    setAlpha(alpha: number) {
-        this.container.setAlpha(alpha);
-        return this;
-    }
-
-    hits(x: number, y: number) {
-        return this.container.hits(x, y);
-    }
-    
 }

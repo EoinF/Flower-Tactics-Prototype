@@ -27,20 +27,34 @@ export class MainMenuContainer extends FlexUIContainer {
         );
     }
 
-    addBackButton(scene: Phaser.Scene, label: string, onClick: (pointer: Phaser.Input.Pointer) => void) {
+    addConfirmButton(scene: Phaser.Scene, label: string, onClick: (pointer: Phaser.Input.Pointer) => void) {
         if (this.bottomPanel == null) {
-            this.bottomPanel = new UIContainer(scene, 0, 0, 500, 40);
+            this.bottomPanel = new UIContainer(scene, 0, 16, 500, 40);
             this.addChild(this.bottomPanel);
         }
-        this.bottomPanel.addChild(
-            new TextButton(scene, 16, 16, 96, 32, "Back", 
+        const button = new TextButton(scene, 16, 16, 96, 32, label, 
+            COLOURS.WHITE,
+            COLOURS.BLUE_500, COLOURS.BLUE_700,
+            16
+        ).onClick(onClick)
+        .setBorder(1, COLOURS.BLACK);
+
+        this.bottomPanel.addChild(button, "Bottom", "Right");
+        return button;
+    }
+
+    addBackButton(scene: Phaser.Scene, label: string, onClick: (pointer: Phaser.Input.Pointer) => void) {
+        if (this.bottomPanel == null) {
+            this.bottomPanel = new UIContainer(scene, 0, 16, 500, 40);
+            this.addChild(this.bottomPanel);
+        }
+        const button = new TextButton(scene, 16, 16, 96, 32, "Back", 
                 COLOURS.BLACK,
                 COLOURS.WHITE, COLOURS.LIGHT_GRAY,
                 16
-            ).onClick(onClick).setBorder(1, COLOURS.RED),
-            "Bottom", "Left"
-        );
-        return this;
+            ).onClick(onClick).setBorder(1, COLOURS.GRAY)
+        this.bottomPanel.addChild(button, "Bottom", "Left");
+        return button;
     }
 
     addFooterText(scene: Phaser.Scene, text: string) {

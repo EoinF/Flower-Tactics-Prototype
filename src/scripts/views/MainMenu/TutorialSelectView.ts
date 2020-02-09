@@ -4,7 +4,7 @@ import { TextLabel } from "../../widgets/generic/TextLabel";
 import { COLOURS } from "../../constants";
 import { MainMenuContainer } from "../../widgets/generic/MainMenuContainer";
 
-export class LevelSelectView {
+export class TutorialSelectView {
     private loadingMessage: TextLabel;
 
     constructor(scene: Phaser.Scene, mainMenuController: MainMenuController) {
@@ -18,7 +18,7 @@ export class LevelSelectView {
 
         maps.forEach(level => {
             container.addButton(scene, level.label, () => {
-                mainMenuController.loadLevel(level.mapName)
+                mainMenuController.loadLevel(level.mapName);
             });
         })
         
@@ -41,7 +41,7 @@ export class LevelSelectView {
         });
         
         mainMenuController.activeMenuScreenObservable().subscribe(activeMenu => {
-            container.setVisible(activeMenu === "LEVEL_SELECT");
+            container.setVisible(activeMenu === "TUTORIAL_SELECT");
         })
     }
 }

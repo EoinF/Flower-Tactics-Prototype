@@ -1,14 +1,15 @@
 import { gameStateController, guiController, mapController, mainMenuController } from "../game";
 import { combineLatest } from "rxjs";
 import { TutorialRunner } from "../tutorial/TutorialRunner";
-import { SoilColourConverter } from "../SoilColourConverter";
 import { Tutorial1 } from "../tutorial/Tutorial1";
 import { Tutorial2 } from "../tutorial/Tutorial2";
 import { filter, mapTo, startWith, tap, first, skip } from "rxjs/operators";
-import { LevelSelectView } from "../views/MainMenu/LevelSelectView";
+import { TutorialSelectView } from "../views/MainMenu/TutorialSelectView";
 import { MainMenuView } from "../views/MainMenu/MainMenuView";
 import { Tutorial3 } from "../tutorial/Tutorial3";
 import { GameStateData } from "../objects/GameState";
+import { NewGameView } from "../views/MainMenu/NewGameView";
+import { LevelConfig } from "../controllers/MainMenuController";
 
 export default class MainMenuScene extends Phaser.Scene {
     constructor() {
@@ -19,8 +20,9 @@ export default class MainMenuScene extends Phaser.Scene {
         guiController.setScreenState("Main Menu");
         mainMenuController.setActiveMenuScreen("MAIN_MENU");
         this.scene.launch("PreloadScene");
-        new LevelSelectView(this, mainMenuController);
+        new TutorialSelectView(this, mainMenuController);
         new MainMenuView(this, mainMenuController, gameStateController);
+        new NewGameView(this, mainMenuController);
 
         const onLoadedGameAssets$ = mainMenuController.onFinishedLoadingGameAssetsObservable();
         const onSelectLevel$ = mainMenuController.loadLevelObservable();
@@ -28,15 +30,15 @@ export default class MainMenuScene extends Phaser.Scene {
             onSelectLevel$,
             onLoadedGameAssets$.pipe(mapTo(true), startWith(false))
         ).pipe(
-            tap(([levelName, isAssetsLoaded]) => {
+            tap(([levelConfig, isAssetsLoaded]) => {
                 if (!isAssetsLoaded) {
                     mainMenuController.setLoadState("LOADING_GAME_ASSETS")
                 }
             }),
-            filter(([levelName, isAssetsLoaded]) => isAssetsLoaded)
-        ).subscribe(([levelName]) => {
+            filter(([levelConfig, isAssetsLoaded]) => isAssetsLoaded)
+        ).subscribe(([levelConfig]) => {
             mainMenuController.setLoadState("LOADING_MAP_DATA");
-            this.loadMap(levelName);
+            this.loadMap(levelConfig);
         });
 
         gameStateController.loadMapObservable().pipe(first()).subscribe(() => {
@@ -66,7 +68,8 @@ export default class MainMenuScene extends Phaser.Scene {
         });
     }
     
-	loadMap(mapName: string) {
+	loadMap(levelConfig: LevelConfig) {
+        const { mapName, player1, player2 } = levelConfig;
         const tutorialRunner = new TutorialRunner(guiController, mapController, gameStateController)
 
         this.load.on('complete', () => {
@@ -80,6 +83,15 @@ export default class MainMenuScene extends Phaser.Scene {
             }
             if (mapName === "tutorial3") {
                 tutorialRunner.runTutorial(new Tutorial3());
+            }
+
+            const playerList = Object.keys(initialState.players).map(key => initialState.players[key]);
+
+            if (player1 != null) {
+                playerList[0].controlledBy = player1;
+            }
+            if (player2 != null) {
+                playerList[1].controlledBy = player2;
             }
 
             gameStateController.loadGame(initialState);

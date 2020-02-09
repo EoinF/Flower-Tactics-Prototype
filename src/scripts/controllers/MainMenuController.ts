@@ -1,12 +1,22 @@
 import { Subject, Observable, ReplaySubject } from "rxjs";
+import { PlayerType } from '../objects/Player';
 
 export type LoadState = "LOADING_GAME_ASSETS" | "LOADING_MAP_DATA" | "FINISHED";
-export type MainMenuScreen = "MAIN_MENU" | "LEVEL_SELECT";
+export type MainMenuScreen = "MAIN_MENU" | "NEW_GAME" | "TUTORIAL_SELECT";
+
+interface ExtraLevelConfig {
+    player1?: PlayerType,
+    player2?: PlayerType
+}
+
+export type LevelConfig = {
+    mapName: string,
+} & ExtraLevelConfig;
 
 export class MainMenuController {
     private onFinishedLoadingGameAssets$: Subject<void>;
     private loadState$: Subject<LoadState>;
-    private loadLevel$: Subject<string>;
+    private loadLevel$: Subject<LevelConfig>;
     private activeMenuScreen$: Subject<MainMenuScreen>;
 
     constructor() {
@@ -28,15 +38,15 @@ export class MainMenuController {
         this.activeMenuScreen$.next(mainMenuScreen);
     }
 
-    loadLevel(levelName: string) {
-        this.loadLevel$.next(levelName);
+    loadLevel(mapName: string, levelConfig: ExtraLevelConfig = {}) {
+        this.loadLevel$.next({ mapName, ...levelConfig });
     }
 
     onFinishedLoadingGameAssetsObservable(): Observable<void> {
         return this.onFinishedLoadingGameAssets$;
     }
 
-    loadLevelObservable(): Observable<string> {
+    loadLevelObservable(): Observable<LevelConfig> {
         return this.loadLevel$;
     }
 

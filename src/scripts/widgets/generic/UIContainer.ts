@@ -68,7 +68,8 @@ export class UIContainer implements UIObject {
         );
         this.backgroundImage = this.scene.add.rectangle(this.x, this.y, this.width, this.height, 0xccaaff, 0)
             .setOrigin(0, 0)
-            .setDepth(this.depth);
+            .setDepth(this.depth)
+            .setVisible(this.visible);
         
         this._setPosition(ax, ay);
     }
