@@ -2,6 +2,7 @@ import { MainMenuContainer } from "../../widgets/generic/MainMenuContainer";
 import { MainMenuController } from "../../controllers/MainMenuController";
 import { MapGenerator } from "../../MapGenerator";
 import { GameStateController } from "../../controllers/GameStateController";
+import { MapSaver } from "../../MapSaver";
 
 export class MainMenuView {
     constructor(scene: Phaser.Scene, mainMenuController: MainMenuController, gameStateController: GameStateController) {
@@ -21,8 +22,9 @@ export class MainMenuView {
 
         container.addButton(scene, "Generate New Map", () => {
             const generatedMap =
-                new MapGenerator(0).generateNewMap({numTilesX: 15, numTilesY: 20})
+                new MapGenerator().generateNewMap({numTilesX: 16, numTilesY: 16})
             
+            new MapSaver().saveMap(generatedMap);
             gameStateController.loadGame(generatedMap);
         });
 

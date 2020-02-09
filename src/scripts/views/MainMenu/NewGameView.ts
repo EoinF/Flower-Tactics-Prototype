@@ -27,7 +27,7 @@ export class NewGameView {
             const players = ["Human", "CPU"];
             const playersMap = {
                 "Human": "Human",
-                "CPU": "AI_1"
+                "CPU": "AI_2"
             }
             const selectedMap$ = new ReplaySubject<string>(1);
             const selectedPlayer1$ = new ReplaySubject<string>(1);
