@@ -1,8 +1,16 @@
 import { GameState, GameStateData } from "./objects/GameState";
+import uuidv4 from 'uuid/v4';
+
+interface SavedGameData {
+    date: Date;
+    id: string;
+    state: GameStateData;
+}
 
 export class MapSaver {
+    private savedGames: SavedGameData[];
     constructor() {
-
+        this.savedGames = JSON.parse(localStorage.getItem("SavedGames") || "[]") as SavedGameData[];
     }
 
     saveMap(gameState: GameState | GameStateData) {
@@ -26,9 +34,13 @@ export class MapSaver {
         this.save(data);
     }
 
-    private save(data: GameStateData) {
-        const element = document.getElementById("map-data-text")!;
-        element.innerText = JSON.stringify(data);
-        element.style.display = "block";
+    private save(state: GameStateData) {
+        const saveData: SavedGameData = {
+            date: new Date(),
+            id: uuidv4(),
+            state
+        };
+        this.savedGames.push(saveData);
+        localStorage.setItem("SavedGames", JSON.stringify(this.savedGames));
     }
 }
