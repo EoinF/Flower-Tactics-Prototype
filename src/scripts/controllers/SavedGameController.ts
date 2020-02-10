@@ -6,6 +6,7 @@ export interface SavedGameData {
     date: string;
     id: string;
     state: GameStateData;
+    mapName: string;
 }
 
 export class SavedGameController {
@@ -35,7 +36,8 @@ export class SavedGameController {
                     const saveData: SavedGameData = {
                         date: new Date().toLocaleString(),
                         id: data.gameId!,
-                        state: data
+                        state: data,
+                        mapName: data.mapName
                     };
                     const existingSaveIndex = savedGames.findIndex(savedGame => savedGame.id === saveData.id);
                     if (existingSaveIndex !== -1) {
@@ -71,6 +73,7 @@ export class SavedGameController {
     
     private getGameStateData(gameState: GameState): GameStateData {
         return {
+            mapName: gameState.mapName,
             numTilesX: gameState.numTilesX,
             numTilesY: gameState.numTilesY,
             flowerTypes: gameState.flowerTypes,

@@ -5,6 +5,7 @@ import { COLOURS } from "../../constants";
 import { MainMenuContainer } from "../../widgets/generic/MainMenuContainer";
 import { SavedGameController } from "../../controllers/SavedGameController";
 import { withLatestFrom, switchMap, filter } from "rxjs/operators";
+import { FlexUIContainer } from "../../widgets/generic/FlexUIContainer";
 
 export class LoadGameView {
     constructor(scene: Phaser.Scene, mainMenuController: MainMenuController, savedGameController: SavedGameController) {
@@ -31,9 +32,18 @@ export class LoadGameView {
             container = new MainMenuContainer(scene, "Load Game");
 
             savedGames.forEach(savedGame => {
-                container.addButton(scene, savedGame.date, () => {
-                    mainMenuController.loadMap(savedGame.state);
-                });
+                const savedGameContainer = new FlexUIContainer(scene, 0, 4, "grow", "auto");
+                savedGameContainer.addChild(new TextButton(scene, 0, 0, 150, 32, savedGame.mapName)
+                    .onClick(() => {
+                        mainMenuController.loadMap(savedGame.state);
+                    }),
+                    "Middle"
+                )
+                savedGameContainer.addChild(
+                    new TextLabel(scene, 32, 0, savedGame.date, COLOURS.BLACK, { fontSize: 12, isBold: true }),
+                    "Middle"
+                );
+                container.addChild(savedGameContainer);
             })
             
             loadingMessage = new TextLabel(scene, 0, 8, "", COLOURS.BLACK, { isBold: true})
@@ -46,13 +56,14 @@ export class LoadGameView {
         });
 
         mainMenuController.loadStateObservable().subscribe(loadState => {
-            console.log(loadState);
-            if (loadState === 'LOADING_GAME_ASSETS') {
-                loadingMessage.setText("Loading game assets...");
-            } else if (loadState === 'LOADING_MAP_DATA') {
-                loadingMessage.setText("Loading map data...");
-            } else if (loadState === 'FINISHED') {
-                loadingMessage.setText("Creating map sprites...");
+            if (loadingMessage != null) {
+                if (loadState === 'LOADING_GAME_ASSETS') {
+                    loadingMessage.setText("Loading game assets...");
+                } else if (loadState === 'LOADING_MAP_DATA') {
+                    loadingMessage.setText("Loading map data...");
+                } else if (loadState === 'FINISHED') {
+                    loadingMessage.setText("Creating map sprites...");
+                }
             }
         });
     }

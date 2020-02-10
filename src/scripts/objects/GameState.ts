@@ -11,6 +11,7 @@ import { Cloud } from "./Cloud";
 import uuidv4 from 'uuid/v4';
 
 export interface GameStateData {
+    mapName: string;
     gameId: string | null;
     clouds: StringMap<Cloud>;
     randomNumberGeneratorSeed: string;
@@ -27,6 +28,7 @@ export interface GameStateData {
 }
 
 export class GameState implements GameStateData {
+    mapName: string;
     gameId: string | null;
     clouds: StringMap<Cloud>;
     randomNumberGeneratorSeed: string;

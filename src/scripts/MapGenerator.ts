@@ -30,6 +30,7 @@ export class MapGenerator {
         mountains = mountains.filter(mountain => rivers.every(river => river.x !== mountain.x || river.y !== mountain.y));
 
         return {
+            mapName: "Generated",
             numTilesX,
             numTilesY,
             gameId: null,

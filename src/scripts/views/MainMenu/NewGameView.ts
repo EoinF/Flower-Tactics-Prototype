@@ -59,12 +59,12 @@ export class NewGameView {
                 .setOrigin(0.5, 0.5);
             container.addChild(this.loadingMessage);
             
-            container.addBackButton(scene, "Back to Main Menu", () => {
+            container.addBackButton(scene, "Back", () => {
                 mainMenuController.setActiveMenuScreen("MAIN_MENU");
             });
             const beginButton = container.addConfirmButton(scene, "Begin", () => {
                 onClickBegin$.next();
-            })
+            });
 
             combineLatest(
                 selectedPlayer1$,

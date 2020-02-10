@@ -1,7 +1,7 @@
 import { SoilColourConverter } from "../SoilColourConverter";
 import { GameStateController } from "../controllers/GameStateController";
 import { MapController } from "../controllers/MapController";
-import { startWith, pairwise, distinctUntilChanged, withLatestFrom, map, filter, flatMap, tap } from "rxjs/operators";
+import { startWith, pairwise, distinctUntilChanged, withLatestFrom, map, filter, flatMap, tap, first } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { PlacedSeedWidget } from "../widgets/specific/PlacedSeedWidget";
 import { TileWidget } from "../widgets/specific/TileWidget";
@@ -51,35 +51,44 @@ export class MapView {
 		this.cloudSprites = [];
 		this.placedSeedSprites = [];
 		this.competingSeedSprites = [];
-
-        this.setupSprites(scene, gameStateController);
-        this.setupCallbacks(gameStateController, gameActionController, mapController, heldObjectController, guiController, flowerSelectionController);
+		gameStateController.gamePhaseObservable().pipe(
+			filter(phase => phase === 'INIT'),
+			withLatestFrom(gameStateController.gameStateObservable())
+		).subscribe(([_, gameState]) => {
+			console.log('setup sprites');
+			this.setupSprites(scene, gameState);
+		});
+		gameStateController.gamePhaseObservable().pipe(
+			filter(phase => phase === 'INIT'),
+			first(),
+			withLatestFrom(gameStateController.gameStateObservable())
+		).subscribe(() => {
+			this.setupCallbacks(gameStateController, gameActionController, mapController, heldObjectController, guiController, flowerSelectionController);
+		});
     }
 
-    setupSprites(scene: Phaser.Scene, gameStateController: GameStateController) {
-		gameStateController.loadMapObservable().subscribe((gameState) => {
-			this.setupTileSprites(gameState);
-			this.setupFlowerSprites(gameState);
-			this.setupCloudSprites(gameState);
-		
-			this.mountainSprites.forEach(s => s.destroy());
-			this.mountainSprites = gameState.mountains.map((mountain) => {
-				const img = scene.add.image(mountain.x * 48, mountain.y * 48, 'mountain')
-					.setDepth(5);
-				return img;
-			});
-			this.riverSprites.forEach(s => s.destroy());
-			this.riverSprites = gameState.rivers.map((river) => {
-				const img = scene.add.image(river.x * 48, river.y * 48, 'river')
-					.setDepth(5);
-				return img;
-			});
-
-			this.placedCloudWidget = new PlacedCloudWidget(scene, 0, 0, COLOURS.BLACK)
-				.setDepth(6)
-				.setAlpha(0.6)
-				.setVisible(false);
+    setupSprites(scene: Phaser.Scene, gameState: GameState) {
+		this.setupTileSprites(gameState);
+		this.setupFlowerSprites(gameState);
+		this.setupCloudSprites(gameState);
+	
+		this.mountainSprites.forEach(s => s.destroy());
+		this.mountainSprites = gameState.mountains.map((mountain) => {
+			const img = scene.add.image(mountain.x * 48, mountain.y * 48, 'mountain')
+				.setDepth(5);
+			return img;
 		});
+		this.riverSprites.forEach(s => s.destroy());
+		this.riverSprites = gameState.rivers.map((river) => {
+			const img = scene.add.image(river.x * 48, river.y * 48, 'river')
+				.setDepth(5);
+			return img;
+		});
+
+		this.placedCloudWidget = new PlacedCloudWidget(scene, 0, 0, COLOURS.BLACK)
+			.setDepth(6)
+			.setAlpha(0.6)
+			.setVisible(false);
     }
 
 	setupTileSprites(gameState: GameState) {

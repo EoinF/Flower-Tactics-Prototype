@@ -1,6 +1,7 @@
 {
     "numTilesX": 5,
     "numTilesY": 7,
+    "mapName": "Tutorial 3",
     "tiles": [
         {
             "index": 0,

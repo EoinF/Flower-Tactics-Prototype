@@ -1,6 +1,7 @@
 {
     "numTilesX": 16,
     "numTilesY": 16,
+    "mapName": "Circles",
     "tiles": [
         {
             "index": 0,

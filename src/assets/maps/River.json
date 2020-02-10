@@ -1,6 +1,7 @@
 {
     "numTilesX": 14,
     "numTilesY": 14,
+    "mapName": "River",
     "tiles": [
         {
             "index": 0,

@@ -3,7 +3,7 @@ import { combineLatest, merge, Observable, Subject } from "rxjs";
 import { TutorialRunner } from "../tutorial/TutorialRunner";
 import { Tutorial1 } from "../tutorial/Tutorial1";
 import { Tutorial2 } from "../tutorial/Tutorial2";
-import { filter, mapTo, startWith, tap, first, skip, flatMap } from "rxjs/operators";
+import { filter, mapTo, startWith, tap, first, skip, flatMap, delay } from "rxjs/operators";
 import { TutorialSelectView } from "../views/MainMenu/TutorialSelectView";
 import { MainMenuView } from "../views/MainMenu/MainMenuView";
 import { Tutorial3 } from "../tutorial/Tutorial3";
@@ -47,21 +47,31 @@ export default class MainMenuScene extends Phaser.Scene {
             gameStateController.loadGame(gameStateData);
         });
 
-        gameStateController.loadMapObservable().pipe(first()).subscribe(() => {
-            this.scene.launch('MainScene');
-            this.scene.launch('UIScene');
-            this.scene.launch('EvolveSeedScene');
-            this.scene.launch('OverlayScene');
-            mainMenuController.setLoadState("FINISHED");
-            guiController.setScreenState("In Game");
+        gameStateController.loadMapObservable().pipe(
+            first(),
+            tap(() => {
+                this.scene.launch('MainScene');
+                this.scene.launch('UIScene');
+                this.scene.launch('EvolveSeedScene');
+                this.scene.launch('OverlayScene');
+                mainMenuController.setLoadState("FINISHED");
+            }),
+            delay(1)
+        ).subscribe(() => {
             gameStateController.setGamePhase("INIT");
+            guiController.setScreenState("In Game");
         });
 
-        gameStateController.loadMapObservable().pipe(skip(1)).subscribe(() => {
-            mainMenuController.setLoadState("FINISHED");
-            guiController.setScreenState("In Game");
+        gameStateController.loadMapObservable().pipe(
+            skip(1),
+            tap(() => {
+                mainMenuController.setLoadState("FINISHED");
+            }),
+            delay(1)
+        ).subscribe(() => {
             gameStateController.setGamePhase("INIT");
-        })
+            guiController.setScreenState("In Game");
+        });
 
         guiController.screenStateObservable().subscribe(screenState => {
             if (screenState === 'Main Menu') {
