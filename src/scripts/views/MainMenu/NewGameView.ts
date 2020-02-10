@@ -9,7 +9,7 @@ import { Subject, combineLatest, ReplaySubject } from "rxjs";
 import { TextButton } from "../../widgets/generic/TextButton";
 
 export class NewGameView {
-    private loadingMessage: TextLabel;
+    private loadingMessage: TextLabel | null;
 
     constructor(scene: Phaser.Scene, mainMenuController: MainMenuController) {
         let container: MainMenuContainer | null = null;
@@ -72,11 +72,15 @@ export class NewGameView {
                 if (player1 === 'Human' && player2 === 'Human') {
                     beginButton.setAlpha(0.3);
                     beginButton.setActive(false);
-                    this.loadingMessage.setText("Human vs Human not supported");
+                    if (this.loadingMessage != null) {
+                        this.loadingMessage.setText("Human vs Human not supported");
+                    }
                 } else {
                     beginButton.setAlpha(1);
                     beginButton.setActive(true);
-                    this.loadingMessage.setText("");
+                    if (this.loadingMessage != null) {
+                        this.loadingMessage.setText("");
+                    }
                 }
             });
 
@@ -90,12 +94,14 @@ export class NewGameView {
         });
 
         mainMenuController.loadStateObservable().subscribe(loadState => {
-            if (loadState === 'LOADING_GAME_ASSETS') {
-                this.loadingMessage.setText("Loading game assets...");
-            } else if (loadState === 'LOADING_MAP_DATA') {
-                this.loadingMessage.setText("Loading map data...");
-            } else {
-                this.loadingMessage.setText("");
+            if (this.loadingMessage != null) {
+                if (loadState === 'LOADING_GAME_ASSETS') {
+                    this.loadingMessage.setText("Loading game assets...");
+                } else if (loadState === 'LOADING_MAP_DATA') {
+                    this.loadingMessage.setText("Loading map data...");
+                } else if (loadState === 'FINISHED') {
+                    this.loadingMessage.setText("Creating map sprites...");
+                }
             }
         });
         

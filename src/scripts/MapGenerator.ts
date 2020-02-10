@@ -32,6 +32,7 @@ export class MapGenerator {
         return {
             numTilesX,
             numTilesY,
+            gameId: null,
             tiles: this.generateTiles(numTilesX, numTilesY),
             flowersMap: {
                 "0": {

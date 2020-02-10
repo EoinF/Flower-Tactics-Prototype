@@ -13,6 +13,8 @@ import { setupGameStateManager } from './gameStateConnectors';
 import { GameActionController } from '../controllers/GameActionController';
 import { setupGameInputConnectors } from './gameInputConnectors';
 import { setupAIConnectors } from './aiConnectors';
+import { SavedGameController } from '../controllers/SavedGameController';
+import { setupGameSaverConnectors } from './gameSaverConnectors';
 
 interface TileLocation {
     tileX: number,
@@ -38,7 +40,8 @@ export function setupConnectors(
     flowerSelectionController: FlowerSelectionController,
     selectedObjectController: SelectedObjectController,
     evolveSeedController: EvolveSeedController,
-    heldObjectController: HeldObjectController
+    heldObjectController: HeldObjectController,
+    savedGameController: SavedGameController
 ) {
     const isMouseOverSeedContainer$ = guiController.mouseOverSeedContainerObservable();
     const isMouseOverFlowerSelection$ = guiController.mouseOverFlowerSelectionObservable();
@@ -53,6 +56,7 @@ export function setupConnectors(
     setupGameDeltaManager(gameStateController, gameDeltaController, gameActionController);
     setupGameInputConnectors(gameStateController, gameDeltaController, heldObjectController, guiController, mapController, gameActionController);
     setupAIConnectors(gameStateController, gameActionController, evolveSeedController);
+    setupGameSaverConnectors(gameStateController, savedGameController);
 
     combineLatest(gameState$, currentPlayer$).pipe(
         map(([state, currentPlayerId]) => state.players[currentPlayerId as string].seedsOwned),

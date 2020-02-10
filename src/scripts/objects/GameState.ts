@@ -8,8 +8,10 @@ import { SeedStatus } from "./SeedStatus";
 import { Player } from "./Player";
 import { FlowerAugmentation } from "./FlowerAugmentation";
 import { Cloud } from "./Cloud";
+import uuidv4 from 'uuid/v4';
 
 export interface GameStateData {
+    gameId: string | null;
     clouds: StringMap<Cloud>;
     randomNumberGeneratorSeed: string;
     numTilesX: number;
@@ -25,6 +27,7 @@ export interface GameStateData {
 }
 
 export class GameState implements GameStateData {
+    gameId: string | null;
     clouds: StringMap<Cloud>;
     randomNumberGeneratorSeed: string;
     private randomNumberGenerator: Phaser.Math.RandomDataGenerator;
@@ -49,6 +52,9 @@ export class GameState implements GameStateData {
         Object.keys(data).forEach(key => {
             this[key] = data[key];
         });
+        if (data.gameId == null) {
+            this.gameId = uuidv4();
+        }
         this.turnCounter = turnCounter;
         this.tileToFlowerIndexMap = new Map<Tile, string>();
         this.tileToRiverMap = new Map<Tile, River>();

@@ -1,6 +1,6 @@
 import { SoilColourConverter } from "../SoilColourConverter";
 import { MapView } from "../views/MapView";
-import { gameStateController, selectedObjectController, mapController, guiController, heldObjectController, gameDeltaController, gameActionController, flowerSelectionController } from "../game";
+import { gameStateController, selectedObjectController, mapController, guiController, heldObjectController, gameActionController, flowerSelectionController } from "../game";
 import { TileStatsView } from "../views/TileStatsView";
 import { combineLatest } from "rxjs";
 

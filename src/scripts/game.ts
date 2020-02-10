@@ -18,6 +18,7 @@ import MainMenuScene from './scenes/mainMenuScene'
 import { MainMenuController } from './controllers/MainMenuController'
 import { of } from 'rxjs'
 import { flatMap } from 'rxjs/operators'
+import { SavedGameController, SavedGameData } from './controllers/SavedGameController'
 
 const DEFAULT_WIDTH = 1280
 const DEFAULT_HEIGHT = 720
@@ -57,6 +58,7 @@ export const flowerSelectionController = new FlowerSelectionController();
 export const evolveSeedController = new EvolveSeedController();
 export const heldObjectController = new HeldObjectController();
 export const mainMenuController = new MainMenuController();
+export const savedGameController = new SavedGameController(); 
 setupConnectors(
   guiController,
   gameStateController,
@@ -66,5 +68,9 @@ setupConnectors(
   flowerSelectionController,
   selectedObjectController,
   evolveSeedController,
-  heldObjectController
+  heldObjectController,
+  savedGameController
 );
+
+const savedGames = JSON.parse(localStorage.getItem("SavedGames") || "[]") as SavedGameData[];
+savedGameController.setSavedGames(savedGames);
