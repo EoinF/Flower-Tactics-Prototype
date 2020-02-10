@@ -6,15 +6,16 @@ import { ArrowSelectionWidget } from "../../widgets/generic/ArrowSelectionWidget
 import { UIContainer } from "../../widgets/generic/UIContainer";
 import { withLatestFrom, filter } from "rxjs/operators";
 import { Subject, combineLatest, ReplaySubject } from "rxjs";
-import { TextButton } from "../../widgets/generic/TextButton";
 
 export class NewGameView {
     private loadingMessage: TextLabel | null;
 
     constructor(scene: Phaser.Scene, mainMenuController: MainMenuController) {
         let container: MainMenuContainer | null = null;
-        const assetsLoadingMessageContainer = new UIContainer(scene, 0, 0, 200, 100, "Middle", "Middle");
-        assetsLoadingMessageContainer.addChild(new TextLabel(scene, 0, 0, "Loading..."), "Middle", "Middle");
+        const assetsLoadingMessageContainer = new UIContainer(scene, 0, 0, 250, 48, "Middle", "Middle")
+            .setBackground(COLOURS.PURPLE_300)
+            .setBorder(1, COLOURS.GRAY);
+        assetsLoadingMessageContainer.addChild(new TextLabel(scene, 0, 0, "Loading Assets...", undefined, {isBold: true}), "Middle", "Middle");
 
         mainMenuController.onFinishedLoadingGameAssetsObservable().pipe(
             withLatestFrom(mainMenuController.activeMenuScreenObservable())

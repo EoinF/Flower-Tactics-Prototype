@@ -6,6 +6,7 @@ export class PlacedSeedWidget extends BaseUIObject {
     private amount: number;
     private amountText: TextLabel;
     private seedSprite: Phaser.GameObjects.Image;
+    private endOfTurnAnimation: Phaser.Tweens.Tween;
 
     constructor(scene: Phaser.Scene,
         x: number, y: number,
@@ -20,6 +21,18 @@ export class PlacedSeedWidget extends BaseUIObject {
 
         this.seedSprite = scene.add.image(0, 0, 'seed2')
             .setTint(playerColour.color);
+
+        this.endOfTurnAnimation = scene.tweens.add({
+            targets: [this.seedSprite, this.amountText],
+            alpha: {from: 1, to: 0},
+            ease: 'Linear',
+            duration: END_OF_TURN_DURATION,
+            onComplete: () => {
+                this.endOfTurnAnimation.pause();
+                this.endOfTurnAnimation.seek(0);
+                this.setVisible(false);
+            }
+        });
         
         this.container.addChild(this.seedSprite, "Middle", "Middle");
         this.container.addChild(this.amountText, "Bottom", "Right");
@@ -44,18 +57,6 @@ export class PlacedSeedWidget extends BaseUIObject {
         this.setAmount(amount);
         this.setColour(colour);
 
-        const targets: any = [this.seedSprite];
-        if (amount > 1) {
-            targets.push(this.amountText);
-        }
-        scene.tweens.add({
-            targets: targets,
-            alpha: {from: 1, to: 0},
-            ease: 'Linear',
-            duration: END_OF_TURN_DURATION,
-            onComplete: () => {
-                this.setVisible(false);
-            }
-        });
+        this.endOfTurnAnimation.play();
     }
 }
