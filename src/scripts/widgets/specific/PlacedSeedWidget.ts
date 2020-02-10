@@ -27,6 +27,7 @@ export class PlacedSeedWidget extends BaseUIObject {
             alpha: {from: 1, to: 0},
             ease: 'Linear',
             duration: END_OF_TURN_DURATION,
+            paused: true,
             onComplete: () => {
                 this.endOfTurnAnimation.pause();
                 this.endOfTurnAnimation.seek(0);
@@ -58,5 +59,6 @@ export class PlacedSeedWidget extends BaseUIObject {
         this.setColour(colour);
 
         this.endOfTurnAnimation.play();
+        this.endOfTurnAnimation.restart();
     }
 }
