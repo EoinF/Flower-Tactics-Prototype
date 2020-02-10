@@ -32,21 +32,23 @@ export class SavedGameController {
                     return dataOrReset.data as SavedGameData[];
                 } else {
                     const data = dataOrReset.data as GameStateData;
-                
-                    const saveData: SavedGameData = {
-                        date: new Date().toLocaleString(),
-                        id: data.gameId!,
-                        state: data,
-                        mapName: data.mapName
-                    };
-                    const existingSaveIndex = savedGames.findIndex(savedGame => savedGame.id === saveData.id);
-                    if (existingSaveIndex !== -1) {
-                        savedGames[existingSaveIndex] = saveData;
-                    } else {
-                        if (savedGames.length >= 3) {
-                            savedGames.pop();
+                    // Don't save tutorials
+                    if (["Tutorial 1", "Tutorial 2", "Tutorial 3"].indexOf(data.mapName) === -1) {
+                        const saveData: SavedGameData = {
+                            date: new Date().toLocaleString(),
+                            id: data.gameId!,
+                            state: data,
+                            mapName: data.mapName
+                        };
+                        const existingSaveIndex = savedGames.findIndex(savedGame => savedGame.id === saveData.id);
+                        if (existingSaveIndex !== -1) {
+                            savedGames[existingSaveIndex] = saveData;
+                        } else {
+                            if (savedGames.length >= 3) {
+                                savedGames.pop();
+                            }
+                            savedGames.unshift(saveData);
                         }
-                        savedGames.unshift(saveData);
                     }
                     return savedGames;
                 }
