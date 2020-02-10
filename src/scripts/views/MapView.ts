@@ -211,7 +211,6 @@ export class MapView {
 							this.scene, placedSeedGroup[0].amount, getPlayerColour(placedSeedGroup[0].ownerId)
 						);
 					} else {
-						console.log('battle!', placedSeedGroup);
 						this.competingSeedSprites[placedSeedGroup[0].tileIndex].applyEndOfTurnAnimation(
 							placedSeedGroup[0].amount, getPlayerColour(placedSeedGroup[0].ownerId),
 							placedSeedGroup[1].amount, getPlayerColour(placedSeedGroup[1].ownerId)

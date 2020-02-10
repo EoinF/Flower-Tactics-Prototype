@@ -1,6 +1,6 @@
 import { GameStateController } from "../controllers/GameStateController";
 import { GameActionController, PlacedSeed, SeedTypeToPlacedSeedsMap } from "../controllers/GameActionController";
-import { withLatestFrom, filter, skip, switchMap, flatMap } from "rxjs/operators";
+import { withLatestFrom, filter, skip, switchMap, flatMap, startWith, tap, pairwise } from "rxjs/operators";
 import { GameState } from "../objects/GameState";
 import { getPlacementStatus } from "./utils";
 import { isRequirementsSatisfied } from "../deltaCalculators/helpers";
@@ -24,9 +24,9 @@ interface SeedsAvailable {
 
 export function setupAIConnectors(gameStateController: GameStateController, gameActionController: GameActionController, evolveSeedController: EvolveSeedController) {
     const startOfTurn$ = gameStateController.gamePhaseObservable().pipe(
-        withLatestFrom(gameStateController.gamePhaseObservable().pipe(skip(1))),
+        pairwise(),
         filter(([_, phase]) => phase === 'ACTION'),
-        switchMap(() => gameStateController.gamePhaseObservable()),
+        switchMap(() => gameStateController.gamePhaseObservable().pipe(startWith('ACTION'))),
         filter(phase => phase === 'ACTION')
     );
 
@@ -88,14 +88,28 @@ function act(playerId: string, gameState: GameState, ownPlacedSeeds: PlacedSeed[
             flowerStats: gameState.flowerTypes[seedStatus.type]
         }
 
-        const opponentAdjacentTiles = tryPlaceSeeds(uniqueTiles, seedsAvailable, playerId, gameState, placedSeedsMap, gameActionController);
+        const ownedFlowersOfType = gameState.players[playerId].flowers
+            .filter(flowerKey => gameState.flowersMap[flowerKey].type === seedStatus.type);
 
-        if (opponentAdjacentTiles.length > 0) {
-            placeCompetingSeeds(seedsAvailable, opponentAdjacentTiles, gameState, playerId, placedSeedsMap, gameActionController);
-        }
+        // Prioritize evolving before placing seeds in the early game
+        const flowersPriority = Math.max(1, 10 - ownedFlowersOfType.length);
+        const seedsPriority = Math.max(1, ownedFlowersOfType.length - Math.sqrt(seedsAvailable.amount));
+        const priority = gameState.getNextRandomNumber(0, seedsPriority + flowersPriority);
 
-        if (seedsAvailable.amount > 50) {
-            tryEvolveSeed(seedsAvailable, gameState, flowerNames, playerId, gameStateController);
+        if (priority > seedsPriority) {
+            const opponentAdjacentTiles = tryPlaceSeeds(uniqueTiles, seedsAvailable, playerId, gameState, placedSeedsMap, gameActionController);
+            
+            if (opponentAdjacentTiles.length > 0) {
+                placeCompetingSeeds(seedsAvailable, opponentAdjacentTiles, gameState, playerId, placedSeedsMap, gameActionController);
+            }
+            
+            if (seedsAvailable.amount > 10 * Math.max(1, Math.floor(Math.sqrt(reversedSeedsOwned.length)))) {
+                tryEvolveSeed(seedsAvailable, gameState, flowerNames, playerId, gameStateController);
+            }
+        } else {
+            if (seedsAvailable.amount > 10 * Math.max(1, Math.floor(Math.sqrt(reversedSeedsOwned.length)))) {
+                tryEvolveSeed(seedsAvailable, gameState, flowerNames, playerId, gameStateController);
+            }
         }
     });
     gameActionController.endTurn(playerId);
@@ -171,7 +185,16 @@ function tryEvolveSeed(seedsAvailable: SeedsAvailable, gameState: GameState, flo
         seedsRequired
     }));
     seedsAvailable.amount -= seedsRequired;
-    gameStateController.applyDelta(getEvolveResultDelta(gameState, choices[0], playerId));
+
+    const soilDeltas = ["nitrogen", "potassium", "phosphorous"];
+    const choice = choices.find(
+        c => c.newFlowerDelta.getDeltas()
+            .some(value => {
+                const deltaKey = value.keys[value.keys.length - 1].toString();
+                return soilDeltas.indexOf(deltaKey) !== -1;
+            })
+        ) || choices[0];
+    gameStateController.applyDelta(getEvolveResultDelta(gameState, choice, playerId));
 }
 
 function placeCompetingSeeds(seedsAvailable: SeedsAvailable, opponentAdjacentTiles: number[], gameState: GameState, 

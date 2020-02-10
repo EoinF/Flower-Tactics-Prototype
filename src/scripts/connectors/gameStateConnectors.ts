@@ -1,9 +1,9 @@
 import { GameState } from "../objects/GameState";
 import { FlowerType } from "../objects/FlowerType";
-import { SEED_INTERVALS } from "../constants";
+import { SEED_INTERVALS, APPLYING_DELTAS_DURATION, RESETTING_ACTIONS_DURATION, ACTION_RESOLUTION_DURATION } from "../constants";
 import { GuiController } from "../controllers/GuiController";
 import { GameStateController } from "../controllers/GameStateController";
-import { withLatestFrom, map, filter } from "rxjs/operators";
+import { withLatestFrom, map, filter, tap, delay, publish, subscribeOn } from "rxjs/operators";
 import { GameDeltaController } from "../controllers/GameDeltaController";
 import { EvolveSeedController, EvolutionChoice } from "../controllers/EvolveSeedController";
 import { GameStateDelta } from "../objects/GameStateDelta";
@@ -33,56 +33,75 @@ export function setupGameStateManager(
 
     gameStateController.gamePhaseObservable().pipe(
         filter(gamePhase => gamePhase === 'INIT'),
-        withLatestFrom(gameStateController.gameStateObservable())
-    ).subscribe(([_, gameState]) => {
-        gameActionController.setPlayers(Object.keys(gameState.players));
+        withLatestFrom(gameStateController.gameStateObservable()),
+        tap(([_, gameState]) => {
+            gameActionController.setPlayers(Object.keys(gameState.players));
+        }),
+        // This is scheduled for later to avoid the weirdness of ACTION phase
+        // showing up before INIT phase in other subscriptions 
+        // (Because INIT is not yet done emitting, and calling subject.next will immediately emit the next event)
+        delay(1)
+    ).subscribe(() => {
         gameStateController.setGamePhase('ACTION');
     });
 
-    gameActionController.endOfTurnObservable().subscribe(() => {
-        gameStateController.setGamePhase("ACTION_RESOLUTION");
+    gameActionController.endOfTurnObservable().pipe(
+        tap(() => {
+            gameStateController.setGamePhase("ACTION_RESOLUTION");
+        }),
+        delay(ACTION_RESOLUTION_DURATION)
+    ).subscribe(() => {
+        gameStateController.setGamePhase("APPLYING_DELTAS");
     })
 
     // Apply the end of turn delta
     gameStateController.gamePhaseObservable().pipe(
         filter(gamePhase => gamePhase === "APPLYING_DELTAS"),
-        withLatestFrom(gameState$, gameDelta$, placedSeeds$)
-    ).subscribe(([_, gameState, gameDelta, placedSeeds]) => {
-        gameStateController.applyDelta(calculateFinalDelta(gameState, gameDelta, placedSeeds));
-    });
+        withLatestFrom(gameState$, gameDelta$, placedSeeds$),
+        tap(([_, gameState, gameDelta, placedSeeds]) => {
+            gameStateController.applyDelta(calculateFinalDelta(gameState, gameDelta, placedSeeds));
+        }),
+        delay(APPLYING_DELTAS_DURATION)
+    ).subscribe(() => {
+        gameStateController.setGamePhase("RESETTING_ACTIONS");
+    })
 
     // Get the new state applied after ending turn
     gameStateController.gamePhaseObservable().pipe(
         filter(gamePhase => gamePhase === "RESETTING_ACTIONS"),
         withLatestFrom(gameState$),
-    ).subscribe(([_, newState]) => {
-        const seedsRemainingByType: StringMap<number> = {};
-        Object.keys(newState.seedStatus)
-            .forEach(key => {
-                seedsRemainingByType[key] = newState.seedStatus[key].quantity;
+        tap(([_, newState]) => {
+            const seedsRemainingByType: StringMap<number> = {};
+            Object.keys(newState.seedStatus)
+                .forEach(key => {
+                    seedsRemainingByType[key] = newState.seedStatus[key].quantity;
+                });
+
+            const autoPlacedSeedsMap = new SeedTypeToPlacedSeedsMap();
+
+            Object.keys(newState.players).forEach(playerId => {
+                if (newState.players[playerId].controlledBy === 'Human' || newState.players[playerId].controlledBy === 'None') {
+                    Object.keys(newState.players[playerId].autoReplantTileMap).forEach(tileIndexKey => {
+                        const type = newState.players[playerId].autoReplantTileMap[tileIndexKey];
+                        const tileIndex = parseInt(tileIndexKey);
+
+                        const status = getPlacementStatus(newState.tiles[tileIndex], newState, playerId, autoPlacedSeedsMap, type);
+                        
+                        if (status === "PLACEMENT_ALLOWED" && seedsRemainingByType[type] > 0) {
+                            autoPlacedSeedsMap.addPlacedSeed(type, tileIndex, playerId);
+                            seedsRemainingByType[type]--;
+                        }
+                    });
+                }
             });
 
-        const autoPlacedSeedsMap = new SeedTypeToPlacedSeedsMap();
-
-        Object.keys(newState.players).forEach(playerId => {
-            if (newState.players[playerId].controlledBy === 'Human' || newState.players[playerId].controlledBy === 'None') {
-                Object.keys(newState.players[playerId].autoReplantTileMap).forEach(tileIndexKey => {
-                    const type = newState.players[playerId].autoReplantTileMap[tileIndexKey];
-                    const tileIndex = parseInt(tileIndexKey);
-
-                    const status = getPlacementStatus(newState.tiles[tileIndex], newState, playerId, autoPlacedSeedsMap, type);
-                    
-                    if (status === "PLACEMENT_ALLOWED" && seedsRemainingByType[type] > 0) {
-                        autoPlacedSeedsMap.addPlacedSeed(type, tileIndex, playerId);
-                        seedsRemainingByType[type]--;
-                    }
-                });
-            }
-        });
-
-        gameActionController.resetClouds();
-        gameActionController.resetSeeds(autoPlacedSeedsMap);
-    });
+            gameActionController.resetClouds();
+            gameActionController.resetSeeds(autoPlacedSeedsMap);
+        }),
+        delay(RESETTING_ACTIONS_DURATION)
+    ).subscribe(() => {
+        gameStateController.setGamePhase("ACTION");
+    })
     
     onClickEvolveButton$.pipe(
         withLatestFrom(gameState$, stagedSeeds$)

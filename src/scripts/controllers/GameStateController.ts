@@ -84,37 +84,7 @@ export class GameStateController {
 
     gamePhaseObservable(): Observable<GamePhase> {
         return this.gamePhase$.pipe(
-            flatMap<GamePhase, GamePhaseWithDelay[]>(phase => {
-                let nextPhases = [{
-                    nextPhase: phase,
-                    delayedBy: 0
-                }];
-                if (phase === 'ACTION_RESOLUTION') {
-                    nextPhases = [
-                        ...nextPhases,
-                        {
-                            nextPhase: 'APPLYING_DELTAS',
-                            delayedBy: ACTION_RESOLUTION_DURATION
-                        },
-                        {
-                            nextPhase: 'RESETTING_ACTIONS',
-                            delayedBy: ACTION_RESOLUTION_DURATION + RESETTING_ACTIONS_DURATION
-                        },
-                        {
-                            nextPhase: 'ACTION',
-                            delayedBy: ACTION_RESOLUTION_DURATION + RESETTING_ACTIONS_DURATION + APPLYING_DELTAS_DURATION
-                        }
-                    ];
-                } else if (phase !== 'INIT' && phase !== 'ACTION') {
-                    console.error(`Not allowed to directly set the phase to ${phase}. Set it to ACTION_RESOLUTION to apply end of turn effects`);
-                }
-                return nextPhases;
-            }),
-            delayWhen((phaseWithDelay) =>
-                timer(phaseWithDelay.delayedBy)
-            ),
-            map(phaseWithDelay => phaseWithDelay.nextPhase),
-            distinctUntilChanged(),
+            distinctUntilChanged()
         );
     }
     
