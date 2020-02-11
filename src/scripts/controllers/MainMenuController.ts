@@ -16,6 +16,8 @@ export type LevelConfig = {
 
 export class MainMenuController {
     private onFinishedLoadingGameAssets$: Subject<void>;
+    // private onFinishedLoadingScenes$: Observable<void>;
+    private onFinishedLoadingMainScene$: Subject<void>;
     private loadState$: Subject<LoadState>;
     private loadMap$: Subject<GameStateData>;
     private startNewLevel$: Subject<LevelConfig>;
@@ -23,6 +25,7 @@ export class MainMenuController {
 
     constructor() {
         this.onFinishedLoadingGameAssets$ = new ReplaySubject(1);
+        this.onFinishedLoadingMainScene$ = new ReplaySubject(1);
         this.loadState$ = new ReplaySubject(1);
         this.startNewLevel$ = new Subject();
         this.loadMap$ = new Subject();
@@ -31,6 +34,10 @@ export class MainMenuController {
     
     setFinishedLoadingGameAssets() {
         this.onFinishedLoadingGameAssets$.next();
+    }
+
+    setFinishedLoadingMainScene() {
+        this.onFinishedLoadingMainScene$.next();
     }
 
     setLoadState(loadState: LoadState) {
@@ -51,6 +58,10 @@ export class MainMenuController {
 
     onFinishedLoadingGameAssetsObservable(): Observable<void> {
         return this.onFinishedLoadingGameAssets$;
+    }
+
+    onFinishedLoadingMainSceneObservable(): Observable<void> {
+        return this.onFinishedLoadingMainScene$;
     }
 
     startNewLevelObservable(): Observable<LevelConfig> {

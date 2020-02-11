@@ -16,6 +16,7 @@ import { PlacedFlowerWidget } from "../widgets/specific/PlacedFlowerWidget";
 import { CompetingSeedsWidget } from "../widgets/specific/CompetingSeedsWidget";
 import { GuiController } from "../controllers/GuiController";
 import { FlowerSelectionController } from "../controllers/FlowerSelectionController";
+import { mainMenuController } from "../game";
 
 export class MapView {
     scene: Phaser.Scene;
@@ -51,17 +52,13 @@ export class MapView {
 		this.cloudSprites = [];
 		this.placedSeedSprites = [];
 		this.competingSeedSprites = [];
-		gameStateController.gamePhaseObservable().pipe(
-			filter(phase => phase === 'INIT'),
-			withLatestFrom(gameStateController.gameStateObservable())
-		).subscribe(([_, gameState]) => {
-			console.log('setup sprites');
+		gameStateController.loadMapObservable().subscribe((gameState) => {
 			this.setupSprites(scene, gameState);
+			mainMenuController.setFinishedLoadingMainScene();
 		});
-		gameStateController.gamePhaseObservable().pipe(
-			filter(phase => phase === 'INIT'),
-			first(),
-			withLatestFrom(gameStateController.gameStateObservable())
+		
+		gameStateController.loadMapObservable().pipe(
+			first()
 		).subscribe(() => {
 			this.setupCallbacks(gameStateController, gameActionController, mapController, heldObjectController, guiController, flowerSelectionController);
 		});

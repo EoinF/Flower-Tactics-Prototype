@@ -29,6 +29,7 @@ export default class MainMenuScene extends Phaser.Scene {
         const onLoadedGameAssets$ = mainMenuController.onFinishedLoadingGameAssetsObservable();
         const onSelectLevel$ = mainMenuController.startNewLevelObservable();
         const onLoadMap$ = mainMenuController.loadMapObservable();
+        const onFinishedLoadingMainScene$ = mainMenuController.onFinishedLoadingMainSceneObservable();
         combineLatest(
             merge(
                 onSelectLevel$.pipe(flatMap(levelConfig => this.loadMap(levelConfig))),
@@ -38,37 +39,33 @@ export default class MainMenuScene extends Phaser.Scene {
         ).pipe(
             tap(([gameStateData, isAssetsLoaded]) => {
                 if (!isAssetsLoaded) {
-                    mainMenuController.setLoadState("LOADING_GAME_ASSETS")
+                    mainMenuController.setLoadState("LOADING_GAME_ASSETS");
                 }
             }),
-            filter(([gameStateData, isAssetsLoaded]) => isAssetsLoaded)
+            filter(([gameStateData, isAssetsLoaded]) => isAssetsLoaded),
+            tap(() => mainMenuController.setLoadState("LOADING_MAP_DATA")),
+            delay(1)
         ).subscribe(([gameStateData]) => {
-            mainMenuController.setLoadState("LOADING_MAP_DATA");
             gameStateController.loadGame(gameStateData);
         });
 
         gameStateController.loadMapObservable().pipe(
-            first(),
-            tap(() => {
-                this.scene.launch('MainScene');
-                this.scene.launch('UIScene');
-                this.scene.launch('EvolveSeedScene');
-                this.scene.launch('OverlayScene');
-                mainMenuController.setLoadState("FINISHED");
-            }),
-            delay(1)
+            first()
         ).subscribe(() => {
-            gameStateController.setGamePhase("INIT");
-            guiController.setScreenState("In Game");
+            this.scene.launch('MainScene');
+            this.scene.launch('UIScene');
+            this.scene.launch('EvolveSeedScene');
+            this.scene.launch('OverlayScene');
+            mainMenuController.setLoadState("FINISHED");
         });
 
         gameStateController.loadMapObservable().pipe(
             skip(1),
-            tap(() => {
-                mainMenuController.setLoadState("FINISHED");
-            }),
-            delay(1)
         ).subscribe(() => {
+            mainMenuController.setLoadState("FINISHED");
+        });
+        
+        onFinishedLoadingMainScene$.subscribe(() => {
             gameStateController.setGamePhase("INIT");
             guiController.setScreenState("In Game");
         });
