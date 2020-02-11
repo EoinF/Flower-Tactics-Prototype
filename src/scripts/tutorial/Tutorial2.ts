@@ -8,7 +8,7 @@ export class Tutorial2 extends TutorialBase {
         callbacks.showTips([
             {
                 title: this.title,
-                content: "In this tutorial you'll learn how to evolve your existing seeds so they can cover varying soil types.",
+                content: "In this tutorial you'll learn how to evolve your seeds so they can cover various soil types.",
                 position: { x: 300, y: 250 }
             },
             {
@@ -89,7 +89,7 @@ export class Tutorial2 extends TutorialBase {
                 callbacks.showTips([
                     {
                         title: this.title,
-                        content: "The odds of success are shown on the right. Click on > again to stage more seeds. This will improve the chances of a successful evolution.",
+                        content: "The odds of success are shown on the right. Click on > again to stage more seeds.",
                         position: { x: 470, y: 320 }
                     }
                 ]);
@@ -110,7 +110,7 @@ export class Tutorial2 extends TutorialBase {
                 callbacks.showTips([
                     {
                         title: this.title,
-                        content: "Not only does this improve the chances of success, but it also produces better results.",
+                        content: "Adding more seeds increases your chances of getting better improvements.",
                         position: { x: 470, y: 320 }
                     },
                     {

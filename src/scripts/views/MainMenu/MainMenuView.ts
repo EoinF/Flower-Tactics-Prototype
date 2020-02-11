@@ -19,13 +19,6 @@ export class MainMenuView {
             mainMenuController.setActiveMenuScreen("LOAD_GAME");
         });
 
-        container.addButton(scene, "Generate New Map", () => {
-            const generatedMap =
-                new MapGenerator().generateNewMap({numTilesX: 16, numTilesY: 16})
-            
-            gameStateController.loadGame(generatedMap);
-        });
-
         container.addFooterText(scene, "version 1.0");
 
         mainMenuController.activeMenuScreenObservable().subscribe(activeMenu => {

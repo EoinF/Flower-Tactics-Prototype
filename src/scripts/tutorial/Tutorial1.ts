@@ -58,12 +58,12 @@ export class Tutorial1 extends TutorialBase {
                     },
                     {
                         title: this.title,
-                        content: "Click a tile on the map and then end your turn to create a new flower. This will produce a flower of the same type with growth set to 0",
+                        content: "Planting a seed on the map will grow a new flower at the end of your turn. You can only plant seeds on tiles next to flowers you own. ",
                         position: undefined
                     },
                     {
                         title: this.title,
-                        content: "You can only plant seeds on tiles adjacent to flowers you own.",
+                        content: "Now click the '+' button and plant the seed.",
                         position: undefined
                     }
                 ])
@@ -77,7 +77,7 @@ export class Tutorial1 extends TutorialBase {
                 callbacks.showTips([
                     {
                         title: this.title,
-                        content: "When placing seeds, some tiles have little stars in them. This means that the soil meets the requirements of that flower type.",
+                        content: "When planting seeds, some tiles have little stars in them. This means that the soil meets the requirements of that flower type.",
                         position: { x: 300, y: 250 }
                     },
                     {

@@ -63,12 +63,12 @@ export class Tutorial3 extends TutorialBase {
                     },
                     {
                         title: this.title,
-                        content: "Whoever has more seeds on a tile gets a flower on that tile. The other player's seeds are lost.",
+                        content: "Whoever has more seeds on a tile gets a flower on that tile. The other player's seeds are lost forever.",
                         position: undefined
                     },
                     {
                         title: this.title,
-                        content: "Plant 2 seeds on the tile to challenge your opponent on that tile.",
+                        content: "Plant 2 seeds on the tile to challenge your opponent for that place.",
                         position: undefined
                     }
                 ])
@@ -84,7 +84,7 @@ export class Tutorial3 extends TutorialBase {
                 callbacks.showTips([
                     {
                         title: this.title,
-                        content: "Good job! Now expand your flowers onto the river tile to finish the tutorial.",
+                        content: "Good job! Now expand your flowers onto the river to finish the tutorial.",
                         position: { x: 348, y: 250 }
                     }
                 ]);
@@ -96,10 +96,12 @@ export class Tutorial3 extends TutorialBase {
         this.addEvent(
             1,
             (gameState, playerId) => (Object.keys(gameState.flowersMap)
-                .some(flowerKey => 
+                .some(flowerKey =>
                     gameState.players[playerId].seedsOwned.indexOf(gameState.flowersMap[flowerKey].type) !== -1 &&
-                    gameState.rivers[0].x === gameState.flowersMap[flowerKey].x &&
-                    gameState.rivers[0].y === gameState.flowersMap[flowerKey].y
+                    gameState.rivers.some(river =>
+                        river.x === gameState.flowersMap[flowerKey].x &&
+                        river.y === gameState.flowersMap[flowerKey].y
+                    )
                 )
             ),
             (callbacks: TutorialRunnerCallbacks) => {
