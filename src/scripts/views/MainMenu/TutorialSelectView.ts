@@ -18,7 +18,7 @@ export class TutorialSelectView {
 
         maps.forEach(level => {
             container.addButton(scene, level.label, () => {
-                mainMenuController.loadLevel(level.mapName);
+                mainMenuController.startNewLevel(level.mapName);
             });
         })
         

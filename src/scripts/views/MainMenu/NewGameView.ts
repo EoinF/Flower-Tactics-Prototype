@@ -90,7 +90,7 @@ export class NewGameView {
             ).subscribe(([_, mapName, player1, player2]) => {
                 let playerType1 = playersMap[player1];
                 let playerType2 = playersMap[player2];
-                mainMenuController.loadLevel(mapName, { player1: playerType1, player2: playerType2 });
+                mainMenuController.startNewLevel(mapName, { player1: playerType1, player2: playerType2 });
             });
         });
 

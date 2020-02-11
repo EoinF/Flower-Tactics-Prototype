@@ -27,7 +27,7 @@ export default class MainMenuScene extends Phaser.Scene {
         new LoadGameView(this, mainMenuController, savedGameController);
 
         const onLoadedGameAssets$ = mainMenuController.onFinishedLoadingGameAssetsObservable();
-        const onSelectLevel$ = mainMenuController.loadLevelObservable();
+        const onSelectLevel$ = mainMenuController.startNewLevelObservable();
         const onLoadMap$ = mainMenuController.loadMapObservable();
         combineLatest(
             merge(

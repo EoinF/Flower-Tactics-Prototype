@@ -1,3 +1,9 @@
+declare global {
+    interface Window { 
+        ga: (type: 'send', otherData: any) => void;
+    }
+}
+
 export interface StringMap<T> {
     [key: string]: T;
 }

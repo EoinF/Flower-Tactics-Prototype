@@ -18,13 +18,13 @@ export class MainMenuController {
     private onFinishedLoadingGameAssets$: Subject<void>;
     private loadState$: Subject<LoadState>;
     private loadMap$: Subject<GameStateData>;
-    private loadLevel$: Subject<LevelConfig>;
+    private startNewLevel$: Subject<LevelConfig>;
     private activeMenuScreen$: Subject<MainMenuScreen>;
 
     constructor() {
         this.onFinishedLoadingGameAssets$ = new ReplaySubject(1);
         this.loadState$ = new ReplaySubject(1);
-        this.loadLevel$ = new Subject();
+        this.startNewLevel$ = new Subject();
         this.loadMap$ = new Subject();
         this.activeMenuScreen$ = new ReplaySubject(1);
     }
@@ -41,8 +41,8 @@ export class MainMenuController {
         this.activeMenuScreen$.next(mainMenuScreen);
     }
 
-    loadLevel(mapName: string, levelConfig: ExtraLevelConfig = {}) {
-        this.loadLevel$.next({ mapName, ...levelConfig });
+    startNewLevel(mapName: string, levelConfig: ExtraLevelConfig = {}) {
+        this.startNewLevel$.next({ mapName, ...levelConfig });
     }
 
     loadMap(data: GameStateData) {
@@ -53,8 +53,8 @@ export class MainMenuController {
         return this.onFinishedLoadingGameAssets$;
     }
 
-    loadLevelObservable(): Observable<LevelConfig> {
-        return this.loadLevel$;
+    startNewLevelObservable(): Observable<LevelConfig> {
+        return this.startNewLevel$;
     }
     
     loadMapObservable(): Observable<GameStateData> {

@@ -1,5 +1,5 @@
-import { withLatestFrom, map, filter, flatMap, first, distinctUntilChanged, mapTo, scan, tap, startWith, pairwise } from 'rxjs/operators';
-import { combineLatest, merge, of, Subject } from 'rxjs';
+import { withLatestFrom, map, filter, startWith, pairwise } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
 import { GuiController } from '../controllers/GuiController';
 import { GameStateController } from '../controllers/GameStateController';
 import { MapController } from '../controllers/MapController';
@@ -13,8 +13,10 @@ import { setupGameStateManager } from './gameStateConnectors';
 import { GameActionController } from '../controllers/GameActionController';
 import { setupGameInputConnectors } from './gameInputConnectors';
 import { setupAIConnectors } from './aiConnectors';
+import { setupAnalyticsConnectors } from './analyticsConnectors';
 import { SavedGameController } from '../controllers/SavedGameController';
 import { setupGameSaverConnectors } from './gameSaverConnectors';
+import { mainMenuController } from '../game';
 
 interface TileLocation {
     tileX: number,
@@ -57,6 +59,7 @@ export function setupConnectors(
     setupGameInputConnectors(gameStateController, gameDeltaController, heldObjectController, guiController, mapController, gameActionController);
     setupAIConnectors(gameStateController, gameActionController, evolveSeedController);
     setupGameSaverConnectors(gameStateController, savedGameController);
+    setupAnalyticsConnectors(mainMenuController, guiController, evolveSeedController, flowerSelectionController, gameActionController);
 
     combineLatest(gameState$, currentPlayer$).pipe(
         map(([state, currentPlayerId]) => state.players[currentPlayerId as string].seedsOwned),
